@@ -4,10 +4,10 @@ import {
   Monitor,
   Users,
   Clock,
-  Graduation,
+  GraduationCap,
   Home,
   Music,
-  Swim,
+  Waves,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -30,7 +30,7 @@ const FacilitiesSection = () => {
       description: "Extensive collection of books, digital resources, and comfortable study spaces.",
     },
     {
-      icon: <Graduation className="h-10 w-10 text-school-primary" />,
+      icon: <GraduationCap className="h-10 w-10 text-school-primary" />,
       title: "Specialized Classrooms",
       description: "Subject-specific classrooms equipped with interactive displays and learning materials.",
     },
@@ -40,7 +40,7 @@ const FacilitiesSection = () => {
       description: "Experienced educators dedicated to personalized student development and growth.",
     },
     {
-      icon: <Swim className="h-10 w-10 text-school-primary" />,
+      icon: <Waves className="h-10 w-10 text-school-primary" />,
       title: "Sports Complex",
       description: "Indoor and outdoor sports facilities including a swimming pool, courts, and playing fields.",
     },
