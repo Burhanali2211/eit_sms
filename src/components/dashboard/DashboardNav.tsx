@@ -1,3 +1,4 @@
+
 import { useAuth } from "@/contexts/AuthContext";
 import { MenuItem } from "@/types/dashboard";
 import { 
@@ -175,7 +176,7 @@ const DashboardNav = () => {
             )
           }
         >
-          {item.icon && <item.icon className="mr-3" size={20} />}
+          {item.icon && React.createElement(item.icon, { size: 20, className: "mr-3" })}
           <span>{item.title}</span>
         </NavLink>
       ))}
