@@ -1,4 +1,3 @@
-
 import { useAuth } from "@/contexts/AuthContext";
 import { MenuItem } from "@/types/dashboard";
 import { 
@@ -18,7 +17,7 @@ import {
   Database,
   Monitor
 } from "lucide-react";
-import React from "react"; // Add the explicit React import
+import React from "react";
 import { NavLink } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
@@ -176,8 +175,7 @@ const DashboardNav = () => {
             )
           }
         >
-          {/* Fix: Using the Icon component properly */}
-          {item.icon && React.createElement(item.icon, { size: 20, className: "mr-3" })}
+          {item.icon && <item.icon className="mr-3" size={20} />}
           <span>{item.title}</span>
         </NavLink>
       ))}
