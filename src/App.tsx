@@ -14,6 +14,8 @@ import Profile from "./pages/dashboard/Profile";
 import Notifications from "./pages/dashboard/Notifications";
 import Calendar from "./pages/dashboard/Calendar";
 import Unauthorized from "./pages/dashboard/Unauthorized";
+import SchoolOverview from "./pages/dashboard/SchoolOverview";
+import Staff from "./pages/dashboard/Staff";
 
 // Student pages
 import Courses from "./pages/dashboard/student/Courses";
@@ -65,6 +67,20 @@ const App = () => (
             <Route path="/dashboard/unauthorized" element={
               <ProtectedRoute>
                 <Unauthorized />
+              </ProtectedRoute>
+            } />
+            
+            {/* School Overview page for principal and super admin */}
+            <Route path="/dashboard/school-overview" element={
+              <ProtectedRoute allowedRoles={['principal', 'super-admin']}>
+                <SchoolOverview />
+              </ProtectedRoute>
+            } />
+            
+            {/* Staff management for principal, school-admin and super-admin */}
+            <Route path="/dashboard/staff" element={
+              <ProtectedRoute allowedRoles={['principal', 'school-admin', 'super-admin']}>
+                <Staff />
               </ProtectedRoute>
             } />
             

@@ -3,8 +3,9 @@ import { useAuth } from "@/contexts/AuthContext";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { Button } from "@/components/ui/button";
-import { Shield } from "lucide-react";
+import { Shield, AlertTriangle, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const Unauthorized = () => {
   const { user } = useAuth();
@@ -23,9 +24,28 @@ const Unauthorized = () => {
             You don't have permission to access this page. Your current role 
             ({user?.role || 'Unknown'}) doesn't have the required privileges.
           </p>
-          <Button onClick={() => navigate('/dashboard')}>
-            Return to Dashboard
-          </Button>
+          
+          <Alert variant="destructive" className="mb-6">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertTitle>Access Restricted</AlertTitle>
+            <AlertDescription>
+              This area requires elevated permissions. Please contact your administrator if you believe you should have access.
+            </AlertDescription>
+          </Alert>
+          
+          <div className="space-x-4">
+            <Button onClick={() => navigate('/dashboard')} variant="default">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Return to Dashboard
+            </Button>
+            
+            <Button 
+              onClick={() => navigate(-1)} 
+              variant="outline"
+            >
+              Go Back
+            </Button>
+          </div>
         </div>
       </div>
     </DashboardLayout>

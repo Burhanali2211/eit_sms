@@ -175,7 +175,8 @@ const DashboardNav = () => {
             )
           }
         >
-          <item.icon className="mr-3 h-5 w-5" />
+          {/* Fix: Using a proper way to render the icon with className */}
+          {item.icon && React.createElement(item.icon, { className: "mr-3 h-5 w-5" })}
           <span>{item.title}</span>
         </NavLink>
       ))}
