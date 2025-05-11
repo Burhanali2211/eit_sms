@@ -18,6 +18,7 @@ import {
   Database,
   Monitor
 } from "lucide-react";
+import React from "react"; // Add the explicit React import
 import { NavLink } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
@@ -175,8 +176,8 @@ const DashboardNav = () => {
             )
           }
         >
-          {/* Fix: Using a proper way to render the icon with className */}
-          {item.icon && React.createElement(item.icon, { className: "mr-3 h-5 w-5" })}
+          {/* Fix: Using the Icon component properly with the correct TypeScript typing */}
+          {item.icon && <item.icon className="mr-3 h-5 w-5" />}
           <span>{item.title}</span>
         </NavLink>
       ))}
