@@ -176,7 +176,11 @@ const DashboardNav = () => {
             )
           }
         >
-          {item.icon && <span className="mr-3">{React.createElement(item.icon, { size: 20 })}</span>}
+          {item.icon && (
+            <span className="mr-3">
+              {React.createElement(item.icon, { size: 20 })}
+            </span>
+          )}
           <span>{item.title}</span>
         </NavLink>
       ))}
