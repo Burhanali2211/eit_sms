@@ -17,38 +17,34 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
+import { useAuth } from "@/contexts/AuthContext";
+import { UserRole } from "@/types/dashboard";
 import { toast } from "@/components/ui/use-toast";
 
 const Login = () => {
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(false);
+  const { login, isLoading } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("student");
+  const [role, setRole] = useState<UserRole>("student");
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
     
-    // Simulate authentication process
-    setTimeout(() => {
-      setIsLoading(false);
-      
-      // Mock authentication logic
-      if (email && password) {
-        toast({
-          title: "Login Successful",
-          description: `Logged in as ${role}`,
-        });
-        navigate("/dashboard");
-      } else {
-        toast({
-          variant: "destructive",
-          title: "Login Failed",
-          description: "Please enter valid credentials",
-        });
-      }
-    }, 1500);
+    if (!email || !password) {
+      toast({
+        variant: "destructive",
+        title: "Login Failed",
+        description: "Please enter valid credentials",
+      });
+      return;
+    }
+    
+    try {
+      await login(email, password, role);
+    } catch (error) {
+      console.error("Login error:", error);
+    }
   };
 
   return (
@@ -79,13 +75,20 @@ const Login = () => {
                     <select
                       id="role"
                       value={role}
-                      onChange={(e) => setRole(e.target.value)}
+                      onChange={(e) => setRole(e.target.value as UserRole)}
                       className="w-full p-2 border rounded-md bg-white"
                     >
                       <option value="student">Student</option>
                       <option value="teacher">Teacher</option>
-                      <option value="admin">Admin</option>
                       <option value="principal">Principal</option>
+                      <option value="admin">Admin</option>
+                      <option value="financial">Financial Admin</option>
+                      <option value="admission">Admission Admin</option>
+                      <option value="school-admin">School Admin</option>
+                      <option value="labs">Labs Admin</option>
+                      <option value="club">Club Admin</option>
+                      <option value="library">Library Admin</option>
+                      <option value="super-admin">Super Admin</option>
                     </select>
                   </div>
                   
@@ -132,6 +135,13 @@ const Login = () => {
                   >
                     {isLoading ? "Logging in..." : "Log in"}
                   </Button>
+                  
+                  <div className="text-sm text-gray-500 text-center mt-2">
+                    <p>For demo purposes, use these credentials:</p>
+                    <p className="font-medium">Email: [role]@edusync.com</p>
+                    <p className="font-medium">Password: password123</p>
+                    <p className="text-xs">Example: student@edusync.com</p>
+                  </div>
                 </form>
               </TabsContent>
               
