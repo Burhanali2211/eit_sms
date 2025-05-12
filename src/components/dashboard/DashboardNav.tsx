@@ -177,8 +177,8 @@ const DashboardNav = () => {
           }
         >
           {item.icon && (
-            <span className="mr-3">
-              {React.createElement(item.icon, {})}
+            <span className="mr-3 w-5 h-5 flex items-center justify-center">
+              {React.createElement(item.icon)}
             </span>
           )}
           <span>{item.title}</span>
