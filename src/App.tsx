@@ -29,6 +29,10 @@ import UserManagement from "./pages/dashboard/admin/UserManagement";
 import SystemSettings from "./pages/dashboard/admin/SystemSettings";
 import SystemDatabase from "./pages/dashboard/admin/SystemDatabase";
 import SchoolManagement from "./pages/dashboard/admin/SchoolManagement";
+import LabResources from "./pages/dashboard/admin/LabResources";
+import ClubActivities from "./pages/dashboard/admin/ClubActivities";
+import Library from "./pages/dashboard/admin/Library";
+import Admissions from "./pages/dashboard/admin/Admissions";
 
 const queryClient = new QueryClient();
 
@@ -133,6 +137,34 @@ const App = () => (
             <Route path="/dashboard/database" element={
               <ProtectedRoute allowedRoles={['super-admin']}>
                 <SystemDatabase />
+              </ProtectedRoute>
+            } />
+            
+            {/* Lab Resources route */}
+            <Route path="/dashboard/labs" element={
+              <ProtectedRoute allowedRoles={['labs', 'principal', 'super-admin']}>
+                <LabResources />
+              </ProtectedRoute>
+            } />
+            
+            {/* Clubs & Activities route */}
+            <Route path="/dashboard/clubs" element={
+              <ProtectedRoute allowedRoles={['club', 'principal', 'super-admin']}>
+                <ClubActivities />
+              </ProtectedRoute>
+            } />
+            
+            {/* Library route */}
+            <Route path="/dashboard/library" element={
+              <ProtectedRoute allowedRoles={['library', 'principal', 'super-admin']}>
+                <Library />
+              </ProtectedRoute>
+            } />
+            
+            {/* Admissions route */}
+            <Route path="/dashboard/admissions" element={
+              <ProtectedRoute allowedRoles={['admission', 'principal', 'super-admin']}>
+                <Admissions />
               </ProtectedRoute>
             } />
             
