@@ -24,6 +24,7 @@ const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
   }
 
   if (!isAuthenticated) {
+    // Save the current location so we can redirect back after login
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 

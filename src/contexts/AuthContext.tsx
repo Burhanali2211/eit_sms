@@ -1,7 +1,7 @@
 
 import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { User, UserRole } from '@/types/dashboard';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from '@/components/ui/use-toast';
 
 interface AuthContextType {
@@ -118,12 +118,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     // Check for existing session in localStorage
     const storedUser = localStorage.getItem('eduSync_user');
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (error) {
+        // If JSON parsing fails, clear the corrupted data
+        localStorage.removeItem('eduSync_user');
+        console.error("Failed to parse stored user data");
+      }
     }
     setIsLoading(false);
   }, []);
@@ -162,13 +169,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         description: `Welcome back, ${userData.name}!`,
       });
       
-      navigate('/dashboard');
+      // Redirect user to where they were trying to go or dashboard
+      const from = location.state?.from?.pathname || "/dashboard";
+      navigate(from, { replace: true });
     } catch (error) {
       toast({
         variant: 'destructive',
         title: 'Login failed',
         description: error instanceof Error ? error.message : 'Unknown error occurred',
       });
+      throw error; // Re-throw to be caught by the login component
     } finally {
       setIsLoading(false);
     }

@@ -1,6 +1,6 @@
 
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -24,11 +24,20 @@ import { Eye, EyeOff, Lock, User } from "lucide-react";
 
 const Login = () => {
   const navigate = useNavigate();
-  const { login, isLoading } = useAuth();
+  const location = useLocation();
+  const { login, isLoading, isAuthenticated } = useAuth();
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [password, setPassword] = useState("password123");
   const [role, setRole] = useState<UserRole>("student");
   const [showPassword, setShowPassword] = useState(false);
+  
+  // Check if user is already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      const from = location.state?.from?.pathname || "/dashboard";
+      navigate(from, { replace: true });
+    }
+  }, [isAuthenticated, navigate, location]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,17 +53,10 @@ const Login = () => {
     
     try {
       await login(email, password, role);
-      toast({
-        title: "Login Successful",
-        description: "Welcome back to EduSync Academy!",
-      });
+      // No need for toast here as the login function handles it
     } catch (error) {
+      // Error is handled in the login function
       console.error("Login error:", error);
-      toast({
-        variant: "destructive",
-        title: "Login Failed",
-        description: "Invalid credentials. Please try again.",
-      });
     }
   };
 
@@ -68,6 +70,8 @@ const Login = () => {
     
     // Auto-fill email based on role for demo purposes
     setEmail(`${selectedRole}@edusync.com`);
+    // Set default password
+    setPassword("password123");
   };
 
   return (
