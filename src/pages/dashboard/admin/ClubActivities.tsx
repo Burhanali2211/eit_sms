@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
@@ -55,7 +56,7 @@ import {
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 
-// Mock data for clubs and activities
+// Mock data for clubs and activities - explicitly typed to match ClubActivity
 const mockActivities: ClubActivity[] = [
   {
     id: "1",
@@ -173,20 +174,19 @@ const ClubActivities = () => {
       return;
     }
     
-    const updatedActivities: ClubActivity[] = [
-      ...activities,
-      {
-        id: (activities.length + 1).toString(),
-        name: newActivity.name,
-        description: newActivity.description,
-        schedule: newActivity.schedule,
-        location: newActivity.location,
-        members: newActivity.members,
-        status: newActivity.status as "active" | "inactive"
-      }
-    ];
+    // Create new activity with proper typing
+    const newActivityWithId: ClubActivity = {
+      id: (activities.length + 1).toString(),
+      name: newActivity.name,
+      description: newActivity.description,
+      schedule: newActivity.schedule,
+      location: newActivity.location,
+      members: newActivity.members,
+      status: newActivity.status // This is already correctly typed from the state
+    };
     
-    setActivities(updatedActivities);
+    setActivities([...activities, newActivityWithId]);
+    
     setIsAddingActivity(false);
     setNewActivity({
       name: "",
