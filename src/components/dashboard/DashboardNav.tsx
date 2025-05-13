@@ -162,16 +162,16 @@ const DashboardNav = () => {
   );
 
   return (
-    <nav className="space-y-1">
+    <nav className="space-y-1 px-2 py-3">
       {navItems.map((item) => (
         <NavLink
           key={item.href}
           to={item.href}
           className={({ isActive }) =>
             cn(
-              "flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors",
+              "flex items-center px-3 py-2.5 text-sm font-medium rounded-md transition-colors",
               isActive
-                ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                ? "bg-school-primary/10 text-school-primary font-semibold"
                 : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
             )
           }

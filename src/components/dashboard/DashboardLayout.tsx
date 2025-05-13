@@ -18,23 +18,24 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
-        <Sidebar className="bg-white border-r">
-          <SidebarHeader className="px-6 py-4">
+        <Sidebar className="bg-white border-r shadow-sm">
+          <SidebarHeader className="px-6 py-6 border-b">
             <div className="flex items-center">
-              <h2 className="text-xl font-bold text-school-primary">
-                EduSync<span className="text-school-secondary">Academy</span>
+              <h2 className="text-xl font-bold">
+                <span className="text-school-primary">Edu</span>
+                <span className="text-school-secondary">Sync</span>
               </h2>
             </div>
           </SidebarHeader>
           
-          <SidebarContent>
+          <SidebarContent className="py-2">
             <DashboardNav />
           </SidebarContent>
           
-          <SidebarFooter className="px-6 py-4">
+          <SidebarFooter className="px-6 py-4 border-t mt-auto">
             <Button
               variant="outline"
-              className="w-full flex items-center justify-center"
+              className="w-full flex items-center justify-center hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors"
               onClick={logout}
             >
               <LogOut className="h-4 w-4 mr-2" />
