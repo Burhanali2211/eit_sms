@@ -137,7 +137,16 @@ const ClubActivities = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
   const [isAddingActivity, setIsAddingActivity] = useState(false);
-  const [newActivity, setNewActivity] = useState<Omit<ClubActivity, "id">>({
+  
+  // Define newActivity with explicitly typed status
+  const [newActivity, setNewActivity] = useState<{
+    name: string;
+    description: string;
+    schedule: string;
+    location: string;
+    members: number;
+    status: "active" | "inactive"; // Explicitly type status with the union type
+  }>({
     name: "",
     description: "",
     schedule: "",
@@ -182,7 +191,7 @@ const ClubActivities = () => {
       schedule: newActivity.schedule,
       location: newActivity.location,
       members: newActivity.members,
-      status: newActivity.status // This is already correctly typed from the state
+      status: newActivity.status // This is now correctly typed
     };
     
     setActivities([...activities, newActivityWithId]);
