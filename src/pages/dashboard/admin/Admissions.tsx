@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
@@ -193,7 +192,7 @@ const Admissions = () => {
     }
     
     const today = new Date().toISOString().split('T')[0];
-    const updatedApplications = [
+    const updatedApplications: AdmissionApplication[] = [
       ...applications,
       {
         id: (applications.length + 1).toString(),

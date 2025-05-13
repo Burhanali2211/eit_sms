@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
@@ -174,7 +173,7 @@ const ClubActivities = () => {
       return;
     }
     
-    const updatedActivities = [
+    const updatedActivities: ClubActivity[] = [
       ...activities,
       {
         id: (activities.length + 1).toString(),
