@@ -177,7 +177,12 @@ const ClubActivities = () => {
       ...activities,
       {
         id: (activities.length + 1).toString(),
-        ...newActivity
+        name: newActivity.name,
+        description: newActivity.description,
+        schedule: newActivity.schedule,
+        location: newActivity.location,
+        members: newActivity.members,
+        status: newActivity.status as "active" | "inactive"
       }
     ];
     
@@ -357,7 +362,10 @@ const ClubActivities = () => {
                           <Switch 
                             id="status"
                             checked={newActivity.status === "active"}
-                            onCheckedChange={(checked) => setNewActivity({...newActivity, status: checked ? "active" : "inactive"})}
+                            onCheckedChange={(checked) => setNewActivity({
+                              ...newActivity, 
+                              status: checked ? "active" : "inactive"
+                            })}
                           />
                           <Label htmlFor="status">
                             {newActivity.status === "active" ? "Active" : "Inactive"}
