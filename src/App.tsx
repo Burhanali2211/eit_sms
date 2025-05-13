@@ -25,6 +25,10 @@ import Classes from "./pages/dashboard/teacher/Classes";
 
 // Admin pages
 import Finance from "./pages/dashboard/finance/Finance";
+import UserManagement from "./pages/dashboard/admin/UserManagement";
+import SystemSettings from "./pages/dashboard/admin/SystemSettings";
+import SystemDatabase from "./pages/dashboard/admin/SystemDatabase";
+import SchoolManagement from "./pages/dashboard/admin/SchoolManagement";
 
 const queryClient = new QueryClient();
 
@@ -102,6 +106,33 @@ const App = () => (
             <Route path="/dashboard/finance" element={
               <ProtectedRoute allowedRoles={['financial', 'principal', 'super-admin']}>
                 <Finance />
+              </ProtectedRoute>
+            } />
+            
+            {/* Admin & Super Admin routes */}
+            <Route path="/dashboard/users" element={
+              <ProtectedRoute allowedRoles={['admin', 'super-admin']}>
+                <UserManagement />
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/dashboard/system" element={
+              <ProtectedRoute allowedRoles={['admin', 'super-admin']}>
+                <SystemSettings />
+              </ProtectedRoute>
+            } />
+            
+            {/* School admin routes */}
+            <Route path="/dashboard/school-management" element={
+              <ProtectedRoute allowedRoles={['school-admin', 'principal', 'super-admin']}>
+                <SchoolManagement />
+              </ProtectedRoute>
+            } />
+            
+            {/* Super Admin only route */}
+            <Route path="/dashboard/database" element={
+              <ProtectedRoute allowedRoles={['super-admin']}>
+                <SystemDatabase />
               </ProtectedRoute>
             } />
             
