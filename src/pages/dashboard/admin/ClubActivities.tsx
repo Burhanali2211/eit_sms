@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
@@ -138,14 +137,14 @@ const ClubActivities = () => {
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
   const [isAddingActivity, setIsAddingActivity] = useState(false);
   
-  // Define newActivity with explicitly typed status
+  // Define newActivity with explicitly typed status as a union type
   const [newActivity, setNewActivity] = useState<{
     name: string;
     description: string;
     schedule: string;
     location: string;
     members: number;
-    status: "active" | "inactive"; // Explicitly type status with the union type
+    status: "active" | "inactive"; // Explicitly use the union type
   }>({
     name: "",
     description: "",
@@ -191,7 +190,7 @@ const ClubActivities = () => {
       schedule: newActivity.schedule,
       location: newActivity.location,
       members: newActivity.members,
-      status: newActivity.status // This is now correctly typed
+      status: newActivity.status // This is now correctly typed as "active" | "inactive"
     };
     
     setActivities([...activities, newActivityWithId]);
@@ -227,7 +226,7 @@ const ClubActivities = () => {
   const handleToggleStatus = (id: string) => {
     const updatedActivities = activities.map(activity => 
       activity.id === id 
-        ? { ...activity, status: activity.status === "active" ? "inactive" : "active" }
+        ? { ...activity, status: activity.status === "active" ? "inactive" : "active" as "active" | "inactive" }
         : activity
     );
     
