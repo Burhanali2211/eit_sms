@@ -1,7 +1,8 @@
+
 import { useState } from "react";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import {
@@ -544,7 +545,7 @@ const SystemMonitoring = () => {
             <Card>
               <CardHeader>
                 <CardTitle>Network Devices</CardTitle>
-                <CardDescription>Connected network devices</CardHeader>
+                <CardDescription>Connected network devices</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
