@@ -16,7 +16,13 @@ import {
   LayoutDashboard,
   FileText,
   Database,
-  Monitor
+  Monitor,
+  Gauge,
+  FileArchive,
+  Bug,
+  Info,
+  History,
+  DatabaseBackup
 } from "lucide-react";
 import React from "react";
 import { NavLink } from "react-router-dom";
@@ -103,6 +109,37 @@ const DashboardNav = () => {
       title: "System",
       href: "/dashboard/system",
       icon: Settings,
+      role: ["admin", "super-admin"],
+    },
+    // Super admin specific
+    {
+      title: "System Logs",
+      href: "/dashboard/logs",
+      icon: Bug,
+      role: ["admin", "super-admin"],
+    },
+    {
+      title: "Audit Trail",
+      href: "/dashboard/audit",
+      icon: History,
+      role: ["admin", "super-admin"],
+    },
+    {
+      title: "System Health",
+      href: "/dashboard/health",
+      icon: Gauge,
+      role: ["admin", "super-admin"],
+    },
+    {
+      title: "Backup & Recovery",
+      href: "/dashboard/backup",
+      icon: DatabaseBackup,
+      role: ["admin", "super-admin"],
+    },
+    {
+      title: "System Monitoring",
+      href: "/dashboard/monitoring",
+      icon: Monitor,
       role: ["admin", "super-admin"],
     },
     // Financial admin

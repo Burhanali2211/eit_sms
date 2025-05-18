@@ -37,6 +37,11 @@ import LabResources from "./pages/dashboard/admin/LabResources";
 import ClubActivities from "./pages/dashboard/admin/ClubActivities";
 import Library from "./pages/dashboard/admin/Library";
 import Admissions from "./pages/dashboard/admin/Admissions";
+import SystemLogs from "./pages/dashboard/admin/SystemLogs";
+import AuditTrail from "./pages/dashboard/admin/AuditTrail";
+import SystemHealth from "./pages/dashboard/admin/SystemHealth";
+import BackupRecovery from "./pages/dashboard/admin/BackupRecovery";
+import SystemMonitoring from "./pages/dashboard/admin/SystemMonitoring";
 
 const queryClient = new QueryClient();
 
@@ -156,10 +161,40 @@ const App = () => (
                 </ProtectedRoute>
               } />
               
-              {/* Super Admin only route */}
+              {/* Super Admin only routes */}
               <Route path="/dashboard/database" element={
                 <ProtectedRoute allowedRoles={['super-admin']}>
                   <SystemDatabase />
+                </ProtectedRoute>
+              } />
+
+              <Route path="/dashboard/logs" element={
+                <ProtectedRoute allowedRoles={['super-admin', 'admin']}>
+                  <SystemLogs />
+                </ProtectedRoute>
+              } />
+
+              <Route path="/dashboard/audit" element={
+                <ProtectedRoute allowedRoles={['super-admin', 'admin']}>
+                  <AuditTrail />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/dashboard/health" element={
+                <ProtectedRoute allowedRoles={['super-admin', 'admin']}>
+                  <SystemHealth />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/dashboard/backup" element={
+                <ProtectedRoute allowedRoles={['super-admin', 'admin']}>
+                  <BackupRecovery />
+                </ProtectedRoute>
+              } />
+
+              <Route path="/dashboard/monitoring" element={
+                <ProtectedRoute allowedRoles={['super-admin', 'admin']}>
+                  <SystemMonitoring />
                 </ProtectedRoute>
               } />
               

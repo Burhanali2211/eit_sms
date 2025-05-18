@@ -392,7 +392,7 @@ const Library = () => {
             </div>
           </CardHeader>
           <CardContent>
-            <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="mb-4">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-4">
               <TabsList>
                 <TabsTrigger value="catalog">
                   <BookOpen className="h-4 w-4 mr-2" />
@@ -403,206 +403,207 @@ const Library = () => {
                   Borrowed Books
                 </TabsTrigger>
               </TabsList>
-            </Tabs>
             
-            <div className="mb-4 flex flex-col sm:flex-row gap-4">
-              <div className="relative flex-1">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search books..."
-                  className="pl-8"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
+            
+              <div className="mb-4 mt-4 flex flex-col sm:flex-row gap-4">
+                <div className="relative flex-1">
+                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search books..."
+                    className="pl-8"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                </div>
+                <div className="sm:w-[180px]">
+                  <Select
+                    value={categoryFilter}
+                    onValueChange={setCategoryFilter}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Filter by category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categories.map((category) => (
+                        <SelectItem key={category} value={category}>
+                          {category}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
-              <div className="sm:w-[180px]">
-                <Select
-                  value={categoryFilter}
-                  onValueChange={setCategoryFilter}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Filter by category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories.map((category) => (
-                      <SelectItem key={category} value={category}>
-                        {category}
-                      </SelectItem>
+              
+              <TabsContent value="catalog">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Title</TableHead>
+                      <TableHead>Author</TableHead>
+                      <TableHead>Category</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredBooks.map((book) => (
+                      <TableRow key={book.id}>
+                        <TableCell className="font-medium">
+                          {book.title}
+                        </TableCell>
+                        <TableCell>{book.author}</TableCell>
+                        <TableCell>{book.category}</TableCell>
+                        <TableCell>
+                          {book.available ? (
+                            <Badge variant="outline" className="bg-green-100 text-green-800 hover:bg-green-100">
+                              <CheckCircle className="h-3.5 w-3.5 mr-1" />
+                              Available
+                            </Badge>
+                          ) : (
+                            <Badge variant="outline" className="bg-amber-100 text-amber-800 hover:bg-amber-100">
+                              <XCircle className="h-3.5 w-3.5 mr-1" />
+                              Checked Out
+                            </Badge>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon">
+                                <MoreHorizontal className="h-4 w-4" />
+                                <span className="sr-only">Open menu</span>
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem onClick={() => {
+                                toast({
+                                  title: "Edit Book",
+                                  description: `Editing ${book.title}`,
+                                });
+                              }}>
+                                <Pencil className="h-4 w-4 mr-2" />
+                                Edit
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleToggleAvailability(book.id)}>
+                                {book.available ? (
+                                  <>
+                                    <User className="h-4 w-4 mr-2" />
+                                    Check Out
+                                  </>
+                                ) : (
+                                  <>
+                                    <CheckCircle className="h-4 w-4 mr-2" />
+                                    Check In
+                                  </>
+                                )}
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem 
+                                className="text-red-600"
+                                onClick={() => handleDeleteBook(book.id)}
+                              >
+                                <Trash2 className="h-4 w-4 mr-2" />
+                                Delete
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
                     ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            
-            <TabsContent value="catalog" className="m-0">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Title</TableHead>
-                    <TableHead>Author</TableHead>
-                    <TableHead>Category</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredBooks.map((book) => (
-                    <TableRow key={book.id}>
-                      <TableCell className="font-medium">
-                        {book.title}
-                      </TableCell>
-                      <TableCell>{book.author}</TableCell>
-                      <TableCell>{book.category}</TableCell>
-                      <TableCell>
-                        {book.available ? (
-                          <Badge variant="outline" className="bg-green-100 text-green-800 hover:bg-green-100">
-                            <CheckCircle className="h-3.5 w-3.5 mr-1" />
-                            Available
-                          </Badge>
-                        ) : (
-                          <Badge variant="outline" className="bg-amber-100 text-amber-800 hover:bg-amber-100">
-                            <XCircle className="h-3.5 w-3.5 mr-1" />
-                            Checked Out
-                          </Badge>
-                        )}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <MoreHorizontal className="h-4 w-4" />
-                              <span className="sr-only">Open menu</span>
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={() => {
-                              toast({
-                                title: "Edit Book",
-                                description: `Editing ${book.title}`,
-                              });
-                            }}>
-                              <Pencil className="h-4 w-4 mr-2" />
-                              Edit
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleToggleAvailability(book.id)}>
-                              {book.available ? (
-                                <>
-                                  <User className="h-4 w-4 mr-2" />
-                                  Check Out
-                                </>
+                    
+                    {filteredBooks.length === 0 && (
+                      <TableRow>
+                        <TableCell colSpan={5} className="text-center py-6">
+                          No books found matching your search.
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </TabsContent>
+              
+              <TabsContent value="borrowed">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Title</TableHead>
+                      <TableHead>Borrowed By</TableHead>
+                      <TableHead>Due Date</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {books
+                      .filter(book => !book.available)
+                      .filter(book => {
+                        const matchesSearch = 
+                          book.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                          book.author.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          (book.borrowedBy && book.borrowedBy.toLowerCase().includes(searchTerm.toLowerCase()));
+                        return matchesSearch;
+                      })
+                      .map((book) => {
+                        const isOverdue = book.dueDate && new Date(book.dueDate) < new Date();
+                        
+                        return (
+                          <TableRow key={book.id}>
+                            <TableCell className="font-medium">
+                              <div>
+                                <div>{book.title}</div>
+                                <div className="text-sm text-muted-foreground">{book.author}</div>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex items-center">
+                                <User className="h-4 w-4 mr-2 text-muted-foreground" />
+                                <span>{book.borrowedBy}</span>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex items-center">
+                                <CalendarClock className="h-4 w-4 mr-2 text-muted-foreground" />
+                                <span>{book.dueDate}</span>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              {isOverdue ? (
+                                <Badge variant="destructive">
+                                  Overdue
+                                </Badge>
                               ) : (
-                                <>
-                                  <CheckCircle className="h-4 w-4 mr-2" />
-                                  Check In
-                                </>
+                                <Badge variant="outline">
+                                  Checked Out
+                                </Badge>
                               )}
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem 
-                              className="text-red-600"
-                              onClick={() => handleDeleteBook(book.id)}
-                            >
-                              <Trash2 className="h-4 w-4 mr-2" />
-                              Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                  
-                  {filteredBooks.length === 0 && (
-                    <TableRow>
-                      <TableCell colSpan={5} className="text-center py-6">
-                        No books found matching your search.
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </TabsContent>
-            
-            <TabsContent value="borrowed" className="m-0">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Title</TableHead>
-                    <TableHead>Borrowed By</TableHead>
-                    <TableHead>Due Date</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {books
-                    .filter(book => !book.available)
-                    .filter(book => {
-                      const matchesSearch = 
-                        book.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                        book.author.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                        (book.borrowedBy && book.borrowedBy.toLowerCase().includes(searchTerm.toLowerCase()));
-                      return matchesSearch;
-                    })
-                    .map((book) => {
-                      const isOverdue = book.dueDate && new Date(book.dueDate) < new Date();
-                      
-                      return (
-                        <TableRow key={book.id}>
-                          <TableCell className="font-medium">
-                            <div>
-                              <div>{book.title}</div>
-                              <div className="text-sm text-muted-foreground">{book.author}</div>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center">
-                              <User className="h-4 w-4 mr-2 text-muted-foreground" />
-                              <span>{book.borrowedBy}</span>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center">
-                              <CalendarClock className="h-4 w-4 mr-2 text-muted-foreground" />
-                              <span>{book.dueDate}</span>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            {isOverdue ? (
-                              <Badge variant="destructive">
-                                Overdue
-                              </Badge>
-                            ) : (
-                              <Badge variant="outline">
-                                Checked Out
-                              </Badge>
-                            )}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <Button 
-                              variant="outline" 
-                              size="sm"
-                              onClick={() => handleToggleAvailability(book.id)}
-                            >
-                              <CheckCircle className="h-4 w-4 mr-2" />
-                              Return
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
-                  
-                  {books.filter(book => !book.available).length === 0 && (
-                    <TableRow>
-                      <TableCell colSpan={5} className="text-center py-6">
-                        No books are currently borrowed.
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </TabsContent>
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                onClick={() => handleToggleAvailability(book.id)}
+                              >
+                                <CheckCircle className="h-4 w-4 mr-2" />
+                                Return
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    
+                    {books.filter(book => !book.available).length === 0 && (
+                      <TableRow>
+                        <TableCell colSpan={5} className="text-center py-6">
+                          No books are currently borrowed.
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </TabsContent>
+            </Tabs>
           </CardContent>
         </Card>
       </div>
