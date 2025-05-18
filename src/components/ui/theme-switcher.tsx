@@ -1,6 +1,6 @@
 
 import * as React from "react";
-import { Moon, Sun } from "lucide-react";
+import { Moon, Sun, Monitor } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,31 +9,53 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { toast } from "@/components/ui/use-toast";
 
 export function ThemeSwitcher() {
-  const { setTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
+
+  const handleThemeChange = (newTheme: "light" | "dark" | "system") => {
+    setTheme(newTheme);
+    toast({
+      title: "Theme Updated",
+      description: `Theme set to ${newTheme[0].toUpperCase() + newTheme.slice(1)}`,
+      duration: 2000,
+    });
+  };
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="rounded-full">
+        <Button variant="ghost" size="icon" className="rounded-full focus:outline-none">
           <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
           <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
           <span className="sr-only">Toggle theme</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => setTheme("light")}>
-          <Sun className="mr-2 h-4 w-4" />
+      <DropdownMenuContent align="end" className="mt-2 w-40 z-50">
+        <DropdownMenuItem 
+          onClick={() => handleThemeChange("light")}
+          className={`flex items-center gap-2 cursor-pointer ${theme === "light" ? "bg-secondary" : ""}`}
+        >
+          <Sun className="h-4 w-4" />
           <span>Light</span>
+          {theme === "light" && <span className="ml-auto text-xs">✓</span>}
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("dark")}>
-          <Moon className="mr-2 h-4 w-4" />
+        <DropdownMenuItem 
+          onClick={() => handleThemeChange("dark")}
+          className={`flex items-center gap-2 cursor-pointer ${theme === "dark" ? "bg-secondary" : ""}`}
+        >
+          <Moon className="h-4 w-4" />
           <span>Dark</span>
+          {theme === "dark" && <span className="ml-auto text-xs">✓</span>}
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("system")}>
-          <span className="mr-2 h-4 w-4">💻</span>
+        <DropdownMenuItem 
+          onClick={() => handleThemeChange("system")}
+          className={`flex items-center gap-2 cursor-pointer ${theme === "system" ? "bg-secondary" : ""}`}
+        >
+          <Monitor className="h-4 w-4" />
           <span>System</span>
+          {theme === "system" && <span className="ml-auto text-xs">✓</span>}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

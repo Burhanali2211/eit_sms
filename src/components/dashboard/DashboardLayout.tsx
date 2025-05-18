@@ -6,6 +6,8 @@ import { LogOut } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import DashboardNav from "./DashboardNav";
 import { useNavigate } from "react-router-dom";
+import { ThemeSwitcher } from "@/components/ui/theme-switcher";
+import { useTheme } from "@/contexts/ThemeContext";
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -13,6 +15,7 @@ interface DashboardLayoutProps {
 
 const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   const { logout, user, isAuthenticated } = useAuth();
+  const { isDarkMode } = useTheme();
   const navigate = useNavigate();
   
   // Ensure user is authenticated, otherwise redirect to login
@@ -26,14 +29,15 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-background dark:bg-background">
+      <div className={`min-h-screen flex w-full bg-background dark:bg-background transition-colors duration-200 ${isDarkMode ? "dark" : ""}`}>
         <Sidebar className="bg-card dark:bg-card border-r shadow-sm">
           <SidebarHeader className="px-6 py-6 border-b">
-            <div className="flex items-center">
+            <div className="flex items-center justify-between">
               <h2 className="text-xl font-bold">
                 <span className="text-school-primary">Edu</span>
                 <span className="text-school-secondary">Sync</span>
               </h2>
+              <ThemeSwitcher />
             </div>
           </SidebarHeader>
           
