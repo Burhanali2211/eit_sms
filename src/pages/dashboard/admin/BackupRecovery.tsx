@@ -47,8 +47,7 @@ import {
   RefreshCw,
   Database,
   Plus,
-  Bell,
-  Checkbox
+  BellRing,
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { Progress } from "@/components/ui/progress";
@@ -65,6 +64,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
 
 // Types
 interface Backup {
@@ -854,7 +854,7 @@ const BackupRecovery = () => {
                   <AccordionItem value="notifications">
                     <AccordionTrigger>
                       <div className="flex items-center">
-                        <Bell className="h-4 w-4 mr-2" />
+                        <BellRing className="h-4 w-4 mr-2" />
                         Notification Settings
                       </div>
                     </AccordionTrigger>
@@ -957,9 +957,5 @@ const BackupRecovery = () => {
     </DashboardLayout>
   );
 };
-
-// For TypeScript to not complain about missing imports that are actually used inside JSX
-const Bell = DatabaseBackup;
-const Checkbox = Switch;
 
 export default BackupRecovery;
