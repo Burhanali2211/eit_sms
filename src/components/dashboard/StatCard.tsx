@@ -2,6 +2,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DashboardStat } from "@/types/dashboard";
 import { ArrowDown, ArrowUp } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const StatCard = ({ title, value, description, change, increasing }: DashboardStat) => {
   return (
@@ -11,7 +12,10 @@ const StatCard = ({ title, value, description, change, increasing }: DashboardSt
           {title}
         </CardTitle>
         {change && (
-          <div className={`flex items-center ${increasing ? 'text-green-500' : 'text-red-500'}`}>
+          <div className={cn(
+            "flex items-center",
+            increasing ? "text-emerald-500 dark:text-emerald-400" : "text-rose-500 dark:text-rose-400"
+          )}>
             {increasing ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />}
           </div>
         )}
@@ -24,12 +28,19 @@ const StatCard = ({ title, value, description, change, increasing }: DashboardSt
           </p>
         )}
         {change && increasing !== undefined && (
-          <div className="mt-4 h-1 w-full bg-gray-200 rounded-full overflow-hidden">
-            <div 
-              className={`h-1 rounded-full ${increasing ? 'bg-green-500' : 'bg-amber-500'}`} 
-              style={{ width: typeof value === 'string' && value.endsWith('%') 
-                ? value 
-                : '75%' }}
+          <div className="mt-4 h-1 w-full bg-muted rounded-full overflow-hidden">
+            <div
+              className={cn(
+                "h-1 rounded-full",
+                increasing
+                  ? "bg-emerald-500 dark:bg-emerald-400"
+                  : "bg-amber-500 dark:bg-amber-400"
+              )}
+              style={{
+                width: typeof value === 'string' && value.endsWith('%')
+                  ? value
+                  : '75%'
+              }}
             ></div>
           </div>
         )}

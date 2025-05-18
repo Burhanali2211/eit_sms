@@ -2,7 +2,7 @@
 import { Bell, LogOut, User, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { 
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -14,6 +14,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { ThemeSwitcher } from "@/components/ui/theme-switcher";
+import { cn } from "@/lib/utils";
 
 interface DashboardHeaderProps {
   title: string;
@@ -36,7 +37,10 @@ const DashboardHeader = ({ title, description }: DashboardHeaderProps) => {
   };
 
   return (
-    <header className="bg-card border-b px-6 py-4 flex items-center justify-between sticky top-0 z-10 shadow-sm">
+    <header className={cn(
+      "border-b px-6 py-4 flex items-center justify-between sticky top-0 z-10",
+      "bg-card text-card-foreground shadow-sm transition-colors duration-300"
+    )}>
       <div className="flex items-center">
         <SidebarTrigger className="mr-4 hover:bg-accent hover:text-accent-foreground rounded-md p-1" />
         <div>
@@ -48,10 +52,10 @@ const DashboardHeader = ({ title, description }: DashboardHeaderProps) => {
           )}
         </div>
       </div>
-      
+
       <div className="flex items-center gap-4">
         <ThemeSwitcher />
-        
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="relative">
@@ -64,8 +68,8 @@ const DashboardHeader = ({ title, description }: DashboardHeaderProps) => {
           <DropdownMenuContent align="end" className="w-80">
             <div className="flex items-center justify-between px-4 pt-4">
               <h2 className="text-lg font-semibold">Notifications</h2>
-              <Link 
-                to="/dashboard/notifications" 
+              <Link
+                to="/dashboard/notifications"
                 className="text-xs text-school-secondary hover:underline"
               >
                 View all
@@ -88,7 +92,7 @@ const DashboardHeader = ({ title, description }: DashboardHeaderProps) => {
             </div>
           </DropdownMenuContent>
         </DropdownMenu>
-        
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <div className="flex items-center gap-2 cursor-pointer hover:bg-accent rounded-md px-2 py-1">

@@ -5,6 +5,7 @@ import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { StatusBadge } from "@/components/ui/status-badge";
 import {
   Tabs,
   TabsContent,
@@ -93,17 +94,17 @@ const performanceMetrics: PerformanceMetric[] = [
 const generateUsageData = () => {
   const data: UsageData[] = [];
   const now = new Date();
-  
+
   for (let i = 0; i < 24; i++) {
     const time = new Date(now);
     time.setHours(now.getHours() - 24 + i);
     const hour = time.getHours();
     const timeString = `${hour}:00`;
-    
+
     // Generate some pattern based on time of day
     const baseValue = (hour >= 8 && hour <= 17) ? 40 : 20;
     const randomFactor = Math.random() * 30;
-    
+
     data.push({
       time: timeString,
       cpu: Math.min(95, baseValue + randomFactor),
@@ -111,7 +112,7 @@ const generateUsageData = () => {
       network: Math.min(95, (baseValue - 5) + randomFactor * 1.2),
     });
   }
-  
+
   return data;
 };
 
@@ -124,7 +125,7 @@ const ResourceUsage = ({ title, usage, icon }: { title: string; usage: number; i
     if (value < 80) return 'text-amber-500';
     return 'text-red-500';
   };
-  
+
   return (
     <Card>
       <CardHeader className="pb-2">
@@ -135,13 +136,11 @@ const ResourceUsage = ({ title, usage, icon }: { title: string; usage: number; i
       </CardHeader>
       <CardContent>
         <div className="text-2xl font-bold">{usage}%</div>
-        <Progress 
-          value={usage} 
-          className={`mt-2 h-2 ${
-            usage < 50 ? 'bg-green-100' : usage < 80 ? 'bg-amber-100' : 'bg-red-100'
-          } ${
-            usage < 50 ? 'bg-green-500' : usage < 80 ? 'bg-amber-500' : 'bg-red-500'
-          }`}
+        <Progress
+          value={usage}
+          className={`mt-2 h-2 ${usage < 50 ? 'bg-green-100' : usage < 80 ? 'bg-amber-100' : 'bg-red-100'
+            } ${usage < 50 ? 'bg-green-500' : usage < 80 ? 'bg-amber-500' : 'bg-red-500'
+            }`}
         />
       </CardContent>
     </Card>
@@ -150,42 +149,18 @@ const ResourceUsage = ({ title, usage, icon }: { title: string; usage: number; i
 
 // Service status component
 const ServiceStatus = ({ service }: { service: SystemStatus['services'][0] }) => {
-  const getStatusBadge = () => {
-    switch (service.status) {
-      case 'online':
-        return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-            <CheckCircle className="w-3 h-3 mr-1" /> Online
-          </span>
-        );
-      case 'degraded':
-        return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
-            <AlertTriangle className="w-3 h-3 mr-1" /> Degraded
-          </span>
-        );
-      case 'offline':
-        return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-            <AlertTriangle className="w-3 h-3 mr-1" /> Offline
-          </span>
-        );
-      default:
-        return null;
-    }
-  };
-  
+
   const getResponseTimeClass = () => {
     if (service.responseTime < 100) return 'text-green-500';
     if (service.responseTime < 300) return 'text-amber-500';
     return 'text-red-500';
   };
-  
+
   return (
     <div className="p-4 border rounded-lg">
       <div className="flex justify-between items-center">
         <div className="font-medium">{service.name}</div>
-        {getStatusBadge()}
+        <StatusBadge status={service.status} />
       </div>
       <div className="mt-2 flex items-center text-sm">
         <Clock className="w-3 h-3 mr-1 text-muted-foreground" />
@@ -218,8 +193,8 @@ const SystemMonitoring = () => {
 
   return (
     <DashboardLayout>
-      <DashboardHeader 
-        title="System Monitoring" 
+      <DashboardHeader
+        title="System Monitoring"
         description="Real-time monitoring of system resources and services"
       />
       <div className="flex-1 overflow-auto bg-gray-50 p-6">
@@ -233,17 +208,17 @@ const SystemMonitoring = () => {
               <AlertTriangle className="h-5 w-5 text-red-500" />
             )}
             <span className="font-medium">
-              System Status: 
+              System Status:
               <span className={
-                mockSystemStatus.status === 'healthy' 
-                  ? 'text-green-500' 
+                mockSystemStatus.status === 'healthy'
+                  ? 'text-green-500'
                   : mockSystemStatus.status === 'warning'
-                  ? 'text-amber-500'
-                  : 'text-red-500'
+                    ? 'text-amber-500'
+                    : 'text-red-500'
               }> {mockSystemStatus.status.charAt(0).toUpperCase() + mockSystemStatus.status.slice(1)}</span>
             </span>
           </div>
-          
+
           <div className="flex gap-4 text-sm text-muted-foreground">
             <div className="flex items-center">
               <ArrowUpCircle className="h-4 w-4 mr-1" />
@@ -253,9 +228,9 @@ const SystemMonitoring = () => {
               <Clock8 className="h-4 w-4 mr-1" />
               <span>Last checked: {mockSystemStatus.lastChecked}</span>
             </div>
-            <Button 
-              variant="outline" 
-              size="sm" 
+            <Button
+              variant="outline"
+              size="sm"
               onClick={handleRefresh}
               disabled={isRefreshing}
             >
@@ -264,7 +239,7 @@ const SystemMonitoring = () => {
             </Button>
           </div>
         </div>
-        
+
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList>
             <TabsTrigger value="overview">Overview</TabsTrigger>
@@ -272,31 +247,31 @@ const SystemMonitoring = () => {
             <TabsTrigger value="network">Network</TabsTrigger>
             <TabsTrigger value="services">Services</TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="overview" className="mt-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-              <ResourceUsage 
-                title="CPU Usage" 
-                usage={mockSystemStatus.cpuUsage} 
+              <ResourceUsage
+                title="CPU Usage"
+                usage={mockSystemStatus.cpuUsage}
                 icon={<Cpu className="h-5 w-5" />}
               />
-              <ResourceUsage 
-                title="Memory Usage" 
-                usage={mockSystemStatus.memoryUsage} 
+              <ResourceUsage
+                title="Memory Usage"
+                usage={mockSystemStatus.memoryUsage}
                 icon={<HardDrive className="h-5 w-5" />}
               />
-              <ResourceUsage 
-                title="Network Usage" 
-                usage={mockSystemStatus.networkUsage} 
+              <ResourceUsage
+                title="Network Usage"
+                usage={mockSystemStatus.networkUsage}
                 icon={<Network className="h-5 w-5" />}
               />
-              <ResourceUsage 
-                title="Disk Usage" 
-                usage={mockSystemStatus.diskUsage} 
+              <ResourceUsage
+                title="Disk Usage"
+                usage={mockSystemStatus.diskUsage}
                 icon={<Database className="h-5 w-5" />}
               />
             </div>
-            
+
             <Card className="mb-6">
               <CardHeader>
                 <CardTitle>System Resource Usage (24 Hours)</CardTitle>
@@ -344,9 +319,9 @@ const SystemMonitoring = () => {
                   </div>
                 </CardContent>
                 <CardFooter>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={() => setActiveTab("services")}
                     className="w-full"
                   >
@@ -354,7 +329,7 @@ const SystemMonitoring = () => {
                   </Button>
                 </CardFooter>
               </Card>
-              
+
               <Card>
                 <CardHeader>
                   <CardTitle>Key Performance Indicators</CardTitle>
@@ -370,13 +345,13 @@ const SystemMonitoring = () => {
                           <div className="flex items-center">
                             {metric.limit ? (
                               <span className="text-sm">
-                                <span 
+                                <span
                                   className={
-                                    metric.value / metric.limit < 0.7 
-                                      ? 'text-green-500' 
+                                    metric.value / metric.limit < 0.7
+                                      ? 'text-green-500'
                                       : metric.value / metric.limit < 0.9
-                                      ? 'text-amber-500'
-                                      : 'text-red-500'
+                                        ? 'text-amber-500'
+                                        : 'text-red-500'
                                   }
                                 >
                                   {metric.value.toLocaleString()}
@@ -385,8 +360,8 @@ const SystemMonitoring = () => {
                               </span>
                             ) : (
                               <span className="text-sm">
-                                {metric.name.includes('Time') 
-                                  ? `${metric.value}ms` 
+                                {metric.name.includes('Time')
+                                  ? `${metric.value}ms`
                                   : `${metric.value}%`
                                 }
                               </span>
@@ -397,9 +372,9 @@ const SystemMonitoring = () => {
                   </div>
                 </CardContent>
                 <CardFooter>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={() => setActiveTab("resources")}
                     className="w-full"
                   >
@@ -421,11 +396,10 @@ const SystemMonitoring = () => {
                   <div className="text-2xl font-bold">{mockSystemStatus.cpuUsage}%</div>
                   <Progress
                     value={mockSystemStatus.cpuUsage}
-                    className={`h-2 ${
-                      mockSystemStatus.cpuUsage < 50 ? 'bg-green-100 bg-green-500' : 
-                      mockSystemStatus.cpuUsage < 80 ? 'bg-amber-100 bg-amber-500' : 
-                      'bg-red-100 bg-red-500'
-                    }`}
+                    className={`h-2 ${mockSystemStatus.cpuUsage < 50 ? 'bg-green-100 bg-green-500' :
+                      mockSystemStatus.cpuUsage < 80 ? 'bg-amber-100 bg-amber-500' :
+                        'bg-red-100 bg-red-500'
+                      }`}
                   />
                 </CardContent>
               </Card>
@@ -439,11 +413,10 @@ const SystemMonitoring = () => {
                   <div className="text-2xl font-bold">{mockSystemStatus.memoryUsage}%</div>
                   <Progress
                     value={mockSystemStatus.memoryUsage}
-                    className={`h-2 ${
-                      mockSystemStatus.memoryUsage < 50 ? 'bg-green-100 bg-green-500' : 
-                      mockSystemStatus.memoryUsage < 80 ? 'bg-amber-100 bg-amber-500' : 
-                      'bg-red-100 bg-red-500'
-                    }`}
+                    className={`h-2 ${mockSystemStatus.memoryUsage < 50 ? 'bg-green-100 bg-green-500' :
+                      mockSystemStatus.memoryUsage < 80 ? 'bg-amber-100 bg-amber-500' :
+                        'bg-red-100 bg-red-500'
+                      }`}
                   />
                 </CardContent>
               </Card>
@@ -457,11 +430,10 @@ const SystemMonitoring = () => {
                   <div className="text-2xl font-bold">{mockSystemStatus.diskUsage}%</div>
                   <Progress
                     value={mockSystemStatus.diskUsage}
-                    className={`h-2 ${
-                      mockSystemStatus.diskUsage < 50 ? 'bg-green-100 bg-green-500' : 
-                      mockSystemStatus.diskUsage < 80 ? 'bg-amber-100 bg-amber-500' : 
-                      'bg-red-100 bg-red-500'
-                    }`}
+                    className={`h-2 ${mockSystemStatus.diskUsage < 50 ? 'bg-green-100 bg-green-500' :
+                      mockSystemStatus.diskUsage < 80 ? 'bg-amber-100 bg-amber-500' :
+                        'bg-red-100 bg-red-500'
+                      }`}
                   />
                 </CardContent>
               </Card>
@@ -602,9 +574,9 @@ const SystemMonitoring = () => {
                       <YAxis />
                       <Tooltip formatter={(value) => `${value}ms`} />
                       <Legend />
-                      <Bar 
-                        dataKey="responseTime" 
-                        name="Response Time (ms)" 
+                      <Bar
+                        dataKey="responseTime"
+                        name="Response Time (ms)"
                         fill="#8884d8"
                         background={{ fill: '#eee' }}
                       />

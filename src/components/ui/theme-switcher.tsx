@@ -17,24 +17,33 @@ export function ThemeSwitcher() {
   const [isRotating, setIsRotating] = React.useState(false);
 
   const handleThemeChange = (newTheme: "light" | "dark" | "system") => {
-    setIsRotating(true);
+    // Only animate if we're not on a reduced motion preference
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (!prefersReducedMotion) {
+      setIsRotating(true);
+      // Use requestAnimationFrame for smoother animation
+      requestAnimationFrame(() => {
+        setTimeout(() => setIsRotating(false), 300); // Reduced from 500ms to 300ms
+      });
+    }
+
     setTheme(newTheme);
-    
+
+    // Show toast notification
     toast({
       title: "Theme Updated",
       description: `Theme set to ${newTheme[0].toUpperCase() + newTheme.slice(1)}`,
-      duration: 2000,
+      duration: 1500, // Reduced from 2000ms to 1500ms
     });
-    
-    setTimeout(() => setIsRotating(false), 500);
   };
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button 
-          variant="ghost" 
-          size="icon" 
+        <Button
+          variant="ghost"
+          size="icon"
           className={cn(
             "rounded-full focus:outline-none transition-all duration-300 hover:bg-secondary",
             isRotating && "theme-toggle-icon rotate"
@@ -45,37 +54,44 @@ export function ThemeSwitcher() {
           <span className="sr-only">Toggle theme</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="mt-2 w-40 z-50 bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg border border-gray-200 dark:border-gray-700 rounded-xl animate-fade-in">
-        <DropdownMenuItem 
+      <DropdownMenuContent
+        align="end"
+        className={cn(
+          "mt-2 w-40 z-50 backdrop-blur-lg rounded-xl animate-fade-in",
+          "bg-background/90 dark:bg-background/90",
+          "border border-border"
+        )}
+      >
+        <DropdownMenuItem
           onClick={() => handleThemeChange("light")}
           className={cn(
             "flex items-center gap-2 cursor-pointer rounded-lg m-1 transition-all",
-            theme === "light" ? "bg-secondary font-medium" : "hover:bg-gray-100 dark:hover:bg-gray-700"
+            theme === "light" ? "bg-secondary font-medium" : "hover:bg-muted"
           )}
         >
           <Sun className="h-4 w-4 text-amber-500" />
           <span>Light</span>
           {theme === "light" && <span className="ml-auto text-xs">✓</span>}
         </DropdownMenuItem>
-        <DropdownMenuItem 
+        <DropdownMenuItem
           onClick={() => handleThemeChange("dark")}
           className={cn(
             "flex items-center gap-2 cursor-pointer rounded-lg m-1 transition-all",
-            theme === "dark" ? "bg-secondary font-medium" : "hover:bg-gray-100 dark:hover:bg-gray-700"
+            theme === "dark" ? "bg-secondary font-medium" : "hover:bg-muted"
           )}
         >
           <Moon className="h-4 w-4 text-indigo-400" />
           <span>Dark</span>
           {theme === "dark" && <span className="ml-auto text-xs">✓</span>}
         </DropdownMenuItem>
-        <DropdownMenuItem 
+        <DropdownMenuItem
           onClick={() => handleThemeChange("system")}
           className={cn(
             "flex items-center gap-2 cursor-pointer rounded-lg m-1 transition-all",
-            theme === "system" ? "bg-secondary font-medium" : "hover:bg-gray-100 dark:hover:bg-gray-700"
+            theme === "system" ? "bg-secondary font-medium" : "hover:bg-muted"
           )}
         >
-          <Monitor className="h-4 w-4 text-gray-500" />
+          <Monitor className="h-4 w-4 text-muted-foreground" />
           <span>System</span>
           {theme === "system" && <span className="ml-auto text-xs">✓</span>}
         </DropdownMenuItem>

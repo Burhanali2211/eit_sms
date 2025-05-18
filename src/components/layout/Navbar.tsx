@@ -3,10 +3,13 @@ import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X, ChevronDown } from "lucide-react";
+import { useTheme } from "@/contexts/ThemeContext";
+import { cn } from "@/lib/utils";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const { isDarkMode } = useTheme();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -26,9 +29,9 @@ const Navbar = () => {
   const navLinks = [
     { name: "Home", path: "/" },
     { name: "About", path: "/about" },
-    { 
-      name: "Academics", 
-      path: "#", 
+    {
+      name: "Academics",
+      path: "#",
       dropdown: true,
       subLinks: [
         { name: "Curriculum", path: "/academics/curriculum" },
@@ -41,7 +44,12 @@ const Navbar = () => {
   ];
 
   return (
-    <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${isScrolled ? "bg-white shadow-md py-2" : "bg-transparent py-4"}`}>
+    <nav className={cn(
+      "fixed top-0 w-full z-50 transition-all duration-300",
+      isScrolled
+        ? "bg-background dark:bg-background shadow-md py-2"
+        : "bg-transparent py-4"
+    )}>
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center">
           <Link to="/" className="flex items-center">
@@ -56,17 +64,26 @@ const Navbar = () => {
             {navLinks.map((link, index) => (
               link.dropdown ? (
                 <div key={index} className="relative group">
-                  <button className="flex items-center text-gray-700 hover:text-school-primary font-medium">
+                  <button className={cn(
+                    "flex items-center font-medium",
+                    "text-foreground hover:text-school-primary"
+                  )}>
                     {link.name}
                     <ChevronDown className="ml-1 h-4 w-4" />
                   </button>
-                  <div className="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg hidden group-hover:block">
+                  <div className={cn(
+                    "absolute left-0 mt-2 w-48 rounded-md shadow-lg hidden group-hover:block",
+                    "bg-background dark:bg-background border border-border"
+                  )}>
                     <div className="py-1">
                       {link.subLinks?.map((subLink, subIndex) => (
-                        <Link 
-                          key={subIndex} 
+                        <Link
+                          key={subIndex}
                           to={subLink.path}
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                          className={cn(
+                            "block px-4 py-2 text-sm",
+                            "text-foreground hover:bg-muted"
+                          )}
                         >
                           {subLink.name}
                         </Link>
@@ -75,10 +92,13 @@ const Navbar = () => {
                   </div>
                 </div>
               ) : (
-                <Link 
-                  key={index} 
+                <Link
+                  key={index}
                   to={link.path}
-                  className="text-gray-700 hover:text-school-primary font-medium"
+                  className={cn(
+                    "font-medium",
+                    "text-foreground hover:text-school-primary"
+                  )}
                 >
                   {link.name}
                 </Link>
@@ -98,7 +118,10 @@ const Navbar = () => {
           <div className="md:hidden">
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="text-gray-700 focus:outline-none"
+              className={cn(
+                "focus:outline-none",
+                "text-foreground"
+              )}
             >
               {isOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
@@ -107,14 +130,20 @@ const Navbar = () => {
 
         {/* Mobile Navigation Menu */}
         {isOpen && (
-          <div className="md:hidden mt-4 bg-white rounded-lg shadow-lg animate-fade-in">
+          <div className={cn(
+            "md:hidden mt-4 rounded-lg shadow-lg animate-fade-in",
+            "bg-background dark:bg-background border border-border"
+          )}>
             <div className="flex flex-col py-4">
               {navLinks.map((link, index) => (
                 <div key={index}>
                   {link.dropdown ? (
                     <>
                       <button
-                        className="flex items-center justify-between w-full px-4 py-2 text-gray-700 hover:bg-gray-100"
+                        className={cn(
+                          "flex items-center justify-between w-full px-4 py-2",
+                          "text-foreground hover:bg-muted"
+                        )}
                         onClick={(e) => {
                           e.currentTarget.nextElementSibling?.classList.toggle('hidden');
                         }}
@@ -122,12 +151,18 @@ const Navbar = () => {
                         {link.name}
                         <ChevronDown className="h-4 w-4" />
                       </button>
-                      <div className="hidden pl-4 border-l-2 border-school-primary/20 ml-4">
+                      <div className={cn(
+                        "hidden pl-4 ml-4",
+                        "border-l-2 border-school-primary/20"
+                      )}>
                         {link.subLinks?.map((subLink, subIndex) => (
                           <Link
                             key={subIndex}
                             to={subLink.path}
-                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                            className={cn(
+                              "block px-4 py-2 text-sm",
+                              "text-foreground hover:bg-muted"
+                            )}
                             onClick={() => setIsOpen(false)}
                           >
                             {subLink.name}
@@ -138,7 +173,10 @@ const Navbar = () => {
                   ) : (
                     <Link
                       to={link.path}
-                      className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                      className={cn(
+                        "block px-4 py-2",
+                        "text-foreground hover:bg-muted"
+                      )}
                       onClick={() => setIsOpen(false)}
                     >
                       {link.name}

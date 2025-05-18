@@ -1,14 +1,15 @@
 
 import { useAuth } from "@/contexts/AuthContext";
+import { useTheme } from "@/contexts/ThemeContext";
 import { MenuItem } from "@/types/dashboard";
-import { 
-  Home, 
-  Book, 
-  Users, 
-  Calendar, 
-  Clock, 
-  User, 
-  Bell, 
+import {
+  Home,
+  Book,
+  Users,
+  Calendar,
+  Clock,
+  User,
+  Bell,
   Settings,
   BookOpen,
   GraduationCap,
@@ -30,7 +31,8 @@ import { cn } from "@/lib/utils";
 
 const DashboardNav = () => {
   const { user } = useAuth();
-  
+  const { isDarkMode } = useTheme();
+
   if (!user) return null;
 
   // Define all navigation items with role-based access
@@ -192,9 +194,9 @@ const DashboardNav = () => {
       role: ["super-admin"],
     }
   ];
-  
+
   // Filter items based on user role
-  const navItems = allNavItems.filter((item) => 
+  const navItems = allNavItems.filter((item) =>
     item.role.includes(user.role)
   );
 
@@ -206,9 +208,11 @@ const DashboardNav = () => {
           to={item.href}
           className={({ isActive }) =>
             cn(
-              "flex items-center px-3 py-2.5 text-sm font-medium rounded-md transition-colors",
+              "flex items-center px-3 py-2.5 text-sm font-medium rounded-md transition-colors duration-200",
               isActive
-                ? "bg-school-primary/10 text-school-primary font-semibold"
+                ? isDarkMode
+                  ? "bg-school-primary/20 text-school-primary dark:text-school-secondary font-semibold"
+                  : "bg-school-primary/10 text-school-primary font-semibold"
                 : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
             )
           }

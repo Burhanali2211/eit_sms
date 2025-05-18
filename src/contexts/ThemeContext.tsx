@@ -47,28 +47,35 @@ export function ThemeProvider({
 
       root.classList.add(systemTheme);
       setIsDarkMode(systemTheme === "dark");
+
+      // Set data-theme attribute for other libraries
+      root.setAttribute('data-theme', systemTheme);
       return;
     }
 
     root.classList.add(theme);
     setIsDarkMode(theme === "dark");
+
+    // Set data-theme attribute for other libraries
+    root.setAttribute('data-theme', theme);
   }, [theme]);
 
   // Listen for system theme changes
   useEffect(() => {
     if (theme !== "system") return;
-    
+
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-    
+
     const handleChange = () => {
       const root = window.document.documentElement;
       const systemTheme = mediaQuery.matches ? "dark" : "light";
-      
+
       root.classList.remove("light", "dark");
       root.classList.add(systemTheme);
+      root.setAttribute('data-theme', systemTheme);
       setIsDarkMode(systemTheme === "dark");
     };
-    
+
     mediaQuery.addEventListener("change", handleChange);
     return () => mediaQuery.removeEventListener("change", handleChange);
   }, [theme]);

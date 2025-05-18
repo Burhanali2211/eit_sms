@@ -20,6 +20,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { StatusBadge } from "@/components/ui/status-badge";
 import { Button } from "@/components/ui/button";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { Search, History, User, Undo, AlertCircle, Calendar, DownloadCloud, Trash, PenLine, Plus, FilePlus, FileX, UserPlus, UserMinus } from "lucide-react";
@@ -198,55 +199,9 @@ const mockAuditEvents: AuditEvent[] = [
   },
 ];
 
-// Get action badge and icon
+// Get action badge
 const getActionBadge = (action: AuditEvent['action']) => {
-  switch (action) {
-    case 'create':
-      return {
-        icon: <FilePlus className="h-3.5 w-3.5 mr-1" />,
-        badge: <Badge variant="outline" className="bg-green-100 text-green-800 hover:bg-green-100">Created</Badge>
-      };
-    case 'update':
-      return {
-        icon: <PenLine className="h-3.5 w-3.5 mr-1" />,
-        badge: <Badge variant="outline" className="bg-blue-100 text-blue-800 hover:bg-blue-100">Updated</Badge>
-      };
-    case 'delete':
-      return {
-        icon: <FileX className="h-3.5 w-3.5 mr-1" />,
-        badge: <Badge variant="outline" className="bg-red-100 text-red-800 hover:bg-red-100">Deleted</Badge>
-      };
-    case 'restore':
-      return {
-        icon: <Undo className="h-3.5 w-3.5 mr-1" />,
-        badge: <Badge variant="outline" className="bg-purple-100 text-purple-800 hover:bg-purple-100">Restored</Badge>
-      };
-    case 'login':
-      return {
-        icon: <User className="h-3.5 w-3.5 mr-1" />,
-        badge: <Badge variant="outline" className="bg-gray-100 text-gray-800 hover:bg-gray-100">Login</Badge>
-      };
-    case 'logout':
-      return {
-        icon: <User className="h-3.5 w-3.5 mr-1" />,
-        badge: <Badge variant="outline" className="bg-gray-100 text-gray-800 hover:bg-gray-100">Logout</Badge>
-      };
-    case 'add-user':
-      return {
-        icon: <UserPlus className="h-3.5 w-3.5 mr-1" />,
-        badge: <Badge variant="outline" className="bg-teal-100 text-teal-800 hover:bg-teal-100">Added User</Badge>
-      };
-    case 'remove-user':
-      return {
-        icon: <UserMinus className="h-3.5 w-3.5 mr-1" />,
-        badge: <Badge variant="outline" className="bg-amber-100 text-amber-800 hover:bg-amber-100">Removed User</Badge>
-      };
-    default:
-      return {
-        icon: <AlertCircle className="h-3.5 w-3.5 mr-1" />,
-        badge: <Badge variant="outline">Action</Badge>
-      };
-  }
+  return <StatusBadge status={action} />;
 };
 
 // Format timestamp
@@ -280,32 +235,32 @@ const AuditTrail = () => {
 
   // Get unique users, actions, entity types for filters
   const users = [
-    {id: 'all', name: 'All Users'},
+    { id: 'all', name: 'All Users' },
     ...Array.from(
       new Set(mockAuditEvents.map(event => event.user.id))
     ).map(id => {
       const user = mockAuditEvents.find(event => event.user.id === id)?.user;
-      return {id, name: user?.name || ''};
+      return { id, name: user?.name || '' };
     })
   ];
 
   const actions = [
-    {value: 'all', label: 'All Actions'},
-    {value: 'create', label: 'Create'},
-    {value: 'update', label: 'Update'},
-    {value: 'delete', label: 'Delete'},
-    {value: 'restore', label: 'Restore'},
-    {value: 'add-user', label: 'Add User'},
-    {value: 'remove-user', label: 'Remove User'},
-    {value: 'login', label: 'Login'},
-    {value: 'logout', label: 'Logout'},
+    { value: 'all', label: 'All Actions' },
+    { value: 'create', label: 'Create' },
+    { value: 'update', label: 'Update' },
+    { value: 'delete', label: 'Delete' },
+    { value: 'restore', label: 'Restore' },
+    { value: 'add-user', label: 'Add User' },
+    { value: 'remove-user', label: 'Remove User' },
+    { value: 'login', label: 'Login' },
+    { value: 'logout', label: 'Logout' },
   ];
 
   const entityTypes = [
-    {value: 'all', label: 'All Entities'},
+    { value: 'all', label: 'All Entities' },
     ...Array.from(
       new Set(mockAuditEvents.map(event => event.entityType))
-    ).map(type => ({value: type, label: type.charAt(0).toUpperCase() + type.slice(1)}))
+    ).map(type => ({ value: type, label: type.charAt(0).toUpperCase() + type.slice(1) }))
   ];
 
   // Filter events
@@ -354,8 +309,8 @@ const AuditTrail = () => {
 
   return (
     <DashboardLayout>
-      <DashboardHeader 
-        title="Audit Trail" 
+      <DashboardHeader
+        title="Audit Trail"
         description="Track and review all changes made to the system"
       />
       <div className="flex-1 overflow-auto bg-gray-50 p-6">
@@ -468,7 +423,7 @@ const AuditTrail = () => {
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center">
-                        {getActionBadge(event.action).badge}
+                        {getActionBadge(event.action)}
                       </div>
                     </TableCell>
                     <TableCell>
@@ -524,11 +479,11 @@ const AuditTrail = () => {
               <div className="mt-4">
                 <Pagination>
                   <PaginationContent>
-                    <PaginationPrevious 
+                    <PaginationPrevious
                       onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                       className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
                     />
-                    
+
                     {Array.from({ length: totalPages }, (_, i) => i + 1)
                       .filter(page => page === 1 || page === totalPages || Math.abs(page - currentPage) <= 1)
                       .map((page, idx, array) => (
@@ -548,8 +503,8 @@ const AuditTrail = () => {
                           </PaginationItem>
                         </React.Fragment>
                       ))}
-                    
-                    <PaginationNext 
+
+                    <PaginationNext
                       onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                       className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
                     />

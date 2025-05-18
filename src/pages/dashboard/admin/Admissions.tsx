@@ -3,16 +3,17 @@ import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
 } from "@/components/ui/table";
 import {
   Search,
@@ -162,24 +163,24 @@ const Admissions = () => {
   });
   const [selectedApplication, setSelectedApplication] = useState<AdmissionApplication | null>(null);
   const [isViewingApplication, setIsViewingApplication] = useState(false);
-  
+
   // Filter applications based on search, status, and grade
   const filteredApplications = applications.filter(app => {
-    const matchesSearch = 
-      app.studentName.toLowerCase().includes(searchTerm.toLowerCase()) || 
-      app.parentName.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    const matchesSearch =
+      app.studentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      app.parentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       app.email.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter ? app.status === statusFilter : true;
     const matchesGrade = gradeFilter ? app.grade === gradeFilter : true;
     return matchesSearch && matchesStatus && matchesGrade;
   });
-  
+
   // Calculate statistics
   const totalApplications = applications.length;
   const pendingApplications = applications.filter(app => app.status === "pending").length;
   const approvedApplications = applications.filter(app => app.status === "approved").length;
   const rejectedApplications = applications.filter(app => app.status === "rejected").length;
-  
+
   // Add new application handler
   const handleAddApplication = () => {
     if (!newApplication.studentName || !newApplication.parentName || !newApplication.email || !newApplication.grade) {
@@ -190,7 +191,7 @@ const Admissions = () => {
       });
       return;
     }
-    
+
     const today = new Date().toISOString().split('T')[0];
     const updatedApplications: AdmissionApplication[] = [
       ...applications,
@@ -201,7 +202,7 @@ const Admissions = () => {
         submittedAt: today
       }
     ];
-    
+
     setApplications(updatedApplications);
     setIsAddingApplication(false);
     setNewApplication({
@@ -211,13 +212,13 @@ const Admissions = () => {
       phone: "",
       grade: ""
     });
-    
+
     toast({
       title: "Application Submitted",
       description: `Application for ${newApplication.studentName} has been submitted.`,
     });
   };
-  
+
   // View application handler
   const handleViewApplication = (id: string) => {
     const application = applications.find(app => app.id === id);
@@ -226,23 +227,23 @@ const Admissions = () => {
       setIsViewingApplication(true);
     }
   };
-  
+
   // Update application status handler
   const handleUpdateStatus = (id: string, status: 'pending' | 'approved' | 'rejected') => {
-    const updatedApplications = applications.map(app => 
+    const updatedApplications = applications.map(app =>
       app.id === id ? { ...app, status } : app
     );
-    
+
     setApplications(updatedApplications);
-    
+
     const statusVerb = status === 'approved' ? 'approved' : status === 'rejected' ? 'rejected' : 'pending review';
     const application = applications.find(app => app.id === id);
-    
+
     toast({
       title: `Application ${status.charAt(0).toUpperCase() + status.slice(1)}`,
       description: `${application?.studentName}'s application has been ${statusVerb}.`,
     });
-    
+
     setIsViewingApplication(false);
   };
 
@@ -252,7 +253,7 @@ const Admissions = () => {
   return (
     <DashboardLayout>
       <DashboardHeader title="Admissions" />
-      <div className="flex-1 overflow-auto bg-gray-50 p-6">
+      <div className={cn("flex-1 overflow-auto dashboard-content p-6")}>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
           <Card>
             <CardHeader className="pb-2">
@@ -267,7 +268,7 @@ const Admissions = () => {
               </p>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium">
@@ -281,7 +282,7 @@ const Admissions = () => {
               </p>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium">
@@ -295,7 +296,7 @@ const Admissions = () => {
               </p>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium">
@@ -310,7 +311,7 @@ const Admissions = () => {
             </CardContent>
           </Card>
         </div>
-        
+
         <Card>
           <CardHeader>
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -336,52 +337,52 @@ const Admissions = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="grid gap-2">
                         <Label htmlFor="student-name">Student Name*</Label>
-                        <Input 
-                          id="student-name" 
+                        <Input
+                          id="student-name"
                           placeholder="Full name of student"
                           value={newApplication.studentName}
-                          onChange={(e) => setNewApplication({...newApplication, studentName: e.target.value})}
+                          onChange={(e) => setNewApplication({ ...newApplication, studentName: e.target.value })}
                         />
                       </div>
-                      
+
                       <div className="grid gap-2">
                         <Label htmlFor="parent-name">Parent/Guardian Name*</Label>
-                        <Input 
-                          id="parent-name" 
+                        <Input
+                          id="parent-name"
                           placeholder="Full name of parent/guardian"
                           value={newApplication.parentName}
-                          onChange={(e) => setNewApplication({...newApplication, parentName: e.target.value})}
+                          onChange={(e) => setNewApplication({ ...newApplication, parentName: e.target.value })}
                         />
                       </div>
                     </div>
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="grid gap-2">
                         <Label htmlFor="email">Email Address*</Label>
-                        <Input 
-                          id="email" 
+                        <Input
+                          id="email"
                           type="email"
                           placeholder="Contact email"
                           value={newApplication.email}
-                          onChange={(e) => setNewApplication({...newApplication, email: e.target.value})}
+                          onChange={(e) => setNewApplication({ ...newApplication, email: e.target.value })}
                         />
                       </div>
-                      
+
                       <div className="grid gap-2">
                         <Label htmlFor="phone">Phone Number</Label>
-                        <Input 
-                          id="phone" 
+                        <Input
+                          id="phone"
                           placeholder="Contact phone number"
                           value={newApplication.phone}
-                          onChange={(e) => setNewApplication({...newApplication, phone: e.target.value})}
+                          onChange={(e) => setNewApplication({ ...newApplication, phone: e.target.value })}
                         />
                       </div>
                     </div>
-                    
+
                     <div className="grid gap-2">
                       <Label htmlFor="grade">Grade Applying For*</Label>
-                      <Select 
-                        onValueChange={(value) => setNewApplication({...newApplication, grade: value})}
+                      <Select
+                        onValueChange={(value) => setNewApplication({ ...newApplication, grade: value })}
                       >
                         <SelectTrigger id="grade">
                           <SelectValue placeholder="Select grade" />
@@ -395,11 +396,11 @@ const Admissions = () => {
                         </SelectContent>
                       </Select>
                     </div>
-                    
+
                     <div className="grid gap-2">
                       <Label htmlFor="notes">Additional Notes</Label>
-                      <Textarea 
-                        id="notes" 
+                      <Textarea
+                        id="notes"
                         placeholder="Any additional information about the applicant"
                         className="min-h-[100px]"
                       />
@@ -426,7 +427,7 @@ const Admissions = () => {
                 <TabsTrigger value="rejected">Rejected</TabsTrigger>
               </TabsList>
             </Tabs>
-            
+
             <div className="mb-4 flex flex-col sm:flex-row gap-4">
               <div className="relative flex-1">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -456,7 +457,7 @@ const Admissions = () => {
                 </Select>
               </div>
             </div>
-            
+
             <Table>
               <TableHeader>
                 <TableRow>
@@ -545,7 +546,7 @@ const Admissions = () => {
                     </TableCell>
                   </TableRow>
                 ))}
-                
+
                 {filteredApplications.length === 0 && (
                   <TableRow>
                     <TableCell colSpan={6} className="text-center py-6">
@@ -557,9 +558,9 @@ const Admissions = () => {
             </Table>
           </CardContent>
         </Card>
-        
-        <Dialog 
-          open={isViewingApplication} 
+
+        <Dialog
+          open={isViewingApplication}
           onOpenChange={(open) => {
             setIsViewingApplication(open);
             if (!open) setSelectedApplication(null);
@@ -584,7 +585,7 @@ const Admissions = () => {
                     <p className="text-base">Grade {selectedApplication.grade}</p>
                   </div>
                 </div>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <h3 className="text-sm font-medium text-muted-foreground mb-1">Parent/Guardian</h3>
@@ -595,7 +596,7 @@ const Admissions = () => {
                     <p className="text-base">{selectedApplication.submittedAt}</p>
                   </div>
                 </div>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <h3 className="text-sm font-medium text-muted-foreground mb-1">Email Address</h3>
@@ -612,7 +613,7 @@ const Admissions = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 <div>
                   <h3 className="text-sm font-medium text-muted-foreground mb-1">Current Status</h3>
                   {selectedApplication.status === "pending" ? (
@@ -632,7 +633,7 @@ const Admissions = () => {
                     </Badge>
                   )}
                 </div>
-                
+
                 <div className="border-t pt-4 mt-4">
                   <h3 className="font-medium mb-2">Application Notes</h3>
                   <p className="text-muted-foreground text-sm">
@@ -642,20 +643,20 @@ const Admissions = () => {
               </div>
               <DialogFooter>
                 <div className="flex space-x-2">
-                  <Button 
-                    variant="destructive" 
+                  <Button
+                    variant="destructive"
                     onClick={() => handleUpdateStatus(selectedApplication.id, "rejected")}
                   >
                     <XCircle className="h-4 w-4 mr-2" />
                     Reject
                   </Button>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     onClick={() => setIsViewingApplication(false)}
                   >
                     Close
                   </Button>
-                  <Button 
+                  <Button
                     onClick={() => handleUpdateStatus(selectedApplication.id, "approved")}
                   >
                     <CheckCircle className="h-4 w-4 mr-2" />
@@ -667,7 +668,7 @@ const Admissions = () => {
           )}
         </Dialog>
       </div>
-    </DashboardLayout>
+    </DashboardLayout >
   );
 };
 

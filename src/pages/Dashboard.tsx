@@ -12,13 +12,13 @@ import { getRoleDashboardStats, mockCalendarEvents, mockNotifications } from "@/
 const Dashboard = () => {
   const { user, isLoading, isAuthenticated } = useAuth();
   const navigate = useNavigate();
-  
+
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
       navigate("/login");
     }
   }, [isLoading, isAuthenticated, navigate]);
-  
+
   if (isLoading || !user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -29,18 +29,18 @@ const Dashboard = () => {
 
   // Get role-specific dashboard stats
   const stats = getRoleDashboardStats(user.role);
-  
+
   return (
     <DashboardLayout>
       <DashboardHeader title="Dashboard" />
-      
+
       <main className="flex-1 overflow-auto dashboard-content p-6">
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           {stats.map((stat, index) => (
             <StatCard key={index} {...stat} />
           ))}
         </div>
-        
+
         <div className="grid gap-6 grid-cols-1 md:grid-cols-2 mt-6">
           <Card>
             <CardHeader className="pb-3">
@@ -62,7 +62,7 @@ const Dashboard = () => {
               </div>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-lg">Recent Notifications</CardTitle>
@@ -92,7 +92,7 @@ const Dashboard = () => {
             <CardContent>
               <div className="space-y-4">
                 {['Mathematics', 'English Literature', 'Physics', 'Computer Science'].map((course, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 border rounded-md hover:bg-gray-50">
+                  <div key={index} className="flex items-center justify-between p-3 border rounded-md hover:bg-muted">
                     <div className="flex items-center">
                       <div className="w-2 h-10 bg-school-primary rounded-full mr-4"></div>
                       <div>
@@ -139,19 +139,19 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="p-4 bg-gray-100 rounded-lg text-center">
+                <div className="p-4 bg-muted rounded-lg text-center">
                   <h3 className="text-xl font-bold">1,250</h3>
                   <p className="text-sm text-muted-foreground">Total Students</p>
                 </div>
-                <div className="p-4 bg-gray-100 rounded-lg text-center">
+                <div className="p-4 bg-muted rounded-lg text-center">
                   <h3 className="text-xl font-bold">85</h3>
                   <p className="text-sm text-muted-foreground">Faculty &amp; Staff</p>
                 </div>
-                <div className="p-4 bg-gray-100 rounded-lg text-center">
+                <div className="p-4 bg-muted rounded-lg text-center">
                   <h3 className="text-xl font-bold">40</h3>
                   <p className="text-sm text-muted-foreground">Classrooms</p>
                 </div>
-                <div className="p-4 bg-gray-100 rounded-lg text-center">
+                <div className="p-4 bg-muted rounded-lg text-center">
                   <h3 className="text-xl font-bold">12</h3>
                   <p className="text-sm text-muted-foreground">Labs &amp; Facilities</p>
                 </div>

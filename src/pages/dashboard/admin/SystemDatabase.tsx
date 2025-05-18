@@ -64,8 +64,8 @@ const SystemDatabase = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sqlQuery, setSqlQuery] = useState("");
   const [queryResult, setQueryResult] = useState<any>(null);
-  
-  const filteredTables = mockTables.filter(table => 
+
+  const filteredTables = mockTables.filter(table =>
     table.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -118,7 +118,7 @@ const SystemDatabase = () => {
   return (
     <DashboardLayout>
       <DashboardHeader title="System Database" />
-      <div className="flex-1 overflow-auto bg-gray-50 p-6">
+      <div className="flex-1 overflow-auto dashboard-content p-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
           <Card>
             <CardHeader className="pb-2">
@@ -396,11 +396,10 @@ const SystemDatabase = () => {
                             <TableCell>{backup.created}</TableCell>
                             <TableCell>
                               <div
-                                className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                                  backup.status === "Completed"
+                                className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${backup.status === "Completed"
                                     ? "bg-green-100 text-green-800"
                                     : "bg-yellow-100 text-yellow-800"
-                                }`}
+                                  }`}
                               >
                                 {backup.status}
                               </div>

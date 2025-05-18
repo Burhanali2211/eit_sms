@@ -26,6 +26,7 @@ import {
   TabsTrigger
 } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { StatusBadge } from "@/components/ui/status-badge";
 import { Button } from "@/components/ui/button";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { Filter, Search, AlertTriangle, Info, CheckCircle, Bug, Archive, Download, RefreshCw } from "lucide-react";
@@ -151,38 +152,7 @@ const mockLogs: SystemLog[] = [
 
 // Get log type badge
 const getLogTypeBadge = (type: SystemLog['type']) => {
-  switch (type) {
-    case 'error':
-      return (
-        <Badge variant="destructive" className="flex items-center">
-          <AlertTriangle className="h-3.5 w-3.5 mr-1" />
-          Error
-        </Badge>
-      );
-    case 'warning':
-      return (
-        <Badge variant="outline" className="bg-amber-100 text-amber-800 hover:bg-amber-100 flex items-center">
-          <AlertTriangle className="h-3.5 w-3.5 mr-1" />
-          Warning
-        </Badge>
-      );
-    case 'info':
-      return (
-        <Badge variant="outline" className="bg-blue-100 text-blue-800 hover:bg-blue-100 flex items-center">
-          <Info className="h-3.5 w-3.5 mr-1" />
-          Info
-        </Badge>
-      );
-    case 'success':
-      return (
-        <Badge variant="outline" className="bg-green-100 text-green-800 hover:bg-green-100 flex items-center">
-          <CheckCircle className="h-3.5 w-3.5 mr-1" />
-          Success
-        </Badge>
-      );
-    default:
-      return null;
-  }
+  return <StatusBadge status={type} />;
 };
 
 const SystemLogs = () => {
@@ -252,15 +222,15 @@ const SystemLogs = () => {
 
   return (
     <DashboardLayout>
-      <DashboardHeader 
-        title="System Logs" 
+      <DashboardHeader
+        title="System Logs"
         description="View and manage system logs and activities"
       />
       <div className="flex-1 overflow-auto bg-gray-50 p-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-red-600">
+              <CardTitle className="text-sm font-medium text-rose-600 dark:text-rose-400">
                 Errors
               </CardTitle>
             </CardHeader>
@@ -271,10 +241,10 @@ const SystemLogs = () => {
               </p>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-amber-600">
+              <CardTitle className="text-sm font-medium text-amber-600 dark:text-amber-400">
                 Warnings
               </CardTitle>
             </CardHeader>
@@ -285,10 +255,10 @@ const SystemLogs = () => {
               </p>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-blue-600">
+              <CardTitle className="text-sm font-medium text-blue-600 dark:text-blue-400">
                 Info
               </CardTitle>
             </CardHeader>
@@ -299,10 +269,10 @@ const SystemLogs = () => {
               </p>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-green-600">
+              <CardTitle className="text-sm font-medium text-emerald-600 dark:text-emerald-400">
                 Success
               </CardTitle>
             </CardHeader>
@@ -314,7 +284,7 @@ const SystemLogs = () => {
             </CardContent>
           </Card>
         </div>
-        
+
         <Card>
           <CardHeader>
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -343,19 +313,19 @@ const SystemLogs = () => {
               <TabsList>
                 <TabsTrigger value="all">All Logs</TabsTrigger>
                 <TabsTrigger value="error">
-                  <AlertTriangle className="h-4 w-4 mr-1 text-red-500" />
+                  <AlertTriangle className="h-4 w-4 mr-1 text-rose-600 dark:text-rose-400" />
                   Errors
                 </TabsTrigger>
                 <TabsTrigger value="warning">
-                  <AlertTriangle className="h-4 w-4 mr-1 text-amber-500" />
+                  <AlertTriangle className="h-4 w-4 mr-1 text-amber-600 dark:text-amber-400" />
                   Warnings
                 </TabsTrigger>
                 <TabsTrigger value="info">
-                  <Info className="h-4 w-4 mr-1 text-blue-500" />
+                  <Info className="h-4 w-4 mr-1 text-blue-600 dark:text-blue-400" />
                   Info
                 </TabsTrigger>
                 <TabsTrigger value="success">
-                  <CheckCircle className="h-4 w-4 mr-1 text-green-500" />
+                  <CheckCircle className="h-4 w-4 mr-1 text-emerald-600 dark:text-emerald-400" />
                   Success
                 </TabsTrigger>
               </TabsList>
@@ -453,11 +423,11 @@ const SystemLogs = () => {
                   <div className="mt-4">
                     <Pagination>
                       <PaginationContent>
-                        <PaginationPrevious 
+                        <PaginationPrevious
                           onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                           className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
                         />
-                        
+
                         {Array.from({ length: totalPages }, (_, i) => i + 1)
                           .filter(page => page === 1 || page === totalPages || Math.abs(page - currentPage) <= 1)
                           .map((page, idx, array) => (
@@ -477,8 +447,8 @@ const SystemLogs = () => {
                               </PaginationItem>
                             </React.Fragment>
                           ))}
-                        
-                        <PaginationNext 
+
+                        <PaginationNext
                           onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                           className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
                         />
