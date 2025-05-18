@@ -202,7 +202,7 @@ const SystemHealth = () => {
         title="System Health"
         description="Monitor system performance and status"
       />
-      <div className={cn("flex-1 overflow-auto dashboard-content p-6")}>
+      <div className={cn("flex-1 overflow-auto dashboard-content bg-gray-50 dark:bg-gray-900 p-6")}>
         <div className="mb-6 flex items-center justify-between">
           <div className="flex items-center gap-2">
             {mockSystemStatus.status === 'healthy' ? (

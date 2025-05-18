@@ -151,9 +151,9 @@ const ResourceUsage = ({ title, usage, icon }: { title: string; usage: number; i
 const ServiceStatus = ({ service }: { service: SystemStatus['services'][0] }) => {
 
   const getResponseTimeClass = () => {
-    if (service.responseTime < 100) return 'text-green-500';
-    if (service.responseTime < 300) return 'text-amber-500';
-    return 'text-red-500';
+    if (service.responseTime < 100) return 'text-emerald-500 dark:text-emerald-400';
+    if (service.responseTime < 300) return 'text-amber-500 dark:text-amber-400';
+    return 'text-rose-500 dark:text-rose-400';
   };
 
   return (
@@ -197,24 +197,24 @@ const SystemMonitoring = () => {
         title="System Monitoring"
         description="Real-time monitoring of system resources and services"
       />
-      <div className="flex-1 overflow-auto bg-gray-50 p-6">
+      <div className="flex-1 overflow-auto bg-gray-50 dark:bg-gray-900 p-6">
         <div className="mb-6 flex items-center justify-between">
           <div className="flex items-center gap-2">
             {mockSystemStatus.status === 'healthy' ? (
-              <CheckCircle className="h-5 w-5 text-green-500" />
+              <CheckCircle className="h-5 w-5 text-emerald-500 dark:text-emerald-400" />
             ) : mockSystemStatus.status === 'warning' ? (
-              <AlertTriangle className="h-5 w-5 text-amber-500" />
+              <AlertTriangle className="h-5 w-5 text-amber-500 dark:text-amber-400" />
             ) : (
-              <AlertTriangle className="h-5 w-5 text-red-500" />
+              <AlertTriangle className="h-5 w-5 text-rose-500 dark:text-rose-400" />
             )}
             <span className="font-medium">
               System Status:
               <span className={
                 mockSystemStatus.status === 'healthy'
-                  ? 'text-green-500'
+                  ? 'text-emerald-500 dark:text-emerald-400'
                   : mockSystemStatus.status === 'warning'
-                    ? 'text-amber-500'
-                    : 'text-red-500'
+                    ? 'text-amber-500 dark:text-amber-400'
+                    : 'text-rose-500 dark:text-rose-400'
               }> {mockSystemStatus.status.charAt(0).toUpperCase() + mockSystemStatus.status.slice(1)}</span>
             </span>
           </div>
@@ -348,10 +348,10 @@ const SystemMonitoring = () => {
                                 <span
                                   className={
                                     metric.value / metric.limit < 0.7
-                                      ? 'text-green-500'
+                                      ? 'text-emerald-500 dark:text-emerald-400'
                                       : metric.value / metric.limit < 0.9
-                                        ? 'text-amber-500'
-                                        : 'text-red-500'
+                                        ? 'text-amber-500 dark:text-amber-400'
+                                        : 'text-rose-500 dark:text-rose-400'
                                   }
                                 >
                                   {metric.value.toLocaleString()}
@@ -396,10 +396,12 @@ const SystemMonitoring = () => {
                   <div className="text-2xl font-bold">{mockSystemStatus.cpuUsage}%</div>
                   <Progress
                     value={mockSystemStatus.cpuUsage}
-                    className={`h-2 ${mockSystemStatus.cpuUsage < 50 ? 'bg-green-100 bg-green-500' :
-                      mockSystemStatus.cpuUsage < 80 ? 'bg-amber-100 bg-amber-500' :
-                        'bg-red-100 bg-red-500'
-                      }`}
+                    className="h-2"
+                    indicatorClassName={
+                      mockSystemStatus.cpuUsage < 50 ? 'bg-emerald-500 dark:bg-emerald-400' :
+                        mockSystemStatus.cpuUsage < 80 ? 'bg-amber-500 dark:bg-amber-400' :
+                          'bg-rose-500 dark:bg-rose-400'
+                    }
                   />
                 </CardContent>
               </Card>
@@ -413,10 +415,12 @@ const SystemMonitoring = () => {
                   <div className="text-2xl font-bold">{mockSystemStatus.memoryUsage}%</div>
                   <Progress
                     value={mockSystemStatus.memoryUsage}
-                    className={`h-2 ${mockSystemStatus.memoryUsage < 50 ? 'bg-green-100 bg-green-500' :
-                      mockSystemStatus.memoryUsage < 80 ? 'bg-amber-100 bg-amber-500' :
-                        'bg-red-100 bg-red-500'
-                      }`}
+                    className="h-2"
+                    indicatorClassName={
+                      mockSystemStatus.memoryUsage < 50 ? 'bg-emerald-500 dark:bg-emerald-400' :
+                        mockSystemStatus.memoryUsage < 80 ? 'bg-amber-500 dark:bg-amber-400' :
+                          'bg-rose-500 dark:bg-rose-400'
+                    }
                   />
                 </CardContent>
               </Card>
@@ -430,10 +434,12 @@ const SystemMonitoring = () => {
                   <div className="text-2xl font-bold">{mockSystemStatus.diskUsage}%</div>
                   <Progress
                     value={mockSystemStatus.diskUsage}
-                    className={`h-2 ${mockSystemStatus.diskUsage < 50 ? 'bg-green-100 bg-green-500' :
-                      mockSystemStatus.diskUsage < 80 ? 'bg-amber-100 bg-amber-500' :
-                        'bg-red-100 bg-red-500'
-                      }`}
+                    className="h-2"
+                    indicatorClassName={
+                      mockSystemStatus.diskUsage < 50 ? 'bg-emerald-500 dark:bg-emerald-400' :
+                        mockSystemStatus.diskUsage < 80 ? 'bg-amber-500 dark:bg-amber-400' :
+                          'bg-rose-500 dark:bg-rose-400'
+                    }
                   />
                 </CardContent>
               </Card>
@@ -522,14 +528,14 @@ const SystemMonitoring = () => {
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="flex items-center space-x-4">
-                    <Router className="h-5 w-5 text-blue-500" />
+                    <Router className="h-5 w-5 text-blue-500 dark:text-blue-400" />
                     <div>
                       <p className="text-sm font-medium">Router</p>
                       <p className="text-xs text-muted-foreground">Online</p>
                     </div>
                   </div>
                   <div className="flex items-center space-x-4">
-                    <Server className="h-5 w-5 text-blue-500" />
+                    <Server className="h-5 w-5 text-blue-500 dark:text-blue-400" />
                     <div>
                       <p className="text-sm font-medium">Firewall</p>
                       <p className="text-xs text-muted-foreground">Online</p>

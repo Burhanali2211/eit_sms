@@ -226,7 +226,7 @@ const SystemLogs = () => {
         title="System Logs"
         description="View and manage system logs and activities"
       />
-      <div className="flex-1 overflow-auto bg-gray-50 p-6">
+      <div className="flex-1 overflow-auto bg-gray-50 dark:bg-gray-900 p-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
           <Card>
             <CardHeader className="pb-2">

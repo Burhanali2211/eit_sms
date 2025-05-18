@@ -313,7 +313,7 @@ const AuditTrail = () => {
         title="Audit Trail"
         description="Track and review all changes made to the system"
       />
-      <div className="flex-1 overflow-auto bg-gray-50 p-6">
+      <div className="flex-1 overflow-auto bg-gray-50 dark:bg-gray-900 p-6">
         <Card className="mb-6">
           <CardHeader>
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
