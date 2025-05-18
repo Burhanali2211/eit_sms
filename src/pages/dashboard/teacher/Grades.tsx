@@ -64,7 +64,17 @@ const Grades = () => {
   const [selectedCourse, setSelectedCourse] = useState("MATH101");
   const [students, setStudents] = useState(studentsList);
   const [editingStudent, setEditingStudent] = useState<string | null>(null);
-  const [editedGrades, setEditedGrades] = useState<Record<string, number>>({});
+  const [editedGrades, setEditedGrades] = useState<{
+    midterm: number;
+    final: number;
+    project: number;
+    participation: number;
+  }>({
+    midterm: 0,
+    final: 0,
+    project: 0,
+    participation: 0
+  });
   const [gradingScale, setGradingScale] = useState({
     A: 90,
     B: 80,
@@ -80,20 +90,36 @@ const Grades = () => {
   );
 
   // Start editing a student's grades
-  const handleEditStudent = (studentId: string, grades: Record<string, number>) => {
+  const handleEditStudent = (studentId: string, grades: {
+    midterm: number;
+    final: number;
+    project: number;
+    participation: number;
+  }) => {
     setEditingStudent(studentId);
-    setEditedGrades(grades);
+    setEditedGrades({
+      midterm: grades.midterm,
+      final: grades.final,
+      project: grades.project,
+      participation: grades.participation
+    });
   };
 
   // Save edited grades
   const handleSaveGrades = (studentId: string) => {
     const updatedStudents = students.map(student => {
       if (student.id === studentId) {
-        const average = Object.values(editedGrades).reduce((sum, grade) => sum + grade, 0) / Object.values(editedGrades).length;
+        const gradeValues = Object.values(editedGrades);
+        const average = gradeValues.reduce((sum, grade) => sum + grade, 0) / gradeValues.length;
         
         return {
           ...student,
-          grades: editedGrades,
+          grades: {
+            midterm: editedGrades.midterm,
+            final: editedGrades.final,
+            project: editedGrades.project,
+            participation: editedGrades.participation
+          },
           average: Math.round(average)
         };
       }
