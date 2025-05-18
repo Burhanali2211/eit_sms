@@ -13,6 +13,7 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useAuth } from "@/contexts/AuthContext";
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
+import { ThemeSwitcher } from "@/components/ui/theme-switcher";
 
 interface DashboardHeaderProps {
   title: string;
@@ -34,15 +35,17 @@ const DashboardHeader = ({ title }: DashboardHeaderProps) => {
   };
 
   return (
-    <header className="bg-white border-b px-6 py-4 flex items-center justify-between sticky top-0 z-10 shadow-sm">
+    <header className="bg-card border-b px-6 py-4 flex items-center justify-between sticky top-0 z-10 shadow-sm">
       <div className="flex items-center">
-        <SidebarTrigger className="mr-4 bg-gray-100 hover:bg-gray-200 rounded-md p-1" />
+        <SidebarTrigger className="mr-4 hover:bg-accent hover:text-accent-foreground rounded-md p-1" />
         <h1 className="text-xl font-semibold bg-gradient-to-r from-school-primary to-school-secondary bg-clip-text text-transparent">
           {title}
         </h1>
       </div>
       
       <div className="flex items-center gap-4">
+        <ThemeSwitcher />
+        
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="relative">
@@ -65,7 +68,7 @@ const DashboardHeader = ({ title }: DashboardHeaderProps) => {
             <DropdownMenuSeparator />
             <div className="max-h-80 overflow-auto">
               {[1, 2, 3].map((i) => (
-                <DropdownMenuItem key={i} className="p-4 cursor-pointer hover:bg-gray-50">
+                <DropdownMenuItem key={i} className="p-4 cursor-pointer hover:bg-accent">
                   <div className="w-full">
                     <div className="flex items-center justify-between mb-1">
                       <p className="font-medium">Notification Title {i}</p>
@@ -82,7 +85,7 @@ const DashboardHeader = ({ title }: DashboardHeaderProps) => {
         
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <div className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 rounded-md px-2 py-1">
+            <div className="flex items-center gap-2 cursor-pointer hover:bg-accent rounded-md px-2 py-1">
               <Avatar className="border-2 border-school-primary/20">
                 <AvatarImage src={user.avatar} alt={user.name} />
                 <AvatarFallback className="bg-school-primary/10 text-school-primary">

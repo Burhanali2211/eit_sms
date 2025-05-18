@@ -35,9 +35,14 @@
 
     --radius: 0.5rem;
 
-    /* Custom school colors */
+    /* School colors */
     --school-primary: 252 64% 75%;
+    --school-primary-foreground: 0 0% 100%;
     --school-secondary: 276 64% 55%;
+    --school-secondary-foreground: 0 0% 100%;
+    --school-accent: 35 100% 50%;
+    --school-light: 220 14% 96%;
+    --school-dark: 215 28% 17%;
 
     /* Sidebar Colors */
     --sidebar: 0 0% 100%;
@@ -79,6 +84,15 @@
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
 
+    /* School colors */
+    --school-primary: 252 64% 65%;
+    --school-primary-foreground: 0 0% 100%;
+    --school-secondary: 276 64% 45%;
+    --school-secondary-foreground: 0 0% 100%;
+    --school-accent: 35 100% 50%;
+    --school-light: 220 14% 96%;
+    --school-dark: 215 28% 17%;
+
     /* Sidebar Colors */
     --sidebar: 222.2 84% 4.9%;
     --sidebar-foreground: 210 40% 98%;
@@ -99,3 +113,18 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  .glass-effect {
+    @apply bg-white/10 backdrop-blur-md border border-white/20 dark:bg-gray-900/50;
+  }
+  
+  .card-hover {
+    @apply transition-all duration-300 hover:shadow-md hover:transform hover:-translate-y-1;
+  }
+  
+  .nav-link {
+    @apply transition-all duration-200 hover:text-school-primary dark:hover:text-school-secondary;
+  }
+}
+

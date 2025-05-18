@@ -26,8 +26,8 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full">
-        <Sidebar className="bg-white border-r shadow-sm">
+      <div className="min-h-screen flex w-full bg-background dark:bg-background">
+        <Sidebar className="bg-card dark:bg-card border-r shadow-sm">
           <SidebarHeader className="px-6 py-6 border-b">
             <div className="flex items-center">
               <h2 className="text-xl font-bold">
@@ -44,7 +44,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
           <SidebarFooter className="px-6 py-4 border-t mt-auto">
             <Button
               variant="outline"
-              className="w-full flex items-center justify-center hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors"
+              className="w-full flex items-center justify-center hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors dark:hover:bg-red-950 dark:hover:text-red-400"
               onClick={logout}
             >
               <LogOut className="h-4 w-4 mr-2" />
