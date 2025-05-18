@@ -8,6 +8,7 @@ import DashboardNav from "./DashboardNav";
 import { useNavigate } from "react-router-dom";
 import { ThemeSwitcher } from "@/components/ui/theme-switcher";
 import { useTheme } from "@/contexts/ThemeContext";
+import { cn } from "@/lib/utils";
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -28,7 +29,10 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen flex w-full bg-background dark:bg-background transition-colors duration-200">
+    <div className={cn(
+      "min-h-screen flex w-full transition-colors duration-300",
+      "bg-background dark:bg-background"
+    )}>
       <SidebarProvider>
         <Sidebar className="bg-card dark:bg-card border-r shadow-sm">
           <SidebarHeader className="px-6 py-6 border-b">
@@ -57,7 +61,10 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
           </SidebarFooter>
         </Sidebar>
 
-        <div className="flex-1 flex flex-col min-h-screen overflow-hidden">
+        <div className={cn(
+          "flex-1 flex flex-col min-h-screen overflow-hidden",
+          "dashboard-content"
+        )}>
           {children}
         </div>
       </SidebarProvider>
