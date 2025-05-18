@@ -28,8 +28,8 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   if (!user) return null;
 
   return (
-    <SidebarProvider>
-      <div className={`min-h-screen flex w-full bg-background dark:bg-background transition-colors duration-200 ${isDarkMode ? "dark" : ""}`}>
+    <div className="min-h-screen flex w-full bg-background dark:bg-background transition-colors duration-200">
+      <SidebarProvider>
         <Sidebar className="bg-card dark:bg-card border-r shadow-sm">
           <SidebarHeader className="px-6 py-6 border-b">
             <div className="flex items-center justify-between">
@@ -60,8 +60,8 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
         <div className="flex-1 flex flex-col min-h-screen overflow-hidden">
           {children}
         </div>
-      </div>
-    </SidebarProvider>
+      </SidebarProvider>
+    </div>
   );
 };
 

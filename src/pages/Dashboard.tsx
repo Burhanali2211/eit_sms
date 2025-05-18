@@ -34,7 +34,7 @@ const Dashboard = () => {
     <DashboardLayout>
       <DashboardHeader title="Dashboard" />
       
-      <main className="flex-1 overflow-auto bg-gray-50 p-6">
+      <main className="flex-1 overflow-auto dashboard-content p-6">
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           {stats.map((stat, index) => (
             <StatCard key={index} {...stat} />
