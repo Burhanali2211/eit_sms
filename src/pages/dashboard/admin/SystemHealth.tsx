@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
@@ -135,10 +134,9 @@ const ResourceUsage = ({ title, usage, icon }: { title: string; usage: number; i
           value={usage} 
           className={`mt-2 h-2 ${
             usage < 50 ? 'bg-green-100' : usage < 80 ? 'bg-amber-100' : 'bg-red-100'
-          }`}
-          indicatorClassName={
+          } ${
             usage < 50 ? 'bg-green-500' : usage < 80 ? 'bg-amber-500' : 'bg-red-500'
-          }
+          }`}
         />
       </CardContent>
     </Card>
@@ -445,18 +443,11 @@ const SystemHealth = () => {
                             value={(metric.value / metric.limit) * 100} 
                             className={`h-2 ${
                               metric.value / metric.limit < 0.7 
-                                ? 'bg-green-100' 
+                                ? 'bg-green-100 bg-green-500' 
                                 : metric.value / metric.limit < 0.9
-                                ? 'bg-amber-100'
-                                : 'bg-red-100'
+                                ? 'bg-amber-100 bg-amber-500'
+                                : 'bg-red-100 bg-red-500'
                             }`}
-                            indicatorClassName={
-                              metric.value / metric.limit < 0.7 
-                                ? 'bg-green-500' 
-                                : metric.value / metric.limit < 0.9
-                                ? 'bg-amber-500'
-                                : 'bg-red-500'
-                            }
                           />
                         )}
                       </div>

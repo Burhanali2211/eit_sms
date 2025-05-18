@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
@@ -46,7 +45,10 @@ import {
   Play,
   Settings,
   RefreshCw,
-  Database
+  Database,
+  Plus,
+  Bell,
+  Checkbox
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { Progress } from "@/components/ui/progress";
