@@ -17,9 +17,10 @@ import { ThemeSwitcher } from "@/components/ui/theme-switcher";
 
 interface DashboardHeaderProps {
   title: string;
+  description?: string; // Added optional description prop
 }
 
-const DashboardHeader = ({ title }: DashboardHeaderProps) => {
+const DashboardHeader = ({ title, description }: DashboardHeaderProps) => {
   const { user, logout } = useAuth();
 
   if (!user) return null;
@@ -38,9 +39,14 @@ const DashboardHeader = ({ title }: DashboardHeaderProps) => {
     <header className="bg-card border-b px-6 py-4 flex items-center justify-between sticky top-0 z-10 shadow-sm">
       <div className="flex items-center">
         <SidebarTrigger className="mr-4 hover:bg-accent hover:text-accent-foreground rounded-md p-1" />
-        <h1 className="text-xl font-semibold bg-gradient-to-r from-school-primary to-school-secondary bg-clip-text text-transparent">
-          {title}
-        </h1>
+        <div>
+          <h1 className="text-xl font-semibold bg-gradient-to-r from-school-primary to-school-secondary bg-clip-text text-transparent">
+            {title}
+          </h1>
+          {description && (
+            <p className="text-sm text-muted-foreground mt-1">{description}</p>
+          )}
+        </div>
       </div>
       
       <div className="flex items-center gap-4">
