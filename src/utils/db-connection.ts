@@ -6,7 +6,7 @@
  * the database after migrating from Supabase.
  */
 
-import { Pool, QueryResult } from 'pg';
+import { Pool, QueryResult, PoolClient } from 'pg';
 
 // Database configuration
 // In a real application, these values should come from environment variables
@@ -70,20 +70,22 @@ export async function getClient() {
   const release = client.release;
   
   // Add timestamp and logging to track query execution time
-  // @ts-ignore
-  client.query = (...args) => {
-    client.lastQuery = args;
+  // Use a custom property for client with type assertion
+  const clientWithLastQuery = client as PoolClient & { lastQuery?: any };
+  
+  clientWithLastQuery.query = (...args: any[]) => {
+    clientWithLastQuery.lastQuery = args;
     return query.apply(client, args);
   };
   
   // Override client.release to keep track of released clients
-  client.release = () => {
-    client.query = query;
-    client.release = release;
+  clientWithLastQuery.release = () => {
+    clientWithLastQuery.query = query;
+    clientWithLastQuery.release = release;
     return release.apply(client);
   };
   
-  return client;
+  return clientWithLastQuery;
 }
 
 /**
@@ -113,8 +115,6 @@ export async function closePool() {
   await pool.end();
   console.log('Database pool has been closed');
 }
-
-// Example data access functions
 
 /**
  * Get all users

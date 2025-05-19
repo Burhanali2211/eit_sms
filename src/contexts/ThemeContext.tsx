@@ -50,6 +50,9 @@ export function ThemeProvider({
 
       // Set data-theme attribute for other libraries
       root.setAttribute('data-theme', systemTheme);
+      
+      // Update CSS variables for background colors
+      updateBackgroundColors(systemTheme === "dark");
       return;
     }
 
@@ -58,7 +61,22 @@ export function ThemeProvider({
 
     // Set data-theme attribute for other libraries
     root.setAttribute('data-theme', theme);
+    
+    // Update CSS variables for background colors
+    updateBackgroundColors(theme === "dark");
   }, [theme]);
+
+  // Function to update CSS variables for background colors
+  const updateBackgroundColors = (isDark: boolean) => {
+    const root = window.document.documentElement;
+    if (isDark) {
+      root.style.setProperty('--dashboard-bg', 'rgb(17, 24, 39)');
+      root.style.setProperty('--content-bg', 'rgb(24, 33, 47)');
+    } else {
+      root.style.setProperty('--dashboard-bg', 'rgb(249, 250, 251)');
+      root.style.setProperty('--content-bg', 'rgb(255, 255, 255)');
+    }
+  };
 
   // Listen for system theme changes
   useEffect(() => {
@@ -74,6 +92,9 @@ export function ThemeProvider({
       root.classList.add(systemTheme);
       root.setAttribute('data-theme', systemTheme);
       setIsDarkMode(systemTheme === "dark");
+      
+      // Update background colors when system theme changes
+      updateBackgroundColors(systemTheme === "dark");
     };
 
     mediaQuery.addEventListener("change", handleChange);
