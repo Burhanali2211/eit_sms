@@ -13,7 +13,7 @@ import { toast } from "@/components/ui/use-toast";
 import { cn } from "@/lib/utils";
 
 export function ThemeSwitcher() {
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, isDarkMode } = useTheme();
   const [isRotating, setIsRotating] = React.useState(false);
 
   const handleThemeChange = (newTheme: "light" | "dark" | "system") => {

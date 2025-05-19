@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -46,31 +45,29 @@ const ConfigurationSection = ({
   
   return (
     <Card className="mb-6 border shadow-sm">
-      <CollapsibleTrigger 
-        asChild 
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-full cursor-pointer hover:bg-muted/40 transition-colors"
-      >
-        <CardHeader className="flex flex-row items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-primary/10 rounded-lg">
-              <Icon className="h-5 w-5 text-primary" />
+      <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+        <CollapsibleTrigger asChild>
+          <CardHeader className="flex flex-row items-center justify-between cursor-pointer hover:bg-muted/40 transition-colors">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <Icon className="h-5 w-5 text-primary" />
+              </div>
+              <div className="text-left">
+                <CardTitle className="text-lg">{title}</CardTitle>
+                <CardDescription className="text-sm">{description}</CardDescription>
+              </div>
             </div>
-            <div className="text-left">
-              <CardTitle className="text-lg">{title}</CardTitle>
-              <CardDescription className="text-sm">{description}</CardDescription>
+            <div className="flex items-center gap-2">
+              <StatusBadge status={isOpen ? "active" : "inactive"} />
             </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <StatusBadge status={isOpen ? "active" : "inactive"} />
-          </div>
-        </CardHeader>
-      </CollapsibleTrigger>
-      <CollapsibleContent>
-        <CardContent className="pt-0 pb-4 px-6">
-          {children}
-        </CardContent>
-      </CollapsibleContent>
+          </CardHeader>
+        </CollapsibleTrigger>
+        <CollapsibleContent>
+          <CardContent className="pt-0 pb-4 px-6">
+            {children}
+          </CardContent>
+        </CollapsibleContent>
+      </Collapsible>
     </Card>
   );
 };
