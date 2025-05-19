@@ -17,4 +17,26 @@ export type StatusType =
   | 'info'
   | 'new'
   | 'draft'
-  | 'archived';
+  | 'archived'
+  | 'online'
+  | 'offline'
+  | 'degraded'
+  | 'approved'
+  | 'rejected'
+  | 'on-leave'
+  | 'create'
+  | 'update'
+  | 'delete'
+  | 'restore'
+  | 'login'
+  | 'logout'
+  | 'add-user'
+  | 'remove-user'
+  | 'paid'
+  | 'overdue';
+
+export interface StatusConfigItem {
+  variant: 'default' | 'success' | 'error' | 'warning' | 'info' | 'secondary';
+  icon: React.ReactNode;
+  label: string;
+}
