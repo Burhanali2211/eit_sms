@@ -29,12 +29,22 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/login" element={<Login />} />
               
-              {/* Import all route groups */}
-              <DashboardRoutes />
-              <StudentRoutes />
-              <TeacherRoutes />
-              <AdminRoutes />
-              <FinanceRoutes />
+              {/* Use Fragment to include route groups */}
+              <Route>
+                {DashboardRoutes()}
+              </Route>
+              <Route>
+                {StudentRoutes()}
+              </Route>
+              <Route>
+                {TeacherRoutes()}
+              </Route>
+              <Route>
+                {AdminRoutes()}
+              </Route>
+              <Route>
+                {FinanceRoutes()}
+              </Route>
               
               <Route path="*" element={<NotFound />} />
             </Routes>
