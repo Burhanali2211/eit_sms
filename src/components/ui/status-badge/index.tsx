@@ -5,7 +5,8 @@ import { cn } from "@/lib/utils";
 import { StatusBadgeProps } from "./types";
 import { getStatusConfig } from "./status-config";
 
-export { StatusType } from "./types";
+// Export the StatusType as a type-only export
+export type { StatusType } from "./types";
 
 export function StatusBadge({ 
   status, 
