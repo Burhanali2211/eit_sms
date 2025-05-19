@@ -1,9 +1,4 @@
-import * as CollapsiblePrimitive from "@radix-ui/react-collapsible"
 
-const Collapsible = CollapsiblePrimitive.Root
-
-const CollapsibleTrigger = CollapsiblePrimitive.CollapsibleTrigger
-
-const CollapsibleContent = CollapsiblePrimitive.CollapsibleContent
-
-export { Collapsible, CollapsibleTrigger, CollapsibleContent }
+// This file is kept for backward compatibility
+// It re-exports everything from the new modular structure
+export { Collapsible, CollapsibleTrigger, CollapsibleContent } from "./collapsible/index";
