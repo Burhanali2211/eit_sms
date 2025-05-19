@@ -202,12 +202,14 @@ export function StatusBadge({
           icon: <AlertCircle className="h-3.5 w-3.5 mr-1" />,
           label: label || "Overdue"
         };
-      default:
+      default: {
+        const statusString = status as string;
         return {
           variant: "default" as const,
           icon: <Info className="h-3.5 w-3.5 mr-1" />,
-          label: label || (typeof status === 'string' ? status.charAt(0).toUpperCase() + status.slice(1) : 'Unknown')
+          label: label || (statusString ? statusString.charAt(0).toUpperCase() + statusString.slice(1) : 'Unknown')
         };
+      }
     }
   };
 
