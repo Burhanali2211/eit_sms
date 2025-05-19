@@ -42,6 +42,7 @@ import AuditTrail from "./pages/dashboard/admin/AuditTrail";
 import SystemHealth from "./pages/dashboard/admin/SystemHealth";
 import BackupRecovery from "./pages/dashboard/admin/BackupRecovery";
 import SystemMonitoring from "./pages/dashboard/admin/SystemMonitoring";
+import ConfigurationManager from "./pages/dashboard/admin/ConfigurationManager";
 
 const queryClient = new QueryClient();
 
@@ -151,6 +152,12 @@ const App = () => (
               <Route path="/dashboard/system" element={
                 <ProtectedRoute allowedRoles={['admin', 'super-admin']}>
                   <SystemSettings />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/dashboard/configuration" element={
+                <ProtectedRoute allowedRoles={['super-admin']}>
+                  <ConfigurationManager />
                 </ProtectedRoute>
               } />
               
