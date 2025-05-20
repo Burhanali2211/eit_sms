@@ -59,4 +59,3 @@ export interface StatusConfigItem {
   icon: React.ReactNode;
   label: string;
 }
-

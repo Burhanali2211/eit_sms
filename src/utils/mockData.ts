@@ -12,7 +12,6 @@ import {
   UserRole,
   DashboardStat
 } from "@/types/dashboard";
-import { FiUsers, FiCalendar, FiActivity, FiBook, FiBriefcase, FiUser, FiDatabase, FiServer } from 'react-icons/fi';
 import { fetchData, fetchFromView, shouldUseMockData } from './db-connection';
 
 // Enhanced mock data now with proper database fetching fallbacks
