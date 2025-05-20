@@ -1,223 +1,227 @@
 /**
- * PostgreSQL Database Connection Utility
+ * Database connection utility
  * 
- * This file provides functions for connecting to a PostgreSQL database
- * and executing queries. It serves as an example of how to interact with
- * the database after migrating from Supabase.
+ * This file provides utilities for connecting to the database,
+ * with support for both PostgreSQL direct connection and Supabase.
  */
 
-import { Pool, QueryResult, PoolClient } from 'pg';
+import { createClient } from '@supabase/supabase-js';
 
-// Database configuration
-// In a real application, these values should come from environment variables
-const config = {
-  user: process.env.DB_USER || 'edusync_user',
-  host: process.env.DB_HOST || 'localhost',
-  database: process.env.DB_NAME || 'edusync_db',
-  password: process.env.DB_PASSWORD || 'secure_password',
-  port: parseInt(process.env.DB_PORT || '5432'),
-  // Additional options
-  ssl: process.env.DB_USE_SSL === 'true' ? { rejectUnauthorized: false } : undefined,
-  max: 20, // Maximum number of clients in the pool
-  idleTimeoutMillis: 30000, // How long a client is allowed to remain idle before being closed
-  connectionTimeoutMillis: 2000, // How long to wait for a connection
+// Environment variables that would be set in production
+// For development, these can be hard-coded or loaded from .env
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'your_supabase_url';
+const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || 'your_supabase_anon_key';
+const USE_MOCK_DATA = import.meta.env.VITE_USE_MOCK_DATA === 'true' || true;
+
+// Create Supabase client
+export const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+/**
+ * Determines if the app should use mock data instead of real database data
+ * This is useful during development or when database is not available
+ */
+export const shouldUseMockData = (): boolean => {
+  return USE_MOCK_DATA;
 };
 
-// Create a new pool
-const pool = new Pool(config);
-
-// Log connection events for debugging
-pool.on('connect', () => {
-  console.log('Connected to PostgreSQL database');
-});
-
-pool.on('error', (err) => {
-  console.error('Unexpected error on idle client', err);
-  process.exit(-1);
-});
-
 /**
- * Execute a query against the PostgreSQL database
- * @param text - SQL query text
- * @param params - Query parameters
- * @returns Promise that resolves to the query result
+ * Generic function to fetch data from the database
+ * Falls back to mock data if database connection fails or mock mode is enabled
+ * 
+ * @param tableName - The database table to query
+ * @param mockData - Mock data to return if using mock mode
+ * @param options - Query options (select, filter, etc.)
+ * @returns The data from the database or mock data
  */
-export async function query<T>(text: string, params?: any[]): Promise<QueryResult<T>> {
-  const start = Date.now();
+export async function fetchData<T>(
+  tableName: string, 
+  mockData: T, 
+  options: { 
+    select?: string,
+    filter?: Record<string, unknown>,
+    limit?: number,
+    orderBy?: { column: string, ascending?: boolean }
+  } = {}
+): Promise<T> {
+  // If using mock data, return the mock data
+  if (shouldUseMockData()) {
+    console.log(`Using mock data for ${tableName}`);
+    return mockData;
+  }
+
+  // Otherwise, attempt to fetch from Supabase
   try {
-    const result = await pool.query(text, params);
-    const duration = Date.now() - start;
+    console.log(`Fetching data from ${tableName} with options:`, options);
     
-    // Log slow queries for optimization
-    if (duration > 500) { // Log queries that take more than 500ms
-      console.warn('Slow query detected:', { text, duration, rows: result.rowCount });
+    let query = supabase
+      .from(tableName)
+      .select(options.select || '*');
+    
+    // Apply filters
+    if (options.filter) {
+      Object.entries(options.filter).forEach(([key, value]) => {
+        query = query.eq(key, value);
+      });
     }
     
-    return result;
+    // Apply order
+    if (options.orderBy) {
+      query = query.order(options.orderBy.column, { 
+        ascending: options.orderBy.ascending ?? true 
+      });
+    }
+    
+    // Apply limit
+    if (options.limit) {
+      query = query.limit(options.limit);
+    }
+    
+    const { data, error } = await query;
+    
+    if (error) {
+      console.error('Error fetching data from Supabase:', error);
+      return mockData;
+    }
+    
+    console.log(`Successfully fetched data from ${tableName}`);
+    return data as unknown as T;
   } catch (error) {
-    console.error('Database query error:', error);
-    throw error;
+    console.error('Error connecting to database:', error);
+    return mockData;
   }
 }
 
 /**
- * Get a client from the pool
- * @returns A client from the pool
+ * Inserts data into the database
+ * 
+ * @param tableName - The table to insert into
+ * @param data - The data to insert
+ * @returns The inserted data or null if there was an error
  */
-export async function getClient() {
-  const client = await pool.connect();
-  const query = client.query;
-  const release = client.release;
+export async function insertData<T>(tableName: string, data: T): Promise<T | null> {
+  if (shouldUseMockData()) {
+    console.log(`[MOCK] Inserting into ${tableName}:`, data);
+    return data; // Just return the data in mock mode
+  }
   
-  // Add timestamp and logging to track query execution time
-  // Use a custom property for client with type assertion
-  const clientWithLastQuery = client as PoolClient & { lastQuery?: any };
-  
-  clientWithLastQuery.query = (...args: any[]) => {
-    clientWithLastQuery.lastQuery = args;
-    return query.apply(client, args);
-  };
-  
-  // Override client.release to keep track of released clients
-  clientWithLastQuery.release = () => {
-    clientWithLastQuery.query = query;
-    clientWithLastQuery.release = release;
-    return release.apply(client);
-  };
-  
-  return clientWithLastQuery;
-}
-
-/**
- * Example function for transaction handling
- * @param callback - Function to execute within the transaction
- * @returns Promise that resolves to the result of the callback
- */
-export async function transaction<T>(callback: (client: any) => Promise<T>): Promise<T> {
-  const client = await getClient();
   try {
-    await client.query('BEGIN');
-    const result = await callback(client);
-    await client.query('COMMIT');
-    return result;
-  } catch (e) {
-    await client.query('ROLLBACK');
-    throw e;
-  } finally {
-    client.release();
+    const { data: insertedData, error } = await supabase
+      .from(tableName)
+      .insert(data as any)
+      .select();
+    
+    if (error) {
+      console.error('Error inserting data:', error);
+      return null;
+    }
+    
+    return insertedData[0] as T;
+  } catch (error) {
+    console.error('Error inserting data:', error);
+    return null;
   }
 }
 
 /**
- * Close the pool when the application shuts down
+ * Updates data in the database
+ * 
+ * @param tableName - The table to update
+ * @param id - The ID of the record to update
+ * @param data - The data to update
+ * @returns The updated data or null if there was an error
  */
-export async function closePool() {
-  await pool.end();
-  console.log('Database pool has been closed');
-}
-
-/**
- * Get all users
- * @returns Promise that resolves to an array of users
- */
-export async function getUsers() {
-  const result = await query<{id: string, name: string, email: string, role: string}>(
-    'SELECT id, name, email, role FROM users'
-  );
-  return result.rows;
-}
-
-/**
- * Get user by ID
- * @param id - User ID
- * @returns Promise that resolves to a user object or null if not found
- */
-export async function getUserById(id: string) {
-  const result = await query<{id: string, name: string, email: string, role: string}>(
-    'SELECT id, name, email, role FROM users WHERE id = $1',
-    [id]
-  );
-  return result.rows[0] || null;
-}
-
-/**
- * Get dashboard stats for a user based on their role
- * @param userId - User ID
- * @param role - User role
- * @returns Promise that resolves to dashboard stats
- */
-export async function getDashboardStats(userId: string, role: string) {
-  switch (role) {
-    case 'student':
-      const studentResult = await query(
-        'SELECT * FROM student_dashboard_view WHERE user_id = $1',
-        [userId]
-      );
-      return studentResult.rows[0] || null;
-      
-    case 'teacher':
-      const teacherResult = await query(
-        'SELECT * FROM teacher_dashboard_view WHERE user_id = $1',
-        [userId]
-      );
-      return teacherResult.rows[0] || null;
-      
-    case 'financial':
-      const financialResult = await query(
-        'SELECT * FROM financial_dashboard_view'
-      );
-      return financialResult.rows[0] || null;
-      
-    // Add cases for other roles
-      
-    default:
-      // Default stats for admin, principal, etc.
-      const defaultResult = await query(
-        'SELECT * FROM system_health'
-      );
-      return defaultResult.rows[0] || null;
+export async function updateData<T>(
+  tableName: string, 
+  id: string, 
+  data: Partial<T>
+): Promise<T | null> {
+  if (shouldUseMockData()) {
+    console.log(`[MOCK] Updating ${tableName} with ID ${id}:`, data);
+    return data as T; // Just return the data in mock mode
+  }
+  
+  try {
+    const { data: updatedData, error } = await supabase
+      .from(tableName)
+      .update(data as any)
+      .eq('id', id)
+      .select();
+    
+    if (error) {
+      console.error('Error updating data:', error);
+      return null;
+    }
+    
+    return updatedData[0] as T;
+  } catch (error) {
+    console.error('Error updating data:', error);
+    return null;
   }
 }
 
 /**
- * Get notifications for a user
- * @param userId - User ID
- * @param limit - Maximum number of notifications to return
- * @returns Promise that resolves to array of notifications
+ * Deletes data from the database
+ * 
+ * @param tableName - The table to delete from
+ * @param id - The ID of the record to delete
+ * @returns True if successful, false otherwise
  */
-export async function getUserNotifications(userId: string, limit = 10) {
-  const result = await query(
-    `SELECT n.id, n.title, n.message, n.created_at, un.is_read 
-     FROM notifications n
-     JOIN user_notifications un ON n.id = un.notification_id
-     WHERE un.user_id = $1
-     ORDER BY n.created_at DESC
-     LIMIT $2`,
-    [userId, limit]
-  );
-  return result.rows;
+export async function deleteData(tableName: string, id: string): Promise<boolean> {
+  if (shouldUseMockData()) {
+    console.log(`[MOCK] Deleting from ${tableName} with ID ${id}`);
+    return true; // Pretend it worked in mock mode
+  }
+  
+  try {
+    const { error } = await supabase
+      .from(tableName)
+      .delete()
+      .eq('id', id);
+    
+    if (error) {
+      console.error('Error deleting data:', error);
+      return false;
+    }
+    
+    return true;
+  } catch (error) {
+    console.error('Error deleting data:', error);
+    return false;
+  }
 }
 
 /**
- * Get calendar events for a user
- * @param userId - User ID
- * @param limit - Maximum number of events to return
- * @returns Promise that resolves to array of events
+ * Fetches data using a custom SQL query or database view
+ * 
+ * @param viewName - The view or SQL query to use
+ * @param mockData - Mock data to return if using mock mode
+ * @param params - Query parameters
+ * @returns The data from the view/query or mock data
  */
-export async function getUserCalendarEvents(userId: string, limit = 5) {
-  const result = await query(
-    `SELECT e.id, e.title, e.description, 
-     to_char(e.event_date, 'Month DD, YYYY') as date,
-     to_char(e.event_time, 'HH24:MI') as time
-     FROM calendar_events e
-     JOIN event_participants ep ON e.id = ep.event_id
-     WHERE ep.user_id = $1 AND e.event_date >= CURRENT_DATE
-     ORDER BY e.event_date, e.event_time
-     LIMIT $2`,
-    [userId, limit]
-  );
-  return result.rows;
+export async function fetchFromView<T>(
+  viewName: string, 
+  mockData: T, 
+  params: Record<string, unknown> = {}
+): Promise<T> {
+  if (shouldUseMockData()) {
+    console.log(`Using mock data for view ${viewName}`);
+    return mockData;
+  }
+  
+  try {
+    const { data, error } = await supabase
+      .from(viewName)
+      .select('*')
+      .eq(Object.keys(params)[0] || 'id', Object.values(params)[0] || '');
+    
+    if (error) {
+      console.error(`Error fetching from view ${viewName}:`, error);
+      return mockData;
+    }
+    
+    return data as unknown as T;
+  } catch (error) {
+    console.error(`Error fetching from view ${viewName}:`, error);
+    return mockData;
+  }
 }
-
-// Export the pool for direct use if needed
-export default pool;

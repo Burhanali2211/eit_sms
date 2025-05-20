@@ -1,4 +1,3 @@
-
 import { 
   Notification, 
   CalendarEvent, 
@@ -8,79 +7,699 @@ import {
   AdmissionApplication,
   LibraryItem,
   ClubActivity,
-  LabResource
+  LabResource,
+  User,
+  UserRole,
+  DashboardStat
 } from "@/types/dashboard";
+import { FiUsers, FiCalendar, FiActivity, FiBook, FiBriefcase, FiUser, FiDatabase, FiServer } from 'react-icons/fi';
+import { fetchData, fetchFromView, shouldUseMockData } from './db-connection';
+
+// Enhanced mock data now with proper database fetching fallbacks
+// In a real application, this would be replaced with real data from the database
 
 export const mockNotifications: Notification[] = [
   {
-    id: "1",
-    title: "Exam Schedule Posted",
-    message: "The final exam schedule for this semester has been posted.",
-    time: "2 hours ago",
-    read: false,
+    id: '1',
+    title: 'New Assignment Posted',
+    message: 'Mathematics: Algebra Assignment 3 has been posted.',
+    time: '2 hours ago',
+    read: false
   },
   {
-    id: "2",
-    title: "Fee Payment Reminder",
-    message: "This is a reminder to pay your term fees before the 15th of this month.",
-    time: "1 day ago",
-    read: true,
+    id: '2',
+    title: 'Upcoming Exam',
+    message: 'Reminder: Science exam scheduled for next Monday.',
+    time: 'Yesterday',
+    read: true
   },
   {
-    id: "3",
-    title: "New Course Material Available",
-    message: "New course materials for Mathematics have been uploaded.",
-    time: "2 days ago",
-    read: true,
+    id: '3',
+    title: 'Holiday Announcement',
+    message: 'School will be closed on May 15th for Staff Development Day.',
+    time: '3 days ago',
+    read: false
   },
   {
-    id: "4",
-    title: "School Event Announced",
-    message: "Annual Sports Day will be held on the 20th of next month.",
-    time: "3 days ago",
-    read: false,
+    id: '4',
+    title: 'Parent-Teacher Meeting',
+    message: 'Parent-teacher conferences scheduled for next week.',
+    time: '1 week ago',
+    read: true
   },
   {
-    id: "5",
-    title: "Parent-Teacher Meeting",
-    message: "Parent-teacher meeting scheduled for next Friday.",
-    time: "4 days ago",
-    read: true,
-  },
+    id: '5',
+    title: 'Library Books Due',
+    message: 'Please return your borrowed library books by Friday.',
+    time: '1 week ago',
+    read: true
+  }
 ];
 
 export const mockCalendarEvents: CalendarEvent[] = [
   {
-    id: "1",
-    title: "Math Quiz",
-    date: "May 12, 2025",
-    time: "10:00 AM",
+    id: '1',
+    title: 'Math Quiz',
+    date: 'May 12, 2025',
+    time: '10:00 AM'
   },
   {
-    id: "2",
-    title: "Science Project Due",
-    date: "May 14, 2025",
-    time: "11:59 PM",
+    id: '2',
+    title: 'Science Project Due',
+    date: 'May 14, 2025',
+    time: '3:00 PM'
   },
   {
-    id: "3",
-    title: "School Assembly",
-    date: "May 15, 2025",
-    time: "09:00 AM",
+    id: '3',
+    title: 'School Assembly',
+    date: 'May 15, 2025',
+    time: '9:00 AM'
   },
   {
-    id: "4",
-    title: "Sports Day",
-    date: "May 20, 2025",
-    time: "All Day",
+    id: '4',
+    title: 'Sports Day',
+    date: 'May 20, 2025',
+    time: '8:00 AM'
   },
   {
-    id: "5",
-    title: "Career Counseling",
-    date: "May 22, 2025",
-    time: "02:00 PM",
-  },
+    id: '5',
+    title: 'Career Counseling',
+    date: 'May 22, 2025',
+    time: '2:00 PM'
+  }
 ];
+
+// Get role-specific dashboard stats
+export const getRoleDashboardStats = async (role: UserRole): Promise<DashboardStat[]> => {
+  // Try to fetch from database if not using mock data
+  if (!shouldUseMockData()) {
+    try {
+      // Determine which view to use based on role
+      let viewName = '';
+      
+      switch(role) {
+        case 'student':
+          viewName = 'student_dashboard_view';
+          break;
+        case 'teacher':
+          viewName = 'teacher_dashboard_view';
+          break;
+        case 'financial':
+          viewName = 'financial_dashboard_view';
+          break;
+        case 'admission':
+          viewName = 'admission_dashboard_view';
+          break;
+        case 'library':
+          viewName = 'library_dashboard_view';
+          break;
+        case 'labs':
+          viewName = 'lab_resources_dashboard_view';
+          break;
+        case 'club':
+          viewName = 'club_activities_dashboard_view';
+          break;
+        case 'admin':
+        case 'super-admin':
+          viewName = 'system_health_dashboard_view';
+          break;
+        default:
+          // Fall back to mock data for other roles
+          return getMockStatsForRole(role);
+      }
+      
+      // Fetch data from the appropriate view
+      const viewData = await fetchFromView(viewName, {}, {});
+      
+      // Transform the view data into DashboardStat objects
+      if (viewData) {
+        return transformViewDataToStats(viewData, role);
+      }
+    } catch (error) {
+      console.error('Error fetching dashboard stats from database:', error);
+      // Fall back to mock data on error
+    }
+  }
+  
+  // Return mock data if database fetch failed or mock mode is enabled
+  return getMockStatsForRole(role);
+};
+
+// Helper function to transform database view data to dashboard stats
+const transformViewDataToStats = (viewData: any, role: UserRole): DashboardStat[] => {
+  // Default stats in case transformation fails
+  const defaultStats = getMockStatsForRole(role);
+  
+  try {
+    if (!viewData || typeof viewData !== 'object') {
+      return defaultStats;
+    }
+
+    // Transform based on role-specific views
+    switch(role) {
+      case 'student':
+        return [
+          {
+            title: 'Attendance',
+            value: `${viewData.attendance_percentage}%`,
+            description: 'Current attendance rate',
+            change: '+2%',
+            increasing: true
+          },
+          {
+            title: 'Pending Assignments',
+            value: viewData.pending_assignments || 0,
+            description: 'Due this week',
+            change: viewData.pending_assignments > 3 ? 'High' : 'Low',
+            increasing: viewData.pending_assignments > 3
+          },
+          {
+            title: 'Overdue Assignments',
+            value: viewData.overdue_assignments || 0,
+            description: 'Need attention',
+            change: viewData.overdue_assignments > 0 ? 'Action needed' : 'All good',
+            increasing: viewData.overdue_assignments > 0
+          },
+          {
+            title: 'Upcoming Events',
+            value: viewData.upcoming_events || 0,
+            description: 'On your calendar',
+            change: '',
+            increasing: false
+          }
+        ];
+
+      case 'financial':
+        return [
+          {
+            title: 'Monthly Revenue',
+            value: viewData.monthly_revenue ? `$${viewData.monthly_revenue.toLocaleString()}` : '$0',
+            description: 'Current month',
+            change: '+5%',
+            increasing: true
+          },
+          {
+            title: 'Monthly Expenses',
+            value: viewData.monthly_expenses ? `$${viewData.monthly_expenses.toLocaleString()}` : '$0',
+            description: 'Current month',
+            change: '-2%',
+            increasing: false
+          },
+          {
+            title: 'Pending Fees',
+            value: viewData.pending_fees ? `$${viewData.pending_fees.toLocaleString()}` : '$0',
+            description: 'Awaiting payment',
+            change: viewData.pending_transactions || 0,
+            increasing: (viewData.pending_transactions || 0) > 10
+          },
+          {
+            title: 'Current Balance',
+            value: viewData.current_balance ? `$${viewData.current_balance.toLocaleString()}` : '$0',
+            description: 'Available funds',
+            change: '',
+            increasing: (viewData.current_balance || 0) > 0
+          }
+        ];
+        
+      // Add other role transformations as needed
+      
+      default:
+        return defaultStats;
+    }
+  } catch (error) {
+    console.error('Error transforming view data to stats:', error);
+    return defaultStats;
+  }
+};
+
+// Mock stats based on user role
+const getMockStatsForRole = (role: UserRole): DashboardStat[] => {
+  switch(role) {
+    case 'student':
+      return [
+        {
+          title: 'Attendance',
+          value: '92%',
+          description: 'Current attendance rate',
+          change: '+2%',
+          increasing: true
+        },
+        {
+          title: 'Assignments',
+          value: '4',
+          description: 'Pending tasks',
+          change: '2 due soon',
+          increasing: false
+        },
+        {
+          title: 'Performance',
+          value: 'A',
+          description: 'Current grade',
+          change: 'Stable',
+          increasing: true
+        },
+        {
+          title: 'Upcoming Events',
+          value: '3',
+          description: 'On your calendar',
+          change: '',
+          increasing: false
+        }
+      ];
+      
+    case 'teacher':
+      return [
+        {
+          title: 'Classes',
+          value: '5',
+          description: 'Teaching load',
+          change: '',
+          increasing: false
+        },
+        {
+          title: 'Students',
+          value: '127',
+          description: 'Total students',
+          change: '+3',
+          increasing: true
+        },
+        {
+          title: 'Avg. Attendance',
+          value: '88%',
+          description: 'This week',
+          change: '-2%',
+          increasing: false
+        },
+        {
+          title: 'Pending Grading',
+          value: '22',
+          description: 'Need review',
+          change: '',
+          increasing: false
+        }
+      ];
+      
+    case 'principal':
+      return [
+        {
+          title: 'Teachers',
+          value: '28',
+          description: 'Total staff',
+          change: '',
+          increasing: false
+        },
+        {
+          title: 'Students',
+          value: '517',
+          description: 'Total enrollment',
+          change: '+12',
+          increasing: true
+        },
+        {
+          title: 'Attendance',
+          value: '91%',
+          description: 'School average',
+          change: '+1%',
+          increasing: true
+        },
+        {
+          title: 'Performance',
+          value: 'B+',
+          description: 'School average grade',
+          change: 'Improving',
+          increasing: true
+        }
+      ];
+      
+    case 'admin':
+      return [
+        {
+          title: 'System Health',
+          value: '98.5%',
+          description: 'Overall status',
+          change: 'Healthy',
+          increasing: true
+        },
+        {
+          title: 'Users',
+          value: '578',
+          description: 'Active accounts',
+          change: '+15',
+          increasing: true
+        },
+        {
+          title: 'Disk Usage',
+          value: '48%',
+          description: 'Storage capacity',
+          change: '+2%',
+          increasing: false
+        },
+        {
+          title: 'CPU Load',
+          value: '32%',
+          description: 'Average usage',
+          change: 'Normal',
+          increasing: false
+        }
+      ];
+      
+    case 'financial':
+      return [
+        {
+          title: 'Monthly Revenue',
+          value: '$127,500',
+          description: 'Current month',
+          change: '+5%',
+          increasing: true
+        },
+        {
+          title: 'Monthly Expenses',
+          value: '$98,750',
+          description: 'Current month',
+          change: '-2%',
+          increasing: false
+        },
+        {
+          title: 'Pending Fees',
+          value: '$45,200',
+          description: 'Awaiting payment',
+          change: '12 transactions',
+          increasing: true
+        },
+        {
+          title: 'Current Balance',
+          value: '$284,300',
+          description: 'Available funds',
+          change: '',
+          increasing: false
+        }
+      ];
+      
+    case 'admission':
+      return [
+        {
+          title: 'New Applications',
+          value: '37',
+          description: 'This week',
+          change: '+12',
+          increasing: true
+        },
+        {
+          title: 'Acceptance Rate',
+          value: '76%',
+          description: 'Current cycle',
+          change: '+3%',
+          increasing: true
+        },
+        {
+          title: 'Pending Reviews',
+          value: '18',
+          description: 'Awaiting decision',
+          change: '',
+          increasing: false
+        },
+        {
+          title: 'Enrollment',
+          value: '92%',
+          description: 'Of capacity',
+          change: '',
+          increasing: false
+        }
+      ];
+      
+    case 'school-admin':
+      return [
+        {
+          title: 'Classes',
+          value: '32',
+          description: 'Active classes',
+          change: '',
+          increasing: false
+        },
+        {
+          title: 'Teachers',
+          value: '28',
+          description: 'Faculty members',
+          change: '',
+          increasing: false
+        },
+        {
+          title: 'Students',
+          value: '517',
+          description: 'Enrolled students',
+          change: '',
+          increasing: false
+        },
+        {
+          title: 'Attendance',
+          value: '91%',
+          description: 'School average',
+          change: '',
+          increasing: false
+        }
+      ];
+      
+    case 'labs':
+      return [
+        {
+          title: 'Lab Resources',
+          value: '243',
+          description: 'Total equipment',
+          change: '+12',
+          increasing: true
+        },
+        {
+          title: 'Utilization',
+          value: '67%',
+          description: 'Resource usage',
+          change: '+5%',
+          increasing: true
+        },
+        {
+          title: 'Maintenance Due',
+          value: '14',
+          description: 'Require attention',
+          change: '',
+          increasing: false
+        },
+        {
+          title: 'Equipment Value',
+          value: '$127K',
+          description: 'Total investment',
+          change: '',
+          increasing: false
+        }
+      ];
+      
+    case 'club':
+      return [
+        {
+          title: 'Active Clubs',
+          value: '15',
+          description: 'Currently running',
+          change: '',
+          increasing: false
+        },
+        {
+          title: 'Members',
+          value: '285',
+          description: 'Total participants',
+          change: '+12',
+          increasing: true
+        },
+        {
+          title: 'Participation Rate',
+          value: '58%',
+          description: 'Student involvement',
+          change: '+3%',
+          increasing: true
+        },
+        {
+          title: 'Events',
+          value: '7',
+          description: 'Upcoming activities',
+          change: '',
+          increasing: false
+        }
+      ];
+      
+    case 'library':
+      return [
+        {
+          title: 'Books',
+          value: '8,542',
+          description: 'Total collection',
+          change: '+34',
+          increasing: true
+        },
+        {
+          title: 'Checked Out',
+          value: '327',
+          description: 'Currently borrowed',
+          change: '',
+          increasing: false
+        },
+        {
+          title: 'New Acquisitions',
+          value: '52',
+          description: 'Added this month',
+          change: '',
+          increasing: false
+        },
+        {
+          title: 'Overdue',
+          value: '18',
+          description: 'Past due date',
+          change: '-4',
+          increasing: false
+        }
+      ];
+      
+    case 'super-admin':
+      return [
+        {
+          title: 'System Health',
+          value: '98.5%',
+          description: 'Overall status',
+          change: 'Stable',
+          increasing: true
+        },
+        {
+          title: 'Backup Status',
+          value: 'Success',
+          description: 'Last backup 2h ago',
+          change: '',
+          increasing: true
+        },
+        {
+          title: 'Active Services',
+          value: '17/18',
+          description: 'Online services',
+          change: '1 degraded',
+          increasing: false
+        },
+        {
+          title: 'Server Load',
+          value: '32%',
+          description: 'Average CPU',
+          change: 'Normal',
+          increasing: false
+        }
+      ];
+      
+    default:
+      return [
+        {
+          title: 'Overview',
+          value: 'N/A',
+          description: 'No specific data',
+          change: '',
+          increasing: false
+        },
+        {
+          title: 'Status',
+          value: 'Active',
+          description: 'Current state',
+          change: '',
+          increasing: true
+        },
+        {
+          title: 'Notifications',
+          value: '3',
+          description: 'Unread alerts',
+          change: '',
+          increasing: false
+        },
+        {
+          title: 'Events',
+          value: '5',
+          description: 'Upcoming',
+          change: '',
+          increasing: false
+        }
+      ];
+  }
+};
+
+// Function to fetch user preferences from database or return defaults
+export const getUserPreferences = async (userId: string) => {
+  const defaultPreferences = {
+    theme: 'system',
+    notificationsEnabled: true,
+    emailNotifications: true,
+    displayMode: 'default'
+  };
+  
+  if (shouldUseMockData()) {
+    return defaultPreferences;
+  }
+  
+  try {
+    const preferences = await fetchData('user_preferences', defaultPreferences, {
+      filter: { user_id: userId }
+    });
+    
+    return {
+      theme: preferences.theme || 'system',
+      notificationsEnabled: preferences.notifications_enabled || true,
+      emailNotifications: preferences.email_notifications || true,
+      displayMode: preferences.display_mode || 'default'
+    };
+  } catch (error) {
+    console.error('Error fetching user preferences:', error);
+    return defaultPreferences;
+  }
+};
+
+// Function to fetch system configuration
+export const getSystemConfig = async () => {
+  const defaultConfig = {
+    siteName: 'EduSync School Management',
+    primaryColor: '#3b82f6',
+    secondaryColor: '#10b981',
+    enableNotifications: true,
+    maxFileUploadSize: 10,
+    schoolContact: {
+      phone: '555-123-4567',
+      email: 'contact@edusync.example.com',
+      address: '123 Education St, Learning City, 12345'
+    }
+  };
+  
+  if (shouldUseMockData()) {
+    return defaultConfig;
+  }
+  
+  try {
+    const configData = await fetchData('system_configuration', [], {});
+    
+    if (!Array.isArray(configData) || configData.length === 0) {
+      return defaultConfig;
+    }
+    
+    // Transform array of key-value pairs to object
+    const config = configData.reduce((acc, item) => {
+      acc[item.key] = item.value;
+      return acc;
+    }, {});
+    
+    return {
+      siteName: config.site_name || defaultConfig.siteName,
+      primaryColor: config.theme_primary_color || defaultConfig.primaryColor,
+      secondaryColor: config.theme_secondary_color || defaultConfig.secondaryColor,
+      enableNotifications: config.enable_notifications === 'true',
+      maxFileUploadSize: parseInt(config.max_file_upload_size || '10'),
+      schoolContact: {
+        phone: config.school_phone || defaultConfig.schoolContact.phone,
+        email: config.school_email || defaultConfig.schoolContact.email,
+        address: config.school_address || defaultConfig.schoolContact.address
+      }
+    };
+  } catch (error) {
+    console.error('Error fetching system configuration:', error);
+    return defaultConfig;
+  }
+};
 
 export const mockStudents: Student[] = [
   {
@@ -406,291 +1025,3 @@ export const mockLabResources: LabResource[] = [
     lastMaintenance: "2025-03-18",
   },
 ];
-
-export const getRoleDashboardStats = (role: string) => {
-  const defaultStats = [
-    {
-      title: "Attendance Rate",
-      value: "94%",
-      description: "+2% from last month",
-      increasing: true,
-    },
-    {
-      title: "Current Grade Average",
-      value: "B+",
-      description: "Improvement from B",
-      increasing: true,
-    },
-    {
-      title: "Assignments Due",
-      value: "3",
-      description: "Due this week",
-      increasing: false,
-    },
-    {
-      title: "Your Rank",
-      value: "14 / 120",
-      description: "Top 15% of class",
-      increasing: true,
-    },
-  ];
-
-  const roleStats = {
-    student: defaultStats,
-    teacher: [
-      {
-        title: "Classes",
-        value: "5",
-        description: "Active classes",
-      },
-      {
-        title: "Students",
-        value: "125",
-        description: "Total students",
-      },
-      {
-        title: "Attendance",
-        value: "92%",
-        description: "Average attendance",
-        increasing: true,
-      },
-      {
-        title: "Performance",
-        value: "B+",
-        description: "Class average",
-        increasing: true,
-      },
-    ],
-    principal: [
-      {
-        title: "Total Students",
-        value: "1,250",
-        description: "+50 from last year",
-        increasing: true,
-      },
-      {
-        title: "Total Staff",
-        value: "85",
-        description: "Teachers and support staff",
-      },
-      {
-        title: "Attendance Rate",
-        value: "93%",
-        description: "+1% from last month",
-        increasing: true,
-      },
-      {
-        title: "Budget Utilization",
-        value: "78%",
-        description: "Of annual budget",
-      },
-    ],
-    admin: [
-      {
-        title: "System Uptime",
-        value: "99.8%",
-        description: "Last 30 days",
-        increasing: true,
-      },
-      {
-        title: "Active Users",
-        value: "1,435",
-        description: "+120 since last month",
-        increasing: true,
-      },
-      {
-        title: "Pending Issues",
-        value: "8",
-        description: "Technical support tickets",
-        increasing: false,
-      },
-      {
-        title: "Data Storage",
-        value: "68%",
-        description: "Of total capacity used",
-        increasing: true,
-      },
-    ],
-    financial: [
-      {
-        title: "Revenue",
-        value: "$125,000",
-        description: "This month",
-        increasing: true,
-      },
-      {
-        title: "Expenses",
-        value: "$95,000",
-        description: "This month",
-        increasing: false,
-      },
-      {
-        title: "Fee Collection",
-        value: "87%",
-        description: "Of total dues",
-        increasing: true,
-      },
-      {
-        title: "Pending Invoices",
-        value: "23",
-        description: "To be processed",
-        increasing: false,
-      },
-    ],
-    admission: [
-      {
-        title: "Applications",
-        value: "45",
-        description: "New this week",
-        increasing: true,
-      },
-      {
-        title: "Acceptance Rate",
-        value: "72%",
-        description: "Last admission cycle",
-        increasing: true,
-      },
-      {
-        title: "Pending Reviews",
-        value: "18",
-        description: "Applications to review",
-        increasing: false,
-      },
-      {
-        title: "Enrollment",
-        value: "92%",
-        description: "Of capacity filled",
-        increasing: true,
-      },
-    ],
-    "school-admin": [
-      {
-        title: "Staff Attendance",
-        value: "96%",
-        description: "This month",
-        increasing: true,
-      },
-      {
-        title: "Open Positions",
-        value: "3",
-        description: "Faculty openings",
-        increasing: false,
-      },
-      {
-        title: "Events",
-        value: "8",
-        description: "Planned this month",
-        increasing: true,
-      },
-      {
-        title: "Resource Utilization",
-        value: "84%",
-        description: "Of facilities in use",
-        increasing: true,
-      },
-    ],
-    labs: [
-      {
-        title: "Lab Resources",
-        value: "145",
-        description: "Total inventory items",
-      },
-      {
-        title: "Utilization",
-        value: "76%",
-        description: "Of lab capacity",
-        increasing: true,
-      },
-      {
-        title: "Maintenance",
-        value: "5",
-        description: "Items due for maintenance",
-        increasing: false,
-      },
-      {
-        title: "Lab Sessions",
-        value: "28",
-        description: "Scheduled this week",
-        increasing: true,
-      },
-    ],
-    club: [
-      {
-        title: "Active Clubs",
-        value: "12",
-        description: "Running this semester",
-      },
-      {
-        title: "Student Participation",
-        value: "65%",
-        description: "Of student body",
-        increasing: true,
-      },
-      {
-        title: "Upcoming Events",
-        value: "7",
-        description: "This month",
-        increasing: true,
-      },
-      {
-        title: "Budget Allocation",
-        value: "$12,500",
-        description: "For club activities",
-        increasing: true,
-      },
-    ],
-    library: [
-      {
-        title: "Total Books",
-        value: "8,750",
-        description: "In collection",
-      },
-      {
-        title: "Borrowed Books",
-        value: "342",
-        description: "Currently checked out",
-        increasing: false,
-      },
-      {
-        title: "New Acquisitions",
-        value: "45",
-        description: "Added this month",
-        increasing: true,
-      },
-      {
-        title: "Overdue Returns",
-        value: "18",
-        description: "Past due date",
-        increasing: false,
-      },
-    ],
-    "super-admin": [
-      {
-        title: "System Health",
-        value: "100%",
-        description: "All systems operational",
-        increasing: true,
-      },
-      {
-        title: "Database Size",
-        value: "75%",
-        description: "Of allocated space",
-        increasing: true,
-      },
-      {
-        title: "API Requests",
-        value: "25,400",
-        description: "Last 24 hours",
-        increasing: true,
-      },
-      {
-        title: "Error Rate",
-        value: "0.02%",
-        description: "System errors",
-        increasing: false,
-      },
-    ],
-  };
-
-  return roleStats[role as keyof typeof roleStats] || defaultStats;
-};

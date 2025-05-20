@@ -8,10 +8,26 @@ import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import StatCard from "@/components/dashboard/StatCard";
 import { getRoleDashboardStats, mockCalendarEvents, mockNotifications } from "@/utils/mockData";
+import { useDatabaseView } from "@/hooks/use-database-connection";
+import { CalendarEvent, Notification } from "@/types/dashboard";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Dashboard = () => {
   const { user, isLoading, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+
+  // Fetch dashboard stats based on user role
+  const { data: stats, isLoading: isStatsLoading } = useDatabaseView(
+    `${user?.role}_dashboard_view`,
+    [],
+    { user_id: user?.id },
+    60000 // Refresh every minute
+  );
+
+  // Use mock data for events and notifications for now
+  // In a production app, these would be replaced with database calls
+  const events = mockCalendarEvents;
+  const notifications = mockNotifications;
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -27,18 +43,31 @@ const Dashboard = () => {
     );
   }
 
-  // Get role-specific dashboard stats
-  const stats = getRoleDashboardStats(user.role);
-
   return (
     <DashboardLayout>
       <DashboardHeader title="Dashboard" />
 
       <main className="flex-1 overflow-auto dashboard-content p-6">
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {stats.map((stat, index) => (
-            <StatCard key={index} {...stat} />
-          ))}
+          {isStatsLoading ? (
+            // Show skeleton loading state
+            Array(4).fill(0).map((_, i) => (
+              <Card key={i} className="overflow-hidden">
+                <CardHeader className="pb-2">
+                  <Skeleton className="h-4 w-1/3" />
+                </CardHeader>
+                <CardContent>
+                  <Skeleton className="h-7 w-1/2 mb-2" />
+                  <Skeleton className="h-4 w-2/3" />
+                </CardContent>
+              </Card>
+            ))
+          ) : (
+            // Show actual stats data
+            stats.map((stat, index) => (
+              <StatCard key={index} {...stat} />
+            ))
+          )}
         </div>
 
         <div className="grid gap-6 grid-cols-1 md:grid-cols-2 mt-6">
@@ -48,7 +77,7 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {mockCalendarEvents.slice(0, 3).map((event) => (
+                {events.slice(0, 3).map((event) => (
                   <div key={event.id} className="flex justify-between items-center">
                     <div>
                       <p className="font-medium">{event.title}</p>
@@ -69,7 +98,7 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {mockNotifications.slice(0, 3).map((notification) => (
+                {notifications.slice(0, 3).map((notification) => (
                   <div key={notification.id} className="flex justify-between items-center">
                     <div>
                       <p className="font-medium">{notification.title}</p>
