@@ -7,7 +7,8 @@
 
 // Use a mock Pool implementation for frontend compatibility
 class MockPool {
-  async query() {
+  async query(queryText: string, params?: any[]) {
+    console.info(`SQL that would be executed in production: ${queryText}`, params);
     console.error('Direct database connection not available in browser environment');
     return { rows: [] };
   }
