@@ -1,3 +1,4 @@
+
 /**
  * Database connection utility
  * 
@@ -9,19 +10,21 @@ import { createClient } from '@supabase/supabase-js';
 
 // Environment variables that would be set in production
 // For development, these can be hard-coded or loaded from .env
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'your_supabase_url';
-const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || 'your_supabase_anon_key';
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || '';
+const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 const USE_MOCK_DATA = import.meta.env.VITE_USE_MOCK_DATA === 'true' || true;
 
-// Create Supabase client
-export const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+// Create Supabase client only if valid URL and key are provided
+export const supabase = (SUPABASE_URL && SUPABASE_URL !== 'your_supabase_url' && SUPABASE_KEY && SUPABASE_KEY !== 'your_supabase_anon_key') 
+  ? createClient(SUPABASE_URL, SUPABASE_KEY)
+  : null;
 
 /**
  * Determines if the app should use mock data instead of real database data
  * This is useful during development or when database is not available
  */
 export const shouldUseMockData = (): boolean => {
-  return USE_MOCK_DATA;
+  return USE_MOCK_DATA || !supabase;
 };
 
 /**
@@ -52,6 +55,11 @@ export async function fetchData<T>(
   // Otherwise, attempt to fetch from Supabase
   try {
     console.log(`Fetching data from ${tableName} with options:`, options);
+    
+    if (!supabase) {
+      console.error('Supabase client is not initialized. Using mock data instead.');
+      return mockData;
+    }
     
     let query = supabase
       .from(tableName)
@@ -105,6 +113,11 @@ export async function insertData<T>(tableName: string, data: T): Promise<T | nul
   }
   
   try {
+    if (!supabase) {
+      console.error('Supabase client is not initialized. Using mock data instead.');
+      return data;
+    }
+    
     const { data: insertedData, error } = await supabase
       .from(tableName)
       .insert(data as any)
@@ -141,6 +154,11 @@ export async function updateData<T>(
   }
   
   try {
+    if (!supabase) {
+      console.error('Supabase client is not initialized. Using mock data instead.');
+      return data as T;
+    }
+    
     const { data: updatedData, error } = await supabase
       .from(tableName)
       .update(data as any)
@@ -173,6 +191,11 @@ export async function deleteData(tableName: string, id: string): Promise<boolean
   }
   
   try {
+    if (!supabase) {
+      console.error('Supabase client is not initialized.');
+      return false;
+    }
+    
     const { error } = await supabase
       .from(tableName)
       .delete()
@@ -209,6 +232,11 @@ export async function fetchFromView<T>(
   }
   
   try {
+    if (!supabase) {
+      console.error('Supabase client is not initialized. Using mock data instead.');
+      return mockData;
+    }
+    
     const { data, error } = await supabase
       .from(viewName)
       .select('*')
