@@ -9,21 +9,14 @@
 export * from './mock';
 
 // Import specific mock data
-import { mockCalendarEvents as calendarEvents } from './mock/calendar-data';
+import { mockCalendarEvents, getRoleDashboardStats, mockNotifications, mockFinancialRecords, mockStudents } from './mock';
 
 // Export for components to use
-export const mockCalendarEvents = calendarEvents;
-
-// Empty dashboard stats
-export const getRoleDashboardStats = (role: string) => {
-  return [];
+export { 
+  mockCalendarEvents, 
+  getRoleDashboardStats, 
+  mockNotifications,
+  mockFinancialRecords,
+  mockStudents
 };
 
-// Empty notifications
-export const mockNotifications = [];
-
-// Mock financial records for Finance component
-export const mockFinancialRecords = [];
-
-// Mock students data for Classes component
-export const mockStudents = [];

@@ -29,3 +29,4 @@ export const pgPool = new MockPool();
 export const shouldUseMockData = (): boolean => {
   return true; // Frontend will always use mock data or API calls
 };
+

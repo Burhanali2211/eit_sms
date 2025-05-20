@@ -17,3 +17,14 @@ export interface CalendarEvent {
   createdAt?: string;
   updatedAt?: string;
 }
+
+export interface CalendarViewOptions {
+  view: 'month' | 'week' | 'day' | 'agenda';
+  date: Date;
+}
+
+export interface EventAction {
+  type: 'add' | 'update' | 'delete';
+  event: CalendarEvent;
+}
+

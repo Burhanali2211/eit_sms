@@ -72,9 +72,19 @@ export function ThemeProvider({
     if (isDark) {
       root.style.setProperty('--dashboard-bg', 'rgb(17, 24, 39)');
       root.style.setProperty('--content-bg', 'rgb(24, 33, 47)');
+      root.style.setProperty('--card-bg', 'rgb(31, 41, 55)');
+      root.style.setProperty('--text-primary', 'rgb(243, 244, 246)');
+      root.style.setProperty('--text-secondary', 'rgb(156, 163, 175)');
+      root.style.setProperty('--border-color', 'rgb(55, 65, 81)');
+      root.style.setProperty('--hover-bg', 'rgb(55, 65, 81)');
     } else {
       root.style.setProperty('--dashboard-bg', 'rgb(249, 250, 251)');
       root.style.setProperty('--content-bg', 'rgb(255, 255, 255)');
+      root.style.setProperty('--card-bg', 'rgb(255, 255, 255)');
+      root.style.setProperty('--text-primary', 'rgb(17, 24, 39)');
+      root.style.setProperty('--text-secondary', 'rgb(107, 114, 128)');
+      root.style.setProperty('--border-color', 'rgb(229, 231, 235)');
+      root.style.setProperty('--hover-bg', 'rgb(243, 244, 246)');
     }
   };
 
