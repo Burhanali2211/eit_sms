@@ -1,3 +1,4 @@
+
 import { 
   Notification, 
   CalendarEvent, 
@@ -640,9 +641,9 @@ export const getUserPreferences = async (userId: string) => {
     
     return {
       theme: preferences.theme || 'system',
-      notificationsEnabled: preferences.notifications_enabled || true,
-      emailNotifications: preferences.email_notifications || true,
-      displayMode: preferences.display_mode || 'default'
+      notificationsEnabled: preferences.notificationsEnabled || true,
+      emailNotifications: preferences.emailNotifications || true,
+      displayMode: preferences.displayMode || 'default'
     };
   } catch (error) {
     console.error('Error fetching user preferences:', error);
