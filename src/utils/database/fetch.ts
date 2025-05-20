@@ -1,19 +1,19 @@
+
 /**
  * Database fetch utilities
  * 
- * Provides functions for fetching data from the database
+ * Provides functions for fetching data from PostgreSQL database
  */
 
-import { supabase, shouldUseMockData } from './config';
+import { pgPool } from './config';
 
 /**
  * Generic function to fetch data from the database
- * Falls back to mock data if database connection fails or mock mode is enabled
  * 
  * @param tableName - The database table to query
- * @param mockData - Mock data to return if using mock mode
+ * @param mockData - No longer used, kept for API compatibility
  * @param options - Query options (select, filter, etc.)
- * @returns The data from the database or mock data
+ * @returns The data from the database
  */
 export async function fetchData<T>(
   tableName: string, 
@@ -25,56 +25,45 @@ export async function fetchData<T>(
     orderBy?: { column: string, ascending?: boolean }
   } = {}
 ): Promise<T> {
-  // If using mock data, return the mock data
-  if (shouldUseMockData()) {
-    console.log(`Using mock data for ${tableName}`);
-    return mockData;
-  }
-
-  // Otherwise, attempt to fetch from Supabase
   try {
     console.log(`Fetching data from ${tableName} with options:`, options);
     
-    if (!supabase) {
-      console.error('Supabase client is not initialized. Using mock data instead.');
-      return mockData;
-    }
-    
-    let query = supabase
-      .from(tableName)
-      .select(options.select || '*');
+    // Build the SQL query
+    let selectFields = options.select || '*';
+    let query = `SELECT ${selectFields} FROM ${tableName}`;
+    const queryParams: any[] = [];
     
     // Apply filters
-    if (options.filter) {
-      Object.entries(options.filter).forEach(([key, value]) => {
-        query = query.eq(key, value);
+    if (options.filter && Object.keys(options.filter).length > 0) {
+      query += ' WHERE ';
+      const filterClauses: string[] = [];
+      
+      Object.entries(options.filter).forEach(([key, value], index) => {
+        filterClauses.push(`${key} = $${index + 1}`);
+        queryParams.push(value);
       });
+      
+      query += filterClauses.join(' AND ');
     }
     
     // Apply order
     if (options.orderBy) {
-      query = query.order(options.orderBy.column, { 
-        ascending: options.orderBy.ascending ?? true 
-      });
+      query += ` ORDER BY ${options.orderBy.column} ${options.orderBy.ascending !== false ? 'ASC' : 'DESC'}`;
     }
     
     // Apply limit
     if (options.limit) {
-      query = query.limit(options.limit);
+      query += ` LIMIT ${options.limit}`;
     }
     
-    const { data, error } = await query;
+    console.log('Executing SQL query:', query, queryParams);
     
-    if (error) {
-      console.error('Error fetching data from Supabase:', error);
-      return mockData;
-    }
-    
-    console.log(`Successfully fetched data from ${tableName}`);
-    return data as unknown as T;
+    // Execute the query
+    const result = await pgPool.query(query, queryParams);
+    return result.rows as unknown as T;
   } catch (error) {
-    console.error('Error connecting to database:', error);
-    return mockData;
+    console.error('Error fetching data from database:', error);
+    throw error;
   }
 }
 
@@ -82,39 +71,39 @@ export async function fetchData<T>(
  * Fetches data using a custom SQL query or database view
  * 
  * @param viewName - The view or SQL query to use
- * @param mockData - Mock data to return if using mock mode
+ * @param mockData - No longer used, kept for API compatibility
  * @param params - Query parameters
- * @returns The data from the view/query or mock data
+ * @returns The data from the view/query
  */
 export async function fetchFromView<T>(
   viewName: string, 
   mockData: T, 
   params: Record<string, unknown> = {}
 ): Promise<T> {
-  if (shouldUseMockData()) {
-    console.log(`Using mock data for view ${viewName}`);
-    return mockData;
-  }
-  
   try {
-    if (!supabase) {
-      console.error('Supabase client is not initialized. Using mock data instead.');
-      return mockData;
+    let query = `SELECT * FROM ${viewName}`;
+    const queryParams: any[] = [];
+    
+    // Apply parameters as WHERE conditions
+    if (Object.keys(params).length > 0) {
+      query += ' WHERE ';
+      const paramClauses: string[] = [];
+      
+      Object.entries(params).forEach(([key, value], index) => {
+        paramClauses.push(`${key} = $${index + 1}`);
+        queryParams.push(value);
+      });
+      
+      query += paramClauses.join(' AND ');
     }
     
-    const { data, error } = await supabase
-      .from(viewName)
-      .select('*')
-      .eq(Object.keys(params)[0] || 'id', Object.values(params)[0] || '');
+    console.log('Executing SQL view query:', query, queryParams);
     
-    if (error) {
-      console.error(`Error fetching from view ${viewName}:`, error);
-      return mockData;
-    }
-    
-    return data as unknown as T;
+    // Execute the query
+    const result = await pgPool.query(query, queryParams);
+    return result.rows as unknown as T;
   } catch (error) {
     console.error(`Error fetching from view ${viewName}:`, error);
-    return mockData;
+    throw error;
   }
 }

@@ -2,10 +2,20 @@
 /**
  * Mock data index
  * 
- * Export all mock data from this file
+ * This file provides empty mock data structures that match the database schema
+ * These are used as fallbacks when database connection fails
  */
 
-export * from './core-mock';
-export * from './user-data';
-export * from './education-data';
-export * from './facility-data';
+// Basic empty structures with proper types
+export const emptyUserData = [];
+export const emptyEducationData = [];
+export const emptyFacilityData = [];
+
+// Empty core data
+export const emptyCoreMockData = {
+  users: [],
+  students: [],
+  teachers: [],
+  classes: [],
+  courses: []
+};

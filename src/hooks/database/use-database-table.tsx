@@ -1,4 +1,3 @@
-
 /**
  * Hook for interacting with database tables
  */
@@ -12,12 +11,12 @@ import { toast } from '@/hooks/use-toast';
  * Handles data fetching, loading state, errors, and CRUD operations
  * 
  * @param tableName - The database table to interact with
- * @param mockData - Mock data to use as fallback
+ * @param defaultValue - Default value to use initially and during errors
  * @param options - Query options (select, filter, etc.)
  */
 export function useDatabaseTable<T extends { id: string }>(
   tableName: string,
-  mockData: T[],
+  defaultValue: T[] = [],
   options: {
     select?: string,
     filter?: Record<string, unknown>,
@@ -26,7 +25,7 @@ export function useDatabaseTable<T extends { id: string }>(
     revalidateInterval?: number // ms between auto-refresh
   } = {}
 ) {
-  const [data, setData] = useState<T[]>([]);
+  const [data, setData] = useState<T[]>(defaultValue);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   
@@ -34,12 +33,16 @@ export function useDatabaseTable<T extends { id: string }>(
   const fetchTableData = async () => {
     setIsLoading(true);
     try {
-      const result = await fetchData<T[]>(tableName, mockData, options);
+      const result = await fetchData<T[]>(tableName, defaultValue, options);
       setData(result);
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err : new Error('Unknown error occurred'));
       console.error(`Error fetching data from ${tableName}:`, err);
+      // In case of error, keep the previous data or use default
+      if (data.length === 0) {
+        setData(defaultValue);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -86,7 +89,7 @@ export function useDatabaseTable<T extends { id: string }>(
     try {
       const result = await updateData<T>(tableName, id, updates);
       if (result) {
-        setData(prev => prev.map(item => item.id === id ? { ...item, ...updates } : item));
+        setData(prev => prev.map(item => item.id === id ? { ...item, ...result } : item));
         toast({
           title: 'Success',
           description: 'Record updated successfully',

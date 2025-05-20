@@ -1,4 +1,3 @@
-
 /**
  * Hook for interacting with database views
  */
@@ -11,28 +10,30 @@ import { fetchFromView } from '@/utils/database';
  * Similar to useDatabaseTable but read-only (no CRUD operations)
  * 
  * @param viewName - The database view to query
- * @param mockData - Mock data to use as fallback
+ * @param defaultValue - Default value to use initially and during errors
  * @param params - Query parameters
  */
 export function useDatabaseView<T>(
   viewName: string,
-  mockData: T,
+  defaultValue: T,
   params: Record<string, unknown> = {},
   revalidateInterval?: number
 ) {
-  const [data, setData] = useState<T>(mockData);
+  const [data, setData] = useState<T>(defaultValue);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   
   const fetchViewData = async () => {
     setIsLoading(true);
     try {
-      const result = await fetchFromView<T>(viewName, mockData, params);
+      const result = await fetchFromView<T>(viewName, defaultValue, params);
       setData(result);
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err : new Error('Unknown error occurred'));
       console.error(`Error fetching data from view ${viewName}:`, err);
+      // In case of error, keep using the default value
+      setData(defaultValue);
     } finally {
       setIsLoading(false);
     }

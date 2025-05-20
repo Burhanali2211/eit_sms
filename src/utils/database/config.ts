@@ -2,26 +2,30 @@
 /**
  * Database configuration
  * 
- * Manages the connection configuration for Supabase
+ * Manages the connection configuration for PostgreSQL
  */
 
-import { createClient } from '@supabase/supabase-js';
+import { Pool } from 'pg';
 
-// Environment variables that would be set in production
-// For development, these can be hard-coded or loaded from .env
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || '';
-const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
-export const USE_MOCK_DATA = import.meta.env.VITE_USE_MOCK_DATA === 'true' || true;
+// Environment variables that should be set in production
+// For development, these would be loaded from .env
+const DB_HOST = import.meta.env.VITE_PG_HOST || 'localhost';
+const DB_PORT = parseInt(import.meta.env.VITE_PG_PORT || '5432');
+const DB_NAME = import.meta.env.VITE_PG_DATABASE || 'edusync';
+const DB_USER = import.meta.env.VITE_PG_USER || 'postgres';
+const DB_PASSWORD = import.meta.env.VITE_PG_PASSWORD || 'postgres';
 
-// Create Supabase client only if valid URL and key are provided
-export const supabase = (SUPABASE_URL && SUPABASE_URL !== 'your_supabase_url' && SUPABASE_KEY && SUPABASE_KEY !== 'your_supabase_anon_key') 
-  ? createClient(SUPABASE_URL, SUPABASE_KEY)
-  : null;
+// Create PostgreSQL connection pool
+export const pgPool = new Pool({
+  host: DB_HOST,
+  port: DB_PORT,
+  database: DB_NAME,
+  user: DB_USER,
+  password: DB_PASSWORD,
+});
 
-/**
- * Determines if the app should use mock data instead of real database data
- * This is useful during development or when database is not available
- */
+// Flag to check if database connection is available
 export const shouldUseMockData = (): boolean => {
-  return USE_MOCK_DATA || !supabase;
+  return false; // Always use real database data now
 };
+
