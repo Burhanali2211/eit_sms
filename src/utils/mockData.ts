@@ -2,8 +2,7 @@
 /**
  * Mock data utility
  * 
- * This file now serves as a compatibility layer that provides empty data
- * with the correct types when database connection fails
+ * This file provides mock data structures for use when database connection is unavailable
  */
 
 // Re-export empty data structures
@@ -17,3 +16,9 @@ export const getRoleDashboardStats = (role: string) => {
 // Empty events and notifications
 export const mockCalendarEvents = [];
 export const mockNotifications = [];
+
+// Mock financial records for Finance component
+export const mockFinancialRecords = [];
+
+// Mock students data for Classes component
+export const mockStudents = [];
