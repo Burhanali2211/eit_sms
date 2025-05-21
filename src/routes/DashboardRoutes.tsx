@@ -13,6 +13,7 @@ import Staff from "@/pages/dashboard/Staff";
 // Import Admin routes
 import UserManagement from "@/pages/dashboard/admin/UserManagement";
 import LabResources from "@/pages/dashboard/admin/LabResources";
+import Library from "@/pages/dashboard/admin/Library";
 
 // Import Teacher routes
 import Classes from "@/pages/dashboard/teacher/Classes";
@@ -81,6 +82,13 @@ const DashboardRoutes = () => {
       <Route path="/dashboard/labs" element={
         <ProtectedRoute allowedRoles={['labs', 'principal', 'super-admin']}>
           <LabResources />
+        </ProtectedRoute>
+      } />
+      
+      {/* Library route */}
+      <Route path="/dashboard/library" element={
+        <ProtectedRoute allowedRoles={['library', 'principal', 'super-admin']}>
+          <Library />
         </ProtectedRoute>
       } />
       
