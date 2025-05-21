@@ -1,12 +1,10 @@
-
 /**
  * Database fetch utilities
  * 
  * Provides functions for fetching data from PostgreSQL database
  */
 
-import { pgPool } from './config';
-import { shouldUseMockData } from '../db-connection';
+import { pgPool, shouldUseMockData } from './config';
 import { toast } from '@/hooks/use-toast';
 
 /**

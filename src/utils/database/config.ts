@@ -17,42 +17,45 @@ const pgUser = import.meta.env.VITE_PG_USER || 'postgres';
 const pgPassword = import.meta.env.VITE_PG_PASSWORD || 'Admin';
 
 // Create a singleton pool instance for server environments, or a mock for browser
-let pgPool: Pool;
-
-try {
-  // Initialize the connection pool
-  pgPool = new Pool({
-    host: pgHost,
-    port: pgPort,
-    database: pgDatabase,
-    user: pgUser,
-    password: pgPassword,
-    // Disable SSL in development environment
-    ssl: import.meta.env.PROD ? { rejectUnauthorized: false } : false,
-  });
-
-  if (!isBrowser) {
-    pgPool.on('error', (err) => {
-      console.error('Unexpected error on idle client', err);
-      // Don't exit process in browser environment
-      if (typeof process !== 'undefined') {
-        process.exit(-1);
-      }
+export const pgPool: Pool = (() => {
+  try {
+    // Initialize the connection pool
+    const pool = new Pool({
+      host: pgHost,
+      port: pgPort,
+      database: pgDatabase,
+      user: pgUser,
+      password: pgPassword,
+      // Disable SSL in development environment
+      ssl: import.meta.env.PROD ? { rejectUnauthorized: false } : false,
     });
+
+    if (!isBrowser) {
+      pool.on('error', (err) => {
+        console.error('Unexpected error on idle client', err);
+        // Don't exit process in browser environment
+        if (typeof process !== 'undefined') {
+          process.exit(-1);
+        }
+      });
+      
+      console.log(`PostgreSQL configuration loaded: ${pgDatabase} on ${pgHost}:${pgPort}`);
+    }
     
-    console.log(`PostgreSQL configuration loaded: ${pgDatabase} on ${pgHost}:${pgPort}`);
+    return pool;
+  } catch (err) {
+    console.error('Failed to initialize PostgreSQL pool:', err);
+    // Create a mock pool for browser environments
+    if (isBrowser) {
+      return {
+        query: () => Promise.reject(new Error('Cannot connect to PostgreSQL from browser')),
+        connect: () => Promise.reject(new Error('Cannot connect to PostgreSQL from browser')),
+        end: () => Promise.resolve(),
+      } as unknown as Pool;
+    }
+    throw err;
   }
-} catch (err) {
-  console.error('Failed to initialize PostgreSQL pool:', err);
-  // Create a mock pool for browser environments
-  if (isBrowser) {
-    pgPool = {
-      query: () => Promise.reject(new Error('Cannot connect to PostgreSQL from browser')),
-      connect: () => Promise.reject(new Error('Cannot connect to PostgreSQL from browser')),
-      end: () => Promise.resolve(),
-    } as unknown as Pool;
-  }
-}
+})();
 
 // Export shouldUseMockData function for backward compatibility
 export async function shouldUseMockData(): Promise<boolean> {
@@ -76,4 +79,4 @@ export async function shouldUseMockData(): Promise<boolean> {
   }
 }
 
-export default pgPool;
+// No longer export default as we're using named export
