@@ -1,61 +1,78 @@
 
-/**
- * Main database connection hook
- * 
- * This hook centralizes database connection logic and re-exports database hooks
- */
-
-import { useState, useEffect } from 'react';
-import { checkDatabaseConnection, DB_CONFIG } from '@/utils/db-connection';
-import { toast } from '@/hooks/use-toast';
-
-// Import the database operation hooks
-import { useDatabaseTable } from './database/use-database-table';
-import { useDatabaseView } from './database/use-database-view';
-
-// Re-export hooks for components to use
-export { useDatabaseTable, useDatabaseView };
+import { useDatabaseQuery } from "./database/use-database-query";
+import { useDatabaseViewQuery } from "./database/use-database-view-query";
+import { useDatabaseOperations } from "./database/use-database-operations";
+import { DB_CONFIG } from '@/utils/db-connection';
 
 /**
- * Hook to check and manage database connectivity
- * @returns Connection status and environment info
+ * Hook for interacting with a database table
+ * Provides query, create, update, delete functionality
  */
-export function useDatabaseConnection() {
-  const [isConnected, setIsConnected] = useState<boolean | null>(null);
-  const [isChecking, setIsChecking] = useState(true);
+export function useDatabaseTable<T>(
+  tableName: string,
+  options: {
+    refreshInterval?: number;
+    initialData?: any[];
+    filter?: Record<string, unknown>;
+  } = {}
+) {
+  // Get query functionality
+  const { 
+    data, 
+    isLoading, 
+    error, 
+    refresh
+  } = useDatabaseQuery<T>(tableName, options);
   
-  useEffect(() => {
-    const checkConnection = async () => {
-      setIsChecking(true);
-      try {
-        const connected = await checkDatabaseConnection();
-        setIsConnected(connected);
-        
-        if (connected) {
-          console.log('Successfully connected to database');
-        } else {
-          console.warn('Database connection failed');
-          toast({
-            title: 'Database Connection Failed',
-            description: 'Could not connect to the database. Some features may not work correctly.',
-            variant: 'destructive',
-          });
-        }
-      } catch (error) {
-        console.error('Error checking database connection:', error);
-        setIsConnected(false);
-      } finally {
-        setIsChecking(false);
-      }
-    };
-    
-    checkConnection();
-  }, []);
+  // Get CRUD operations
+  const {
+    insert,
+    update,
+    delete: remove,
+    isProcessing
+  } = useDatabaseOperations<T>(tableName);
   
   return {
-    isConnected,
-    isChecking,
-    environment: DB_CONFIG.environment,
-    appName: DB_CONFIG.appName
+    // Data and state
+    data,
+    isLoading: isLoading || isProcessing,
+    error,
+    
+    // Operations
+    create: insert,
+    update,
+    remove,
+    refresh,
+    
+    // Configuration
+    tableName,
+    config: DB_CONFIG
+  };
+}
+
+/**
+ * Hook for interacting with a database view
+ */
+export function useDatabaseView<T>(
+  viewName: string, 
+  params: Record<string, any> = {},
+  options = {},
+  refreshInterval?: number
+) {
+  // Use the view query hook
+  const { 
+    data, 
+    isLoading, 
+    error,
+    refresh
+  } = useDatabaseViewQuery<T>(viewName, params, refreshInterval);
+  
+  return {
+    data,
+    isLoading,
+    error,
+    refresh,
+    viewName,
+    config: DB_CONFIG
   };
 }
