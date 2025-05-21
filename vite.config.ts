@@ -40,5 +40,7 @@ export default defineConfig(({ mode }) => ({
   // Fix for Node.js modules in the browser
   define: {
     'process.env': {},
+    // Add explicit handling for cloudflare:sockets
+    'import.meta.CLOUDFLARE_SOCKETS': 'null'
   },
 }));

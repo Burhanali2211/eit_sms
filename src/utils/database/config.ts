@@ -1,5 +1,7 @@
 
-import { Pool } from 'pg';
+// We need to fix the Pool import from pg package
+import pg from 'pg';
+const { Pool } = pg;
 import { createPgPolyfills } from '../pg-polyfills';
 import { toast } from '@/hooks/use-toast';
 
@@ -17,7 +19,7 @@ const pgUser = import.meta.env.VITE_PG_USER || 'postgres';
 const pgPassword = import.meta.env.VITE_PG_PASSWORD || 'Admin';
 
 // Create a singleton pool instance for server environments, or a mock for browser
-export const pgPool: Pool = (() => {
+export const pgPool = (() => {
   try {
     // Initialize the connection pool
     const pool = new Pool({
@@ -51,7 +53,7 @@ export const pgPool: Pool = (() => {
         query: () => Promise.reject(new Error('Cannot connect to PostgreSQL from browser')),
         connect: () => Promise.reject(new Error('Cannot connect to PostgreSQL from browser')),
         end: () => Promise.resolve(),
-      } as unknown as Pool;
+      } as unknown as typeof Pool.prototype;
     }
     throw err;
   }
