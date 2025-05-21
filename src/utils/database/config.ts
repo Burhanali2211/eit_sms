@@ -1,5 +1,9 @@
 
 import { Pool } from 'pg';
+import { createPgPolyfills } from '../pg-polyfills';
+
+// Initialize polyfills for browser environment
+createPgPolyfills();
 
 // Get database configuration from environment variables
 const pgHost = import.meta.env.VITE_PG_HOST || 'localhost';
@@ -24,15 +28,19 @@ export async function shouldUseMockData(): Promise<boolean> {
     client.release();
     return false; // Connection successful, no need for mock data
   } catch (error) {
+    console.error('Database connection failed, using mock data instead', error);
     return true; // Connection failed, use mock data
   }
 }
 
 pgPool.on('error', (err) => {
   console.error('Unexpected error on idle client', err);
-  process.exit(-1);
+  // Don't exit process in browser environment
+  if (typeof process !== 'undefined') {
+    process.exit(-1);
+  }
 });
 
-console.log(`Connected to PostgreSQL database: ${pgDatabase} on ${pgHost}:${pgPort}`);
+console.log(`PostgreSQL configuration loaded: ${pgDatabase} on ${pgHost}:${pgPort}`);
 
 export default pgPool;

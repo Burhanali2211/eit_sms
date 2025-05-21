@@ -32,11 +32,11 @@ export default defineConfig(({ mode }) => ({
   // Handle Node.js modules for browser compatibility
   build: {
     rollupOptions: {
-      external: ['pg-native'],
+      external: ['pg-native', 'cloudflare:sockets'],
     },
   },
   // Fix for the cloudflare:sockets issue
   define: {
-    'process.env': {}
-  }
+    'process.env': {},
+  },
 }));
