@@ -17,6 +17,17 @@ export const pgPool = new Pool({
   password: pgPassword,
 });
 
+// Export shouldUseMockData function for backward compatibility
+export async function shouldUseMockData(): Promise<boolean> {
+  try {
+    const client = await pgPool.connect();
+    client.release();
+    return false; // Connection successful, no need for mock data
+  } catch (error) {
+    return true; // Connection failed, use mock data
+  }
+}
+
 pgPool.on('error', (err) => {
   console.error('Unexpected error on idle client', err);
   process.exit(-1);

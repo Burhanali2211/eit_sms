@@ -1,6 +1,17 @@
 
 import { pgPool } from './database/config';
 
+// Add a DB_CONFIG object with environment information
+export const DB_CONFIG = {
+  environment: import.meta.env.VITE_APP_ENV || 'development',
+  appName: import.meta.env.VITE_APP_NAME || 'EduSync',
+  host: import.meta.env.VITE_PG_HOST || 'localhost',
+  port: parseInt(import.meta.env.VITE_PG_PORT || '5432'),
+  database: import.meta.env.VITE_PG_DATABASE || 'edusync',
+  user: import.meta.env.VITE_PG_USER || 'postgres',
+  password: import.meta.env.VITE_PG_PASSWORD || 'Admin'
+};
+
 /**
  * Checks if the database connection is available
  * @returns Promise<boolean> indicating if the connection was successful

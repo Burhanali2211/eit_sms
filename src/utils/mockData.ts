@@ -12,15 +12,15 @@
 // Re-export database utilities
 export * from './database';
 
-// Import and re-export database functions
+// Import and re-export database functions and shouldUseMockData
 import {
   fetchData,
   fetchFromView,
   insertData,
   updateData,
-  deleteData,
-  shouldUseMockData
+  deleteData
 } from './database';
+import { shouldUseMockData } from './db-connection';
 
 // Export for components to use
 export {
