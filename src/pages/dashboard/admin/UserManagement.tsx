@@ -17,6 +17,7 @@ import UserList from "@/components/admin/UserList";
 import AddUserForm from "@/components/admin/AddUserForm";
 import { useDatabaseTable } from "@/hooks/use-database-connection";
 import { toast } from "@/hooks/use-toast";
+import { User } from "@/types/dashboard";
 
 // Using mock data until connected to database
 const mockUsers = [
@@ -67,6 +68,12 @@ const mockUsers = [
   },
 ];
 
+// Define the user type for better type safety
+interface UserManagementUser extends User {
+  status: string;
+  lastLogin?: string;
+}
+
 const UserManagement = () => {
   // Attempt to get users from database, fallback to mock data
   const { 
@@ -75,9 +82,9 @@ const UserManagement = () => {
     update: updateUser,
     remove: removeUser,
     isLoading 
-  } = useDatabaseTable('users', {});
+  } = useDatabaseTable<UserManagementUser>('users', {});
 
-  const [users, setUsers] = useState(dbUsers.length > 0 ? dbUsers : mockUsers);
+  const [users, setUsers] = useState<UserManagementUser[]>(dbUsers.length > 0 ? dbUsers : mockUsers);
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
 
   // Update state when database data loads
@@ -87,20 +94,25 @@ const UserManagement = () => {
     }
   });
 
-  const handleAddUser = async (newUserData: any) => {
+  const handleAddUser = async (newUserData: Partial<UserManagementUser>) => {
     try {
       // Try to create in database first
-      let newUser;
+      let newUser: UserManagementUser;
 
       if (dbUsers.length > 0) {
-        newUser = await createUser(newUserData);
+        const createdUser = await createUser(newUserData);
+        if (typeof createdUser === 'object' && createdUser !== null && 'id' in createdUser) {
+          newUser = createdUser as UserManagementUser;
+        } else {
+          throw new Error("Invalid user data returned from database");
+        }
       } else {
         // Fallback to mock data
         newUser = {
           id: (users.length + 1).toString(),
-          name: newUserData.name,
-          email: newUserData.email,
-          role: newUserData.role,
+          name: newUserData.name || '',
+          email: newUserData.email || '',
+          role: newUserData.role || 'student',
           status: "Active",
           lastLogin: "Never",
           avatar: "https://github.com/shadcn.png",
@@ -112,7 +124,7 @@ const UserManagement = () => {
       
       toast({
         title: "User Added",
-        description: `${newUserData.name} has been added successfully`,
+        description: `${newUser.name} has been added successfully`,
       });
     } catch (error) {
       console.error("Error adding user:", error);

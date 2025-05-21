@@ -29,7 +29,7 @@ const mockUsers: Record<string, Omit<User, 'id'> & { password: string }> = {
     email: 'student@edusync.com',
     role: 'student',
     password: 'password123',
-    createdAt: new Date(),
+    createdAt: new Date().toISOString(),
     avatar: 'https://github.com/shadcn.png',
   },
   'teacher@edusync.com': {
@@ -37,7 +37,7 @@ const mockUsers: Record<string, Omit<User, 'id'> & { password: string }> = {
     email: 'teacher@edusync.com',
     role: 'teacher',
     password: 'password123',
-    createdAt: new Date(),
+    createdAt: new Date().toISOString(),
     avatar: 'https://github.com/shadcn.png',
   },
   'principal@edusync.com': {
@@ -45,7 +45,7 @@ const mockUsers: Record<string, Omit<User, 'id'> & { password: string }> = {
     email: 'principal@edusync.com',
     role: 'principal',
     password: 'password123',
-    createdAt: new Date(),
+    createdAt: new Date().toISOString(),
     avatar: 'https://github.com/shadcn.png',
   },
   'admin@edusync.com': {
@@ -53,7 +53,7 @@ const mockUsers: Record<string, Omit<User, 'id'> & { password: string }> = {
     email: 'admin@edusync.com',
     role: 'admin',
     password: 'password123',
-    createdAt: new Date(),
+    createdAt: new Date().toISOString(),
     avatar: 'https://github.com/shadcn.png',
   },
   'financial@edusync.com': {
@@ -61,7 +61,7 @@ const mockUsers: Record<string, Omit<User, 'id'> & { password: string }> = {
     email: 'financial@edusync.com',
     role: 'financial',
     password: 'password123',
-    createdAt: new Date(),
+    createdAt: new Date().toISOString(),
     avatar: 'https://github.com/shadcn.png',
   },
   'admission@edusync.com': {
@@ -69,7 +69,7 @@ const mockUsers: Record<string, Omit<User, 'id'> & { password: string }> = {
     email: 'admission@edusync.com',
     role: 'admission',
     password: 'password123',
-    createdAt: new Date(),
+    createdAt: new Date().toISOString(),
     avatar: 'https://github.com/shadcn.png',
   },
   'schooladmin@edusync.com': {
@@ -77,7 +77,7 @@ const mockUsers: Record<string, Omit<User, 'id'> & { password: string }> = {
     email: 'schooladmin@edusync.com',
     role: 'school-admin',
     password: 'password123',
-    createdAt: new Date(),
+    createdAt: new Date().toISOString(),
     avatar: 'https://github.com/shadcn.png',
   },
   'labs@edusync.com': {
@@ -85,7 +85,7 @@ const mockUsers: Record<string, Omit<User, 'id'> & { password: string }> = {
     email: 'labs@edusync.com',
     role: 'labs',
     password: 'password123',
-    createdAt: new Date(),
+    createdAt: new Date().toISOString(),
     avatar: 'https://github.com/shadcn.png',
   },
   'club@edusync.com': {
@@ -93,7 +93,7 @@ const mockUsers: Record<string, Omit<User, 'id'> & { password: string }> = {
     email: 'club@edusync.com',
     role: 'club',
     password: 'password123',
-    createdAt: new Date(),
+    createdAt: new Date().toISOString(),
     avatar: 'https://github.com/shadcn.png',
   },
   'library@edusync.com': {
@@ -101,7 +101,7 @@ const mockUsers: Record<string, Omit<User, 'id'> & { password: string }> = {
     email: 'library@edusync.com',
     role: 'library',
     password: 'password123',
-    createdAt: new Date(),
+    createdAt: new Date().toISOString(),
     avatar: 'https://github.com/shadcn.png',
   },
   'superadmin@edusync.com': {
@@ -109,7 +109,7 @@ const mockUsers: Record<string, Omit<User, 'id'> & { password: string }> = {
     email: 'superadmin@edusync.com',
     role: 'super-admin',
     password: 'password123',
-    createdAt: new Date(),
+    createdAt: new Date().toISOString(),
     avatar: 'https://github.com/shadcn.png',
   },
 };

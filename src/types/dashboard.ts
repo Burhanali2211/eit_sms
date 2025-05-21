@@ -22,6 +22,7 @@ export interface User {
 export interface Student {
   id: string;
   name: string;
+  email?: string; // Added this property to fix mock data errors
   rollNumber: string;
   grade?: string;
   section?: string;
@@ -82,4 +83,73 @@ export interface NewResource {
   available: number;
   location?: string;
   description?: string;
+}
+
+// Add the missing types referenced in errors
+export interface DashboardStat {
+  title: string;
+  value: string | number;
+  description: string;
+  change?: string | number;
+  increasing?: boolean;
+}
+
+export interface Teacher {
+  id: string;
+  name: string;
+  email: string;
+  subject: string;
+  classes: string[];
+}
+
+export interface FinancialRecord {
+  id: string;
+  type: string;
+  amount: number;
+  date: string;
+  status: string;
+  description: string;
+}
+
+export interface AdmissionApplication {
+  id: string;
+  studentName: string;
+  parentName: string;
+  email: string;
+  phone: string;
+  grade: string;
+  status: string;
+  submittedAt: string;
+}
+
+export interface LibraryItem {
+  id: string;
+  title: string;
+  author: string;
+  category: string;
+  available: boolean;
+  dueDate?: string;
+  borrowedBy?: string;
+}
+
+export interface ClubActivity {
+  id: string;
+  name: string;
+  description: string;
+  schedule: string;
+  location: string;
+  members: number;
+  status: string;
+}
+
+export interface CalendarEvent {
+  id: string;
+  title: string;
+  description?: string;
+  date: string;
+  time?: string;
+  endTime?: string;
+  allDay?: boolean;
+  location?: string;
+  color?: string;
 }
