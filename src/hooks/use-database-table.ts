@@ -1,36 +1,50 @@
 
+/**
+ * Legacy database table hook
+ * 
+ * This file is kept for backward compatibility with components 
+ * that still use it. It's recommended to use the newer
+ * database hooks from hooks/database/ instead.
+ */
+
 import { useState, useEffect } from 'react';
 import { pgPool } from '@/utils/database/config';
-import { handleMockResponse } from '@/utils/mock';
 import { toast } from '@/hooks/use-toast';
+import { checkDatabaseConnection } from '@/utils/db-connection';
 
 interface UseDatabaseTableOptions {
   refreshInterval?: number;
   initialData?: any[];
-  mockData?: any[];
 }
 
 export function useDatabaseTable<T>(
   tableName: string, 
   options: UseDatabaseTableOptions = {}
 ) {
-  const { refreshInterval, initialData = [], mockData = [] } = options;
-  const [data, setData] = useState<T[]>(initialData.length > 0 ? initialData : mockData);
+  const { refreshInterval, initialData = [] } = options;
+  const [data, setData] = useState<T[]>(initialData);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
+  const [isConnected, setIsConnected] = useState<boolean | null>(null);
+
+  // Check database connection first
+  useEffect(() => {
+    const checkConnection = async () => {
+      const connected = await checkDatabaseConnection();
+      setIsConnected(connected);
+    };
+    checkConnection();
+  }, []);
 
   const fetchData = async () => {
     setIsLoading(true);
     try {
-      // In a real environment, this would query the database
+      // Query the database
       const query = `SELECT * FROM ${tableName}`;
       const result = await pgPool.query(query);
       
-      // If we got real results, use them, otherwise use mock data
-      if (result.rows && result.rows.length > 0) {
+      if (result && result.rows) {
         setData(result.rows as T[]);
-      } else if (mockData.length > 0) {
-        setData(mockData as T[]);
       } else {
         setData([] as T[]);
       }
@@ -39,10 +53,7 @@ export function useDatabaseTable<T>(
     } catch (err: any) {
       console.error(`Error fetching data from ${tableName}:`, err);
       setError(err);
-      if (mockData.length > 0) {
-        console.log(`Using mock data for ${tableName}`);
-        setData(mockData as T[]);
-      }
+      setData([] as T[]);
     } finally {
       setIsLoading(false);
     }
@@ -50,7 +61,6 @@ export function useDatabaseTable<T>(
 
   const insertItem = async (item: Partial<T>) => {
     try {
-      // In a real environment, this would insert into the database
       const keys = Object.keys(item);
       const values = Object.values(item);
       const placeholders = values.map((_, i) => `$${i + 1}`).join(', ');
@@ -61,18 +71,29 @@ export function useDatabaseTable<T>(
         RETURNING *
       `;
       
-      console.info(`SQL that would be executed: ${query}`, values);
+      console.log('Executing SQL insert:', query, values);
       
-      // Simulate successful insertion with mock data
-      const newId = Math.random().toString(36).substring(2, 15);
-      const newItem = { id: newId, ...item } as unknown as T;
-      setData([...data, newItem]);
+      const result = await pgPool.query(query, values);
       
-      handleMockResponse('Create', true);
-      return newItem;
+      if (result && result.rows && result.rows.length > 0) {
+        const newItem = result.rows[0] as T;
+        setData([...data, newItem]);
+        
+        toast({
+          title: 'Success',
+          description: `Record added to ${tableName}`,
+        });
+        return newItem;
+      } else {
+        throw new Error('Insert operation did not return data');
+      }
     } catch (err: any) {
       console.error(`Error inserting into ${tableName}:`, err);
-      handleMockResponse('Create', false);
+      toast({
+        title: 'Error',
+        description: 'Failed to add record',
+        variant: 'destructive',
+      });
       throw err;
     }
   };
@@ -90,19 +111,32 @@ export function useDatabaseTable<T>(
         RETURNING *
       `;
       
-      console.info(`SQL that would be executed: ${query}`, [...values, id]);
+      console.log('Executing SQL update:', query, [...values, id]);
       
-      // Simulate successful update with mock data
-      setData(data.map(item => {
-        const itemId = (item as any).id;
-        return itemId === id ? { ...item, ...changes } : item;
-      }));
+      const result = await pgPool.query(query, [...values, id]);
       
-      handleMockResponse('Update', true);
-      return { id, ...changes };
+      if (result && result.rows && result.rows.length > 0) {
+        const updatedItem = result.rows[0] as T;
+        setData(data.map(item => {
+          const itemId = (item as any).id;
+          return itemId === id ? updatedItem : item;
+        }));
+        
+        toast({
+          title: 'Success',
+          description: 'Record updated successfully',
+        });
+        return updatedItem;
+      } else {
+        throw new Error('Update operation did not return data');
+      }
     } catch (err: any) {
       console.error(`Error updating in ${tableName}:`, err);
-      handleMockResponse('Update', false);
+      toast({
+        title: 'Error',
+        description: 'Failed to update record',
+        variant: 'destructive',
+      });
       throw err;
     }
   };
@@ -115,29 +149,43 @@ export function useDatabaseTable<T>(
         RETURNING id
       `;
       
-      console.info(`SQL that would be executed: ${query}`, [id]);
+      console.log('Executing SQL delete:', query, [id]);
       
-      // Simulate successful deletion with mock data
-      setData(data.filter(item => (item as any).id !== id));
+      const result = await pgPool.query(query, [id]);
       
-      handleMockResponse('Delete', true);
-      return { id };
+      if (result && result.rows && result.rows.length > 0) {
+        setData(data.filter(item => (item as any).id !== id));
+        
+        toast({
+          title: 'Success',
+          description: 'Record deleted successfully',
+        });
+        return { id };
+      } else {
+        throw new Error('No record found to delete');
+      }
     } catch (err: any) {
       console.error(`Error deleting from ${tableName}:`, err);
-      handleMockResponse('Delete', false);
+      toast({
+        title: 'Error',
+        description: 'Failed to delete record',
+        variant: 'destructive',
+      });
       throw err;
     }
   };
 
   useEffect(() => {
-    fetchData();
-    
-    // Set up refresh interval if provided
-    if (refreshInterval && refreshInterval > 0) {
-      const intervalId = setInterval(fetchData, refreshInterval);
-      return () => clearInterval(intervalId);
+    if (isConnected) {
+      fetchData();
+      
+      // Set up refresh interval if provided
+      if (refreshInterval && refreshInterval > 0) {
+        const intervalId = setInterval(fetchData, refreshInterval);
+        return () => clearInterval(intervalId);
+      }
     }
-  }, [refreshInterval]);
+  }, [refreshInterval, isConnected]);
 
   return { 
     data, 
@@ -152,13 +200,22 @@ export function useDatabaseTable<T>(
 
 export function useDatabaseView<T>(
   viewName: string, 
-  mockData: T[] = [],
   params: Record<string, any> = {},
   refreshInterval?: number
 ) {
-  const [data, setData] = useState<T[]>(mockData);
+  const [data, setData] = useState<T[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
+  const [isConnected, setIsConnected] = useState<boolean | null>(null);
+
+  // Check database connection first
+  useEffect(() => {
+    const checkConnection = async () => {
+      const connected = await checkDatabaseConnection();
+      setIsConnected(connected);
+    };
+    checkConnection();
+  }, []);
 
   const fetchData = async () => {
     setIsLoading(true);
@@ -173,29 +230,36 @@ export function useDatabaseView<T>(
       const query = `SELECT * FROM ${viewName} ${whereClause}`;
       const paramValues = Object.values(params).filter(v => v !== undefined);
       
-      console.info(`SQL that would be executed: ${query}`, paramValues);
+      console.log('Executing SQL view query:', query, paramValues);
       
-      // Use mock data since we're in browser environment
-      setData(mockData as T[]);
+      const result = await pgPool.query(query, paramValues);
+      
+      if (result && result.rows) {
+        setData(result.rows as T[]);
+      } else {
+        setData([] as T[]);
+      }
+      
       setError(null);
     } catch (err: any) {
       console.error(`Error fetching data from view ${viewName}:`, err);
       setError(err);
-      // Fall back to mock data
-      setData(mockData);
+      setData([] as T[]);
     } finally {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchData();
-    
-    if (refreshInterval && refreshInterval > 0) {
-      const intervalId = setInterval(fetchData, refreshInterval);
-      return () => clearInterval(intervalId);
+    if (isConnected) {
+      fetchData();
+      
+      if (refreshInterval && refreshInterval > 0) {
+        const intervalId = setInterval(fetchData, refreshInterval);
+        return () => clearInterval(intervalId);
+      }
     }
-  }, [JSON.stringify(params), refreshInterval]);
+  }, [JSON.stringify(params), refreshInterval, isConnected]);
 
   return { data, isLoading, error, refresh: fetchData };
 }

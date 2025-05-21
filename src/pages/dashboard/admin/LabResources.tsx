@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,12 +21,10 @@ import {
   Filter,
   Microscope,
   Wrench,
-  RefreshCw,
   Trash2,
   MoreHorizontal,
   Pencil
 } from "lucide-react";
-import { LabResource } from "@/types/dashboard";
 import { toast } from "@/hooks/use-toast";
 import {
   Select,
@@ -53,67 +51,38 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { useDatabaseTable, useDatabaseView } from "@/hooks/use-database-connection";
 
-// Mock data for lab resources
-const mockLabResources: LabResource[] = [
-  {
-    id: "1",
-    name: "Microscope Set",
-    type: "Science",
-    quantity: 15,
-    available: 12,
-    location: "Science Lab 1",
-    lastMaintenance: "2023-04-15"
-  },
-  {
-    id: "2",
-    name: "Computer Workstation",
-    type: "Technology",
-    quantity: 30,
-    available: 30,
-    location: "Computer Lab",
-    lastMaintenance: "2023-05-20"
-  },
-  {
-    id: "3",
-    name: "Chemistry Kit",
-    type: "Science",
-    quantity: 20,
-    available: 18,
-    location: "Science Lab 2",
-    lastMaintenance: "2023-03-10"
-  },
-  {
-    id: "4",
-    name: "Physics Experiment Kit",
-    type: "Science",
-    quantity: 12,
-    available: 9,
-    location: "Science Lab 1",
-    lastMaintenance: "2023-02-28"
-  },
-  {
-    id: "5",
-    name: "3D Printer",
-    type: "Technology",
-    quantity: 2,
-    available: 1,
-    location: "Technology Lab",
-    lastMaintenance: "2023-04-30"
-  },
-  {
-    id: "6",
-    name: "Robotics Kit",
-    type: "Technology",
-    quantity: 10,
-    available: 8,
-    location: "Technology Lab",
-    lastMaintenance: "2023-05-05"
-  }
-];
+// Lab resource type definition
+interface LabResource {
+  id: string;
+  name: string;
+  type: string;
+  quantity: number;
+  available: number;
+  location: string;
+  lastMaintenance: string;
+}
 
 const LabResources = () => {
-  const [resources, setResources] = useState<LabResource[]>(mockLabResources);
+  // Get lab resources from database
+  const { 
+    data: resources, 
+    isLoading: resourcesLoading, 
+    error: resourcesError,
+    create: createResource,
+    update: updateResource,
+    remove: removeResource,
+    refresh: refreshResources
+  } = useDatabaseTable<LabResource>("lab_resources");
+  
+  // Get additional dashboard stats from database view
+  const {
+    data: dashboardStats,
+    isLoading: statsLoading,
+    error: statsError
+  } = useDatabaseView("lab_resources_dashboard_view", {}, {}, 60000);
+  
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState<string | null>(null);
   const [isAddingResource, setIsAddingResource] = useState(false);
@@ -123,25 +92,25 @@ const LabResources = () => {
     quantity: 1,
     available: 1,
     location: "",
-    lastMaintenance: ""
+    lastMaintenance: new Date().toISOString().split('T')[0]
   });
   
   // Filter resources based on search and filter criteria
-  const filteredResources = resources.filter(resource => {
+  const filteredResources = resources ? resources.filter(resource => {
     const matchesSearch = resource.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
                           resource.location.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesType = filterType ? resource.type === filterType : true;
     return matchesSearch && matchesType;
-  });
+  }) : [];
   
   // Resource types
   const resourceTypes = ["Science", "Technology", "Art", "Sports", "Music"];
   
-  // Location options
-  const locations = [...new Set(resources.map(resource => resource.location))];
+  // Location options from available resources
+  const locations = resources ? [...new Set(resources.map(resource => resource.location))] : [];
   
   // Add new resource handler
-  const handleAddResource = () => {
+  const handleAddResource = async () => {
     if (!newResource.name || !newResource.location) {
       toast({
         variant: "destructive",
@@ -151,62 +120,94 @@ const LabResources = () => {
       return;
     }
     
-    const updatedResources = [
-      ...resources,
-      {
-        id: (resources.length + 1).toString(),
+    try {
+      await createResource({
         ...newResource,
         available: Math.min(newResource.quantity, newResource.available)
-      }
-    ];
-    
-    setResources(updatedResources);
-    setIsAddingResource(false);
-    setNewResource({
-      name: "",
-      type: "Science",
-      quantity: 1,
-      available: 1,
-      location: "",
-      lastMaintenance: ""
-    });
-    
-    toast({
-      title: "Resource Added",
-      description: `${newResource.name} has been added successfully.`,
-    });
+      });
+      
+      // Reset form and close dialog
+      setIsAddingResource(false);
+      setNewResource({
+        name: "",
+        type: "Science",
+        quantity: 1,
+        available: 1,
+        location: "",
+        lastMaintenance: new Date().toISOString().split('T')[0]
+      });
+    } catch (error) {
+      console.error("Error adding resource:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to add resource. Please try again.",
+      });
+    }
   };
   
   // Delete resource handler
-  const handleDeleteResource = (id: string) => {
-    const updatedResources = resources.filter(resource => resource.id !== id);
-    setResources(updatedResources);
-    
-    toast({
-      title: "Resource Deleted",
-      description: "The resource has been deleted successfully.",
-    });
+  const handleDeleteResource = async (id: string) => {
+    try {
+      await removeResource(id);
+    } catch (error) {
+      console.error("Error deleting resource:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to delete resource. Please try again.",
+      });
+    }
   };
   
   // Schedule maintenance handler
-  const handleScheduleMaintenance = (id: string) => {
-    const today = new Date().toISOString().split('T')[0];
-    const updatedResources = resources.map(resource => 
-      resource.id === id ? { ...resource, lastMaintenance: today } : resource
-    );
-    
-    setResources(updatedResources);
-    
-    toast({
-      title: "Maintenance Scheduled",
-      description: "Maintenance has been scheduled for today.",
-    });
+  const handleScheduleMaintenance = async (id: string) => {
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      await updateResource(id, { lastMaintenance: today });
+      toast({
+        title: "Maintenance Scheduled",
+        description: "Maintenance has been scheduled for today.",
+      });
+    } catch (error) {
+      console.error("Error scheduling maintenance:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to schedule maintenance. Please try again.",
+      });
+    }
   };
+  
+  // Calculate dashboard stats
+  const totalResources = resources ? resources.length : 0;
+  const totalItems = resources ? resources.reduce((sum, r) => sum + r.quantity, 0) : 0;
+  const availableItems = resources ? resources.reduce((sum, r) => sum + r.available, 0) : 0;
+  const inUseItems = resources ? resources.reduce((sum, r) => sum + (r.quantity - r.available), 0) : 0;
+  const needsMaintenance = resources ? resources.filter(r => {
+    const lastMaintenance = new Date(r.lastMaintenance || "");
+    const threeMonthsAgo = new Date();
+    threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+    return lastMaintenance < threeMonthsAgo;
+  }).length : 0;
+  
+  if (resourcesLoading) {
+    return (
+      <DashboardLayout>
+        <DashboardHeader title="Lab Resources" />
+        <div className="flex-1 overflow-auto bg-gray-50 dark:bg-gray-900 p-6">
+          <div className="flex items-center justify-center h-64">
+            <p className="text-muted-foreground">Loading resources...</p>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>
       <DashboardHeader title="Lab Resources" />
-      <div className="flex-1 overflow-auto bg-gray-50 p-6">
+      <div className="flex-1 overflow-auto bg-gray-50 dark:bg-gray-900 p-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
           <Card>
             <CardHeader className="pb-2">
@@ -215,9 +216,9 @@ const LabResources = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{resources.length} types</div>
+              <div className="text-2xl font-bold">{totalResources} types</div>
               <p className="text-xs text-muted-foreground mt-1">
-                {resources.reduce((sum, r) => sum + r.quantity, 0)} total items
+                {totalItems} total items
               </p>
             </CardContent>
           </Card>
@@ -230,7 +231,7 @@ const LabResources = () => {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {resources.reduce((sum, r) => sum + r.available, 0)} items
+                {availableItems} items
               </div>
               <p className="text-xs text-muted-foreground mt-1">
                 Ready for use
@@ -246,7 +247,7 @@ const LabResources = () => {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {resources.reduce((sum, r) => sum + (r.quantity - r.available), 0)} items
+                {inUseItems} items
               </div>
               <p className="text-xs text-muted-foreground mt-1">
                 Currently checked out
@@ -262,12 +263,7 @@ const LabResources = () => {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {resources.filter(r => {
-                  const lastMaintenance = new Date(r.lastMaintenance || "");
-                  const threeMonthsAgo = new Date();
-                  threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
-                  return lastMaintenance < threeMonthsAgo;
-                }).length} items
+                {needsMaintenance} items
               </div>
               <p className="text-xs text-muted-foreground mt-1">
                 Over 3 months since last check
@@ -347,7 +343,11 @@ const LabResources = () => {
                           type="number" 
                           min={1}
                           value={newResource.quantity}
-                          onChange={(e) => setNewResource({...newResource, quantity: parseInt(e.target.value), available: Math.min(parseInt(e.target.value), newResource.available)})}
+                          onChange={(e) => setNewResource({
+                            ...newResource, 
+                            quantity: parseInt(e.target.value), 
+                            available: Math.min(parseInt(e.target.value), newResource.available)
+                          })}
                         />
                       </div>
                       
@@ -359,7 +359,10 @@ const LabResources = () => {
                           min={0}
                           max={newResource.quantity}
                           value={newResource.available}
-                          onChange={(e) => setNewResource({...newResource, available: Math.min(parseInt(e.target.value), newResource.quantity)})}
+                          onChange={(e) => setNewResource({
+                            ...newResource, 
+                            available: Math.min(parseInt(e.target.value), newResource.quantity)
+                          })}
                         />
                       </div>
                     </div>
@@ -430,79 +433,79 @@ const LabResources = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredResources.map((resource) => (
-                  <TableRow key={resource.id}>
-                    <TableCell className="font-medium">
-                      <div className="flex items-center">
-                        {resource.type === "Science" ? (
-                          <Microscope className="h-4 w-4 mr-2 text-purple-500" />
-                        ) : resource.type === "Technology" ? (
-                          <Monitor className="h-4 w-4 mr-2 text-blue-500" />
+                {filteredResources.length > 0 ? (
+                  filteredResources.map((resource) => (
+                    <TableRow key={resource.id}>
+                      <TableCell className="font-medium">
+                        <div className="flex items-center">
+                          {resource.type === "Science" ? (
+                            <Microscope className="h-4 w-4 mr-2 text-purple-500" />
+                          ) : resource.type === "Technology" ? (
+                            <Monitor className="h-4 w-4 mr-2 text-blue-500" />
+                          ) : (
+                            <div className="w-4 h-4 mr-2" />
+                          )}
+                          {resource.name}
+                        </div>
+                      </TableCell>
+                      <TableCell>{resource.type}</TableCell>
+                      <TableCell>{resource.location}</TableCell>
+                      <TableCell>
+                        {resource.available}/{resource.quantity}
+                      </TableCell>
+                      <TableCell>
+                        {resource.available === 0 ? (
+                          <Badge variant="destructive">Out of Stock</Badge>
+                        ) : resource.available < resource.quantity / 2 ? (
+                          <Badge variant="outline" className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200 hover:bg-yellow-100 dark:hover:bg-yellow-900">Low Stock</Badge>
                         ) : (
-                          <div className="w-4 h-4 mr-2" />
+                          <Badge variant="outline" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 hover:bg-green-100 dark:hover:bg-green-900">Available</Badge>
                         )}
-                        {resource.name}
-                      </div>
-                    </TableCell>
-                    <TableCell>{resource.type}</TableCell>
-                    <TableCell>{resource.location}</TableCell>
-                    <TableCell>
-                      {resource.available}/{resource.quantity}
-                    </TableCell>
-                    <TableCell>
-                      {resource.available === 0 ? (
-                        <Badge variant="destructive">Out of Stock</Badge>
-                      ) : resource.available < resource.quantity / 2 ? (
-                        <Badge variant="outline" className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100">Low Stock</Badge>
-                      ) : (
-                        <Badge variant="outline" className="bg-green-100 text-green-800 hover:bg-green-100">Available</Badge>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {resource.lastMaintenance ? resource.lastMaintenance : "Not recorded"}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon">
-                            <MoreHorizontal className="h-4 w-4" />
-                            <span className="sr-only">Open menu</span>
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem onClick={() => {
-                            toast({
-                              title: "Edit Resource",
-                              description: `Editing ${resource.name}`,
-                            });
-                          }}>
-                            <Pencil className="h-4 w-4 mr-2" />
-                            Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleScheduleMaintenance(resource.id)}>
-                            <Wrench className="h-4 w-4 mr-2" />
-                            Schedule Maintenance
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem 
-                            className="text-red-600"
-                            onClick={() => handleDeleteResource(resource.id)}
-                          >
-                            <Trash2 className="h-4 w-4 mr-2" />
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))}
-                
-                {filteredResources.length === 0 && (
+                      </TableCell>
+                      <TableCell>
+                        {resource.lastMaintenance ? resource.lastMaintenance : "Not recorded"}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon">
+                              <MoreHorizontal className="h-4 w-4" />
+                              <span className="sr-only">Open menu</span>
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem onClick={() => {
+                              toast({
+                                title: "Edit Resource",
+                                description: `Editing ${resource.name}`,
+                              });
+                            }}>
+                              <Pencil className="h-4 w-4 mr-2" />
+                              Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleScheduleMaintenance(resource.id)}>
+                              <Wrench className="h-4 w-4 mr-2" />
+                              Schedule Maintenance
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem 
+                              className="text-red-600 dark:text-red-400"
+                              onClick={() => handleDeleteResource(resource.id)}
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
                   <TableRow>
                     <TableCell colSpan={7} className="text-center py-6">
-                      No resources found matching your search.
+                      {searchTerm || filterType ? 'No resources found matching your search.' : 'No resources available. Add some using the button above.'}
                     </TableCell>
                   </TableRow>
                 )}

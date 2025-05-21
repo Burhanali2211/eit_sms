@@ -1,3 +1,4 @@
+
 /**
  * Hook for interacting with database tables
  */
@@ -57,7 +58,8 @@ export function useDatabaseTable<T extends { id: string }>(
       const interval = setInterval(fetchTableData, options.revalidateInterval);
       return () => clearInterval(interval);
     }
-  }, [tableName, JSON.stringify(options.filter), options.limit, options.select, options.orderBy?.column, options.orderBy?.ascending]);
+  }, [tableName, JSON.stringify(options.filter), options.limit, options.select, 
+      options.orderBy?.column, options.orderBy?.ascending]);
   
   // Create operation
   const create = async (item: Omit<T, 'id'>) => {

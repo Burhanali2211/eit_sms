@@ -1,27 +1,45 @@
 
 /**
- * Mock data utility
+ * Legacy mock data utility
  * 
- * This file provides mock data structures for use when database connection is unavailable
+ * This file now redirects to database connection utilities.
+ * It's kept for backward compatibility with components that 
+ * still import from this path.
+ * 
+ * New components should use database hooks directly.
  */
 
-// Re-export mock data structures
-export * from './mock';
+// Re-export database utilities
+export * from './database';
 
-// Import specific mock data
-import { 
-  mockCalendarEvents, 
-  getRoleDashboardStats, 
-  mockNotifications, 
-  mockFinancialRecords, 
-  mockStudents 
-} from './mock';
+// Import and re-export database functions
+import {
+  fetchData,
+  fetchFromView,
+  insertData,
+  updateData,
+  deleteData,
+  shouldUseMockData
+} from './database';
 
 // Export for components to use
-export { 
-  mockCalendarEvents, 
-  getRoleDashboardStats, 
-  mockNotifications,
-  mockFinancialRecords,
-  mockStudents
+export {
+  fetchData,
+  fetchFromView,
+  insertData,
+  updateData,
+  deleteData,
+  shouldUseMockData
 };
+
+// This is an empty export to satisfy existing imports
+// Components should be updated to use database hooks instead
+export const mockCalendarEvents: any[] = [];
+export const mockFinancialRecords: any[] = [];
+export const mockNotifications: any[] = [];
+export const mockStudents: any[] = [];
+
+export function getRoleDashboardStats(role: string) {
+  console.warn('getRoleDashboardStats is deprecated. Use useDatabaseView with dashboard_stats instead');
+  return [];
+}

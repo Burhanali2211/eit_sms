@@ -3,7 +3,7 @@
  * Database mutation utilities
  * 
  * Provides functions for inserting, updating, and deleting data
- * In browser environment, these will make API calls instead of direct DB access
+ * using the PostgreSQL database through API calls
  */
 
 import { pgPool } from './config';
@@ -11,7 +11,6 @@ import { toast } from '@/hooks/use-toast';
 
 /**
  * Inserts data into the database
- * In browser environment, this will make an API call
  * 
  * @param tableName - The table to insert into
  * @param data - The data to insert
@@ -19,19 +18,33 @@ import { toast } from '@/hooks/use-toast';
  */
 export async function insertData<T>(tableName: string, data: T): Promise<T> {
   try {
-    // In browser environment, we should use an API call instead of direct DB access
-    // For now, log that this would be an API call in production and return the data
-    console.info(`In production, this would be an API call to insert data into ${tableName}`);
-    toast({
-      title: 'Mock Insert Operation',
-      description: `This would insert data into ${tableName} in production`,
-    });
+    const keys = Object.keys(data as object);
+    const values = Object.values(data as object);
     
-    // Return the data as if it was inserted successfully
-    return {
-      ...data,
-      id: `mock-id-${Date.now()}` // Add a mock ID if it doesn't exist
-    } as unknown as T;
+    if (keys.length === 0) {
+      throw new Error("Cannot insert empty data object");
+    }
+    
+    const placeholders = values.map((_, i) => `$${i + 1}`).join(', ');
+    const query = `
+      INSERT INTO ${tableName} (${keys.join(', ')})
+      VALUES (${placeholders})
+      RETURNING *
+    `;
+    
+    console.log('Executing SQL insert:', query, values);
+    
+    const result = await pgPool.query(query, values);
+    
+    if (result && result.rows && result.rows.length > 0) {
+      toast({
+        title: 'Success',
+        description: `Data successfully added to ${tableName}`,
+      });
+      return result.rows[0] as T;
+    } else {
+      throw new Error('Insert operation did not return data');
+    }
   } catch (error) {
     console.error('Error inserting data:', error);
     toast({
@@ -45,7 +58,6 @@ export async function insertData<T>(tableName: string, data: T): Promise<T> {
 
 /**
  * Updates data in the database
- * In browser environment, this will make an API call
  * 
  * @param tableName - The table to update
  * @param id - The ID of the record to update
@@ -58,19 +70,34 @@ export async function updateData<T>(
   data: Partial<T>
 ): Promise<T> {
   try {
-    // In browser environment, we should use an API call instead of direct DB access
-    // For now, log that this would be an API call in production and return the data
-    console.info(`In production, this would be an API call to update data in ${tableName}`);
-    toast({
-      title: 'Mock Update Operation',
-      description: `This would update record ${id} in ${tableName} in production`,
-    });
+    const keys = Object.keys(data as object);
+    const values = Object.values(data as object);
     
-    // Return the data as if it was updated successfully
-    return {
-      id,
-      ...data
-    } as unknown as T;
+    if (keys.length === 0) {
+      throw new Error("Cannot update with empty data object");
+    }
+    
+    const setClause = keys.map((key, i) => `${key} = $${i + 1}`).join(', ');
+    const query = `
+      UPDATE ${tableName}
+      SET ${setClause}
+      WHERE id = $${values.length + 1}
+      RETURNING *
+    `;
+    
+    console.log('Executing SQL update:', query, [...values, id]);
+    
+    const result = await pgPool.query(query, [...values, id]);
+    
+    if (result && result.rows && result.rows.length > 0) {
+      toast({
+        title: 'Success',
+        description: `Record successfully updated in ${tableName}`,
+      });
+      return result.rows[0] as T;
+    } else {
+      throw new Error('Update operation did not return data');
+    }
   } catch (error) {
     console.error('Error updating data:', error);
     toast({
@@ -84,7 +111,6 @@ export async function updateData<T>(
 
 /**
  * Deletes data from the database
- * In browser environment, this will make an API call
  * 
  * @param tableName - The table to delete from
  * @param id - The ID of the record to delete
@@ -92,15 +118,25 @@ export async function updateData<T>(
  */
 export async function deleteData(tableName: string, id: string): Promise<boolean> {
   try {
-    // In browser environment, we should use an API call instead of direct DB access
-    // For now, log that this would be an API call in production
-    console.info(`In production, this would be an API call to delete record ${id} from ${tableName}`);
-    toast({
-      title: 'Mock Delete Operation',
-      description: `This would delete record ${id} from ${tableName} in production`,
-    });
+    const query = `
+      DELETE FROM ${tableName}
+      WHERE id = $1
+      RETURNING id
+    `;
     
-    return true;
+    console.log('Executing SQL delete:', query, [id]);
+    
+    const result = await pgPool.query(query, [id]);
+    
+    if (result && result.rows && result.rows.length > 0) {
+      toast({
+        title: 'Success',
+        description: `Record successfully deleted from ${tableName}`,
+      });
+      return true;
+    } else {
+      throw new Error('No record found to delete');
+    }
   } catch (error) {
     console.error('Error deleting data:', error);
     toast({
