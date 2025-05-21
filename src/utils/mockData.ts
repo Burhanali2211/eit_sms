@@ -32,8 +32,7 @@ export {
   shouldUseMockData
 };
 
-// This is an empty export to satisfy existing imports
-// Components should be updated to use database hooks instead
+// For backward compatibility, export empty arrays
 export const mockCalendarEvents: any[] = [];
 export const mockFinancialRecords: any[] = [];
 export const mockNotifications: any[] = [];

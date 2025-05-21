@@ -1,4 +1,3 @@
-
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
@@ -7,9 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import StatCard from "@/components/dashboard/StatCard";
-import { getRoleDashboardStats, mockCalendarEvents, mockNotifications } from "@/utils/mockData";
-import { useDatabaseView } from "@/hooks/use-database-connection";
-import { CalendarEvent, Notification } from "@/types/dashboard";
+import { useDatabaseTable, useDatabaseView } from "@/hooks/use-database-table";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const Dashboard = () => {
@@ -19,15 +16,20 @@ const Dashboard = () => {
   // Fetch dashboard stats based on user role
   const { data: stats, isLoading: isStatsLoading } = useDatabaseView(
     `${user?.role}_dashboard_view`,
-    [],
     { user_id: user?.id },
     60000 // Refresh every minute
   );
 
-  // Use mock data for events and notifications for now
-  // In a production app, these would be replaced with database calls
-  const events = mockCalendarEvents;
-  const notifications = mockNotifications;
+  // Fetch events and notifications from database
+  const { data: events = [] } = useDatabaseTable('calendar_events', {
+    filter: { user_id: user?.id },
+    refreshInterval: 60000
+  });
+
+  const { data: notifications = [] } = useDatabaseTable('notifications', {
+    filter: { user_id: user?.id },
+    refreshInterval: 60000
+  });
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -64,9 +66,15 @@ const Dashboard = () => {
             ))
           ) : (
             // Show actual stats data
-            stats.map((stat, index) => (
+            stats && stats.length > 0 ? stats.map((stat: any, index: number) => (
               <StatCard key={index} {...stat} />
-            ))
+            )) : (
+              <Card className="col-span-4">
+                <CardContent className="flex items-center justify-center h-32">
+                  <p className="text-muted-foreground">No statistics available. Please check database connection.</p>
+                </CardContent>
+              </Card>
+            )
           )}
         </div>
 
@@ -77,7 +85,7 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {events.slice(0, 3).map((event) => (
+                {events && events.length > 0 ? events.slice(0, 3).map((event: any) => (
                   <div key={event.id} className="flex justify-between items-center">
                     <div>
                       <p className="font-medium">{event.title}</p>
@@ -87,7 +95,11 @@ const Dashboard = () => {
                     </div>
                     <ChevronRight className="h-5 w-5 text-muted-foreground" />
                   </div>
-                ))}
+                )) : (
+                  <div className="text-center py-4 text-muted-foreground">
+                    No upcoming events
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -98,7 +110,7 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {notifications.slice(0, 3).map((notification) => (
+                {notifications && notifications.length > 0 ? notifications.slice(0, 3).map((notification: any) => (
                   <div key={notification.id} className="flex justify-between items-center">
                     <div>
                       <p className="font-medium">{notification.title}</p>
@@ -106,7 +118,11 @@ const Dashboard = () => {
                     </div>
                     <ChevronRight className="h-5 w-5 text-muted-foreground" />
                   </div>
-                ))}
+                )) : (
+                  <div className="text-center py-4 text-muted-foreground">
+                    No recent notifications
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -119,19 +135,20 @@ const Dashboard = () => {
               <CardTitle>My Courses</CardTitle>
             </CardHeader>
             <CardContent>
+              {/* We'll fetch this data from the database */}
               <div className="space-y-4">
-                {['Mathematics', 'English Literature', 'Physics', 'Computer Science'].map((course, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 border rounded-md hover:bg-muted">
-                    <div className="flex items-center">
-                      <div className="w-2 h-10 bg-school-primary rounded-full mr-4"></div>
-                      <div>
-                        <h3 className="font-medium">{course}</h3>
-                        <p className="text-sm text-muted-foreground">Next class: Tomorrow, 10:00 AM</p>
-                      </div>
+                {/* Fetch student courses from database */}
+                {/* This is just placeholder UI until we connect to the database */}
+                <div className="flex items-center justify-between p-3 border rounded-md hover:bg-muted">
+                  <div className="flex items-center">
+                    <div className="w-2 h-10 bg-school-primary rounded-full mr-4"></div>
+                    <div>
+                      <h3 className="font-medium">Please check database connection</h3>
+                      <p className="text-sm text-muted-foreground">No courses found</p>
                     </div>
-                    <ChevronRight className="h-5 w-5 text-muted-foreground" />
                   </div>
-                ))}
+                  <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                </div>
               </div>
             </CardContent>
           </Card>
