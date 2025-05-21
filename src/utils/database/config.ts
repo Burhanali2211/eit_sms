@@ -18,6 +18,9 @@ export const DB_CONFIG = {
   password: import.meta.env.VITE_PG_PASSWORD || 'Admin',
   // Disable SSL in development environment
   ssl: import.meta.env.PROD ? { rejectUnauthorized: false } : false,
+  // Add the missing properties
+  environment: import.meta.env.VITE_APP_ENV || 'development',
+  appName: import.meta.env.VITE_APP_NAME || 'EduSync'
 };
 
 // Create a proper pool interface that works in both environments
