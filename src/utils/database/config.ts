@@ -1,6 +1,6 @@
 
 // We need to fix the Pool import from pg package
-import pg from 'pg';
+import * as pg from 'pg';
 const { Pool } = pg;
 import { createPgPolyfills } from '../pg-polyfills';
 import { toast } from '@/hooks/use-toast';
