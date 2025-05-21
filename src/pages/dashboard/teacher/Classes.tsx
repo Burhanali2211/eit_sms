@@ -30,11 +30,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useDatabaseTable } from "@/hooks/use-database-connection";
+import { useDatabaseTable } from "@/hooks/use-database-table";
 import { toast } from "@/hooks/use-toast";
 
 const Classes = () => {
-  // Fetch classes from database
+  // Fetch classes from database with refreshInterval option
   const { 
     data: classesData, 
     isLoading: classesLoading, 
@@ -78,7 +78,7 @@ const Classes = () => {
 
   const students = studentsData || [];
   
-  const filteredStudents = students.filter(student => 
+  const filteredStudents = students.filter((student: Student) => 
     student.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
     student.rollNumber?.toLowerCase().includes(searchTerm.toLowerCase())
   );

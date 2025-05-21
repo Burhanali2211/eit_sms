@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
@@ -15,7 +14,6 @@ import {
   Briefcase
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { mockFinancialRecords } from "@/utils/mockData";
 import { useDatabaseTable } from "@/hooks/use-database-table";
 import {
   Table,
@@ -41,7 +39,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "@/hooks/use-toast";
 import { Label } from "@/components/ui/label";
 
 interface FinancialRecord {
@@ -56,7 +54,7 @@ interface FinancialRecord {
 const Finance = () => {
   const { data: records, isLoading, insert: addRecord } = useDatabaseTable<FinancialRecord>(
     "financial_records", 
-    { mockData: mockFinancialRecords }
+    { refreshInterval: 30000 } // Use refreshInterval instead of mockData
   );
   
   const [searchTerm, setSearchTerm] = useState("");

@@ -15,13 +15,14 @@ import { checkDatabaseConnection } from '@/utils/db-connection';
 interface UseDatabaseTableOptions {
   refreshInterval?: number;
   initialData?: any[];
+  filter?: Record<string, unknown>;
 }
 
 export function useDatabaseTable<T>(
   tableName: string, 
   options: UseDatabaseTableOptions = {}
 ) {
-  const { refreshInterval, initialData = [] } = options;
+  const { refreshInterval, initialData = [], filter = {} } = options;
   const [data, setData] = useState<T[]>(initialData);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
@@ -39,9 +40,27 @@ export function useDatabaseTable<T>(
   const fetchData = async () => {
     setIsLoading(true);
     try {
+      // Build the SQL query with filters if provided
+      let query = `SELECT * FROM ${tableName}`;
+      const queryParams: any[] = [];
+      
+      // Apply filters
+      if (filter && Object.keys(filter).length > 0) {
+        query += ' WHERE ';
+        const filterClauses: string[] = [];
+        
+        Object.entries(filter).forEach(([key, value], index) => {
+          filterClauses.push(`${key} = $${index + 1}`);
+          queryParams.push(value);
+        });
+        
+        query += filterClauses.join(' AND ');
+      }
+      
+      console.log('Executing SQL query:', query, queryParams);
+      
       // Query the database
-      const query = `SELECT * FROM ${tableName}`;
-      const result = await pgPool.query(query);
+      const result = await pgPool.query(query, queryParams);
       
       if (result && result.rows) {
         setData(result.rows as T[]);
@@ -185,7 +204,7 @@ export function useDatabaseTable<T>(
         return () => clearInterval(intervalId);
       }
     }
-  }, [refreshInterval, isConnected]);
+  }, [refreshInterval, isConnected, JSON.stringify(filter)]); // Add filter as a dependency
 
   return { 
     data, 
