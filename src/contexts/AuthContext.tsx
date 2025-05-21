@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { User, UserRole } from '@/types/dashboard';
 import { useNavigate, useLocation } from 'react-router-dom';

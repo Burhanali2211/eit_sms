@@ -17,7 +17,7 @@ import UserList from "@/components/admin/UserList";
 import AddUserForm from "@/components/admin/AddUserForm";
 import { useDatabaseTable } from "@/hooks/use-database-connection";
 import { toast } from "@/hooks/use-toast";
-import { User } from "@/types/dashboard";
+import { User, UserRole } from "@/types/dashboard";
 
 // Using mock data until connected to database
 const mockUsers = [
@@ -25,7 +25,7 @@ const mockUsers = [
     id: "1",
     name: "Alex Student",
     email: "student@edusync.com",
-    role: "student",
+    role: "student" as UserRole,
     status: "Active",
     lastLogin: "2023-05-12 09:25 AM",
     avatar: "https://github.com/shadcn.png",
@@ -34,7 +34,7 @@ const mockUsers = [
     id: "2",
     name: "Taylor Teacher",
     email: "teacher@edusync.com",
-    role: "teacher",
+    role: "teacher" as UserRole,
     status: "Active",
     lastLogin: "2023-05-12 08:10 AM",
     avatar: "https://github.com/shadcn.png",
@@ -43,7 +43,7 @@ const mockUsers = [
     id: "3",
     name: "Pat Principal",
     email: "principal@edusync.com",
-    role: "principal",
+    role: "principal" as UserRole,
     status: "Active",
     lastLogin: "2023-05-11 04:45 PM",
     avatar: "https://github.com/shadcn.png",
@@ -52,7 +52,7 @@ const mockUsers = [
     id: "4",
     name: "Admin User",
     email: "admin@edusync.com",
-    role: "admin",
+    role: "admin" as UserRole,
     status: "Active",
     lastLogin: "2023-05-12 10:30 AM",
     avatar: "https://github.com/shadcn.png",
@@ -61,7 +61,7 @@ const mockUsers = [
     id: "5",
     name: "Finance Manager",
     email: "financial@edusync.com",
-    role: "financial",
+    role: "financial" as UserRole,
     status: "Active",
     lastLogin: "2023-05-10 01:15 PM",
     avatar: "https://github.com/shadcn.png",
@@ -84,7 +84,7 @@ const UserManagement = () => {
     isLoading 
   } = useDatabaseTable<UserManagementUser>('users', {});
 
-  const [users, setUsers] = useState<UserManagementUser[]>(dbUsers.length > 0 ? dbUsers : mockUsers);
+  const [users, setUsers] = useState<UserManagementUser[]>(dbUsers.length > 0 ? dbUsers : mockUsers as UserManagementUser[]);
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
 
   // Update state when database data loads

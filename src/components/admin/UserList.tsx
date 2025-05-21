@@ -21,9 +21,15 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
+import { User, UserRole } from "@/types/dashboard";
+
+interface UserListItem extends User {
+  status: string;
+  lastLogin?: string;
+}
 
 interface UserListProps {
-  users: any[];
+  users: UserListItem[];
   onDelete: (id: string) => void;
   onStatusChange: (id: string, status: string) => void;
 }
