@@ -20,7 +20,7 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  // Add optimizeDeps configuration to handle node-postgres in browser
+  // Optimize dependencies for browser compatibility
   optimizeDeps: {
     esbuildOptions: {
       // Node.js global to browser globalThis
@@ -28,6 +28,8 @@ export default defineConfig(({ mode }) => ({
         global: 'globalThis',
       },
     },
+    // Exclude problematic dependencies from optimization
+    exclude: ['pg', 'pg-native'],
   },
   // Handle Node.js modules for browser compatibility
   build: {
@@ -35,7 +37,7 @@ export default defineConfig(({ mode }) => ({
       external: ['pg-native', 'cloudflare:sockets'],
     },
   },
-  // Fix for the cloudflare:sockets issue
+  // Fix for Node.js modules in the browser
   define: {
     'process.env': {},
   },
