@@ -9,7 +9,13 @@
 export * from './mock';
 
 // Import specific mock data
-import { mockCalendarEvents, getRoleDashboardStats, mockNotifications, mockFinancialRecords, mockStudents } from './mock';
+import { 
+  mockCalendarEvents, 
+  getRoleDashboardStats, 
+  mockNotifications, 
+  mockFinancialRecords, 
+  mockStudents 
+} from './mock';
 
 // Export for components to use
 export { 
@@ -19,4 +25,3 @@ export {
   mockFinancialRecords,
   mockStudents
 };
-

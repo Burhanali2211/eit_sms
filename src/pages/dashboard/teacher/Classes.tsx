@@ -42,6 +42,7 @@ const classes = [
 const Classes = () => {
   const [selectedClass, setSelectedClass] = useState(classes[0]);
   const [searchTerm, setSearchTerm] = useState("");
+  // Update to use the correctly typed mockStudents
   const [students, setStudents] = useState<Student[]>(mockStudents);
   
   const filteredStudents = students.filter(student => 

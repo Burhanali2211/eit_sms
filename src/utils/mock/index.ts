@@ -1,4 +1,3 @@
-
 import { mockCalendarEvents } from './calendar-data';
 import { toast } from '@/hooks/use-toast';
 
@@ -66,16 +65,16 @@ export const mockFinancialRecords = [
   { id: '10', description: 'Field Trip Collection', amount: 1200, type: 'fee', date: '2023-06-10', status: 'pending' }
 ];
 
-// Mock students data
+// Mock students data - updating to include grade and section
 export const mockStudents = [
-  { id: '1', name: 'John Smith', rollNumber: '10A-01', email: 'john@school.com', attendance: 95, performanceGrade: 'A', status: 'active' },
-  { id: '2', name: 'Emily Johnson', rollNumber: '10A-02', email: 'emily@school.com', attendance: 88, performanceGrade: 'B+', status: 'active' },
-  { id: '3', name: 'Michael Brown', rollNumber: '10A-03', email: 'michael@school.com', attendance: 92, performanceGrade: 'A-', status: 'active' },
-  { id: '4', name: 'Jessica Davis', rollNumber: '10A-04', email: 'jessica@school.com', attendance: 78, performanceGrade: 'C+', status: 'warning' },
-  { id: '5', name: 'Daniel Wilson', rollNumber: '10A-05', email: 'daniel@school.com', attendance: 85, performanceGrade: 'B', status: 'active' },
-  { id: '6', name: 'Sarah Thompson', rollNumber: '10A-06', email: 'sarah@school.com', attendance: 90, performanceGrade: 'A-', status: 'active' },
-  { id: '7', name: 'David Martinez', rollNumber: '10A-07', email: 'david@school.com', attendance: 65, performanceGrade: 'D+', status: 'at-risk' },
-  { id: '8', name: 'Sophia Garcia', rollNumber: '10A-08', email: 'sophia@school.com', attendance: 98, performanceGrade: 'A+', status: 'active' }
+  { id: '1', name: 'John Smith', grade: '10', section: 'A', rollNumber: '10A-01', email: 'john@school.com', attendance: 95, performanceGrade: 'A', status: 'active' },
+  { id: '2', name: 'Emily Johnson', grade: '10', section: 'A', rollNumber: '10A-02', email: 'emily@school.com', attendance: 88, performanceGrade: 'B+', status: 'active' },
+  { id: '3', name: 'Michael Brown', grade: '10', section: 'A', rollNumber: '10A-03', email: 'michael@school.com', attendance: 92, performanceGrade: 'A-', status: 'active' },
+  { id: '4', name: 'Jessica Davis', grade: '10', section: 'A', rollNumber: '10A-04', email: 'jessica@school.com', attendance: 78, performanceGrade: 'C+', status: 'warning' },
+  { id: '5', name: 'Daniel Wilson', grade: '10', section: 'A', rollNumber: '10A-05', email: 'daniel@school.com', attendance: 85, performanceGrade: 'B', status: 'active' },
+  { id: '6', name: 'Sarah Thompson', grade: '10', section: 'A', rollNumber: '10A-06', email: 'sarah@school.com', attendance: 90, performanceGrade: 'A-', status: 'active' },
+  { id: '7', name: 'David Martinez', grade: '10', section: 'A', rollNumber: '10A-07', email: 'david@school.com', attendance: 65, performanceGrade: 'D+', status: 'at-risk' },
+  { id: '8', name: 'Sophia Garcia', grade: '10', section: 'A', rollNumber: '10A-08', email: 'sophia@school.com', attendance: 98, performanceGrade: 'A+', status: 'active' }
 ];
 
 // Function to handle response with toast notifications
