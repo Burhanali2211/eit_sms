@@ -20,27 +20,23 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  // Optimize dependencies for browser compatibility
+  // Completely exclude pg from the build
   optimizeDeps: {
-    esbuildOptions: {
-      // Node.js global to browser globalThis
-      define: {
-        global: 'globalThis',
-      },
-    },
-    // Exclude problematic dependencies from optimization
     exclude: ['pg', 'pg-native'],
   },
   // Handle Node.js modules for browser compatibility
   build: {
+    commonjsOptions: {
+      transformMixedEsModules: true,
+    },
     rollupOptions: {
-      external: ['pg-native', 'cloudflare:sockets'],
+      external: ['pg', 'pg-native', 'cloudflare:sockets'],
     },
   },
-  // Fix for Node.js modules in the browser
+  // Provide empty shims for Node.js globals
   define: {
     'process.env': {},
-    // Add explicit handling for cloudflare:sockets
+    'global': 'window',
     'import.meta.CLOUDFLARE_SOCKETS': 'null'
   },
 }));

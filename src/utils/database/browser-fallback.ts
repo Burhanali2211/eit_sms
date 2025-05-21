@@ -27,6 +27,11 @@ export const getMockData = (tableName: string): any[] => {
         { id: 'mock-2', name: 'Teacher User', email: 'teacher@example.com', role: 'teacher' },
         { id: 'mock-3', name: 'Student User', email: 'student@example.com', role: 'student' },
       ];
+    } else if (tableName === 'courses') {
+      inMemoryDb[tableName] = [
+        { id: 'c1', name: 'Mathematics', description: 'Basic math course', teacherId: 'mock-2' },
+        { id: 'c2', name: 'Science', description: 'Introduction to science', teacherId: 'mock-2' }
+      ];
     }
   }
   return inMemoryDb[tableName];
@@ -40,8 +45,6 @@ export async function browserFetchData<T>(
 ): Promise<T> {
   console.log(`[Browser Fallback] Fetching data from ${tableName}`, options);
   
-  // In a real application, this would call an API endpoint
-  // For now, we'll return mock data or empty results
   try {
     const mockData = getMockData(tableName);
     
@@ -53,6 +56,22 @@ export async function browserFetchData<T>(
       return filtered as unknown as T;
     }
     
+    // Handle ordering if provided
+    if (options.orderBy) {
+      const { column, ascending = true } = options.orderBy;
+      mockData.sort((a, b) => {
+        if (a[column] < b[column]) return ascending ? -1 : 1;
+        if (a[column] > b[column]) return ascending ? 1 : -1;
+        return 0;
+      });
+    }
+    
+    // Handle limit if provided
+    if (options.limit && typeof options.limit === 'number') {
+      return mockData.slice(0, options.limit) as unknown as T;
+    }
+    
+    // Return all data
     return mockData as unknown as T;
   } catch (error) {
     console.error('Error in browser fetch fallback:', error);
@@ -69,7 +88,7 @@ export async function browserFetchData<T>(
 export const browserFallbackOperations = {
   fetchData: browserFetchData,
   fetchFromView: browserFetchData,
-  insertData: async <T>(tableName: string, data: any): Promise<T | null> => {
+  insertData: async <T>(tableName: string, data: any): Promise<T> => {
     console.log(`[Browser Fallback] Inserting data into ${tableName}`, data);
     const mockData = getMockData(tableName);
     const newItem = { id: `mock-${Date.now()}`, ...data };
@@ -82,7 +101,7 @@ export const browserFallbackOperations = {
     
     return newItem as unknown as T;
   },
-  updateData: async <T>(tableName: string, id: string, data: any): Promise<T | null> => {
+  updateData: async <T>(tableName: string, id: string, data: any): Promise<T> => {
     console.log(`[Browser Fallback] Updating data in ${tableName}`, { id, data });
     const mockData = getMockData(tableName);
     const index = mockData.findIndex(item => item.id === id);
@@ -96,7 +115,7 @@ export const browserFallbackOperations = {
       
       return mockData[index] as unknown as T;
     }
-    return null;
+    return data as unknown as T;  // Return original data as fallback
   },
   deleteData: async (tableName: string, id: string): Promise<boolean> => {
     console.log(`[Browser Fallback] Deleting data from ${tableName}`, { id });

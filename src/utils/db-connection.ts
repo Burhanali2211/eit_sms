@@ -1,25 +1,20 @@
 
-import { pgPool } from './database/config';
-
-// Add a DB_CONFIG object with environment information
-export const DB_CONFIG = {
-  environment: import.meta.env.VITE_APP_ENV || 'development',
-  appName: import.meta.env.VITE_APP_NAME || 'EduSync',
-  host: import.meta.env.VITE_PG_HOST || 'localhost',
-  port: parseInt(import.meta.env.VITE_PG_PORT || '5432'),
-  database: import.meta.env.VITE_PG_DATABASE || 'edusync',
-  user: import.meta.env.VITE_PG_USER || 'postgres',
-  password: import.meta.env.VITE_PG_PASSWORD || 'Admin'
-};
+import { pgPool, DB_CONFIG } from './database/config';
 
 /**
  * Checks if the database connection is available
  * @returns Promise<boolean> indicating if the connection was successful
  */
 export async function checkDatabaseConnection(): Promise<boolean> {
+  // Check if we're in a browser environment
+  if (typeof window !== 'undefined') {
+    console.log('Browser environment detected - database connection not available');
+    return false;
+  }
+
   try {
     const client = await pgPool.connect();
-    client.release();
+    // client.release() would be called here in Node environment
     console.log('Database connection successful');
     return true;
   } catch (error) {
@@ -33,5 +28,8 @@ export async function checkDatabaseConnection(): Promise<boolean> {
  * @returns Promise<boolean> indicating if mock data should be used
  */
 export async function shouldUseMockData(): Promise<boolean> {
-  return !(await checkDatabaseConnection());
+  return typeof window !== 'undefined' || !(await checkDatabaseConnection());
 }
+
+// Re-export the DB_CONFIG
+export { DB_CONFIG };

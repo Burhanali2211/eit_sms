@@ -6,7 +6,7 @@
  * using the PostgreSQL database through API calls
  */
 
-import { pgPool } from './config';
+import { pgPool, shouldUseMockData } from './config';
 import { toast } from '@/hooks/use-toast';
 
 /**
@@ -17,6 +17,15 @@ import { toast } from '@/hooks/use-toast';
  * @returns The inserted data with generated fields
  */
 export async function insertData<T>(tableName: string, data: T): Promise<T> {
+  // First check if we should use mock data
+  const useMock = await shouldUseMockData();
+  if (useMock) {
+    console.log(`Using mock data for inserting into ${tableName}`);
+    // Import the browser fallbacks dynamically to avoid Node.js vs browser issues
+    const { browserFallbackOperations } = await import('./browser-fallback');
+    return browserFallbackOperations.insertData(tableName, data);
+  }
+  
   try {
     const keys = Object.keys(data as object);
     const values = Object.values(data as object);
@@ -69,6 +78,15 @@ export async function updateData<T>(
   id: string, 
   data: Partial<T>
 ): Promise<T> {
+  // First check if we should use mock data
+  const useMock = await shouldUseMockData();
+  if (useMock) {
+    console.log(`Using mock data for updating in ${tableName}`);
+    // Import the browser fallbacks dynamically to avoid Node.js vs browser issues
+    const { browserFallbackOperations } = await import('./browser-fallback');
+    return browserFallbackOperations.updateData(tableName, id, data);
+  }
+  
   try {
     const keys = Object.keys(data as object);
     const values = Object.values(data as object);
@@ -117,6 +135,15 @@ export async function updateData<T>(
  * @returns True if successful, throws error otherwise
  */
 export async function deleteData(tableName: string, id: string): Promise<boolean> {
+  // First check if we should use mock data
+  const useMock = await shouldUseMockData();
+  if (useMock) {
+    console.log(`Using mock data for deleting from ${tableName}`);
+    // Import the browser fallbacks dynamically to avoid Node.js vs browser issues
+    const { browserFallbackOperations } = await import('./browser-fallback');
+    return browserFallbackOperations.deleteData(tableName, id);
+  }
+  
   try {
     const query = `
       DELETE FROM ${tableName}

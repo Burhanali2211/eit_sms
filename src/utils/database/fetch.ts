@@ -1,3 +1,4 @@
+
 /**
  * Database fetch utilities
  * 
@@ -25,6 +26,15 @@ export async function fetchData<T>(
     orderBy?: { column: string, ascending?: boolean }
   } = {}
 ): Promise<T> {
+  // First check if we should use mock data
+  const useMock = await shouldUseMockData();
+  if (useMock) {
+    console.log(`Using mock data for ${tableName}`);
+    // Import the browser fallbacks dynamically to avoid Node.js vs browser issues
+    const { browserFallbackOperations } = await import('./browser-fallback');
+    return browserFallbackOperations.fetchData(tableName, defaultValue, options);
+  }
+  
   try {
     console.log(`Fetching data from ${tableName} with options:`, options);
     
@@ -91,6 +101,15 @@ export async function fetchFromView<T>(
   defaultValue: T, 
   params: Record<string, unknown> = {}
 ): Promise<T> {
+  // First check if we should use mock data
+  const useMock = await shouldUseMockData();
+  if (useMock) {
+    console.log(`Using mock data for view ${viewName}`);
+    // Import the browser fallbacks dynamically to avoid Node.js vs browser issues
+    const { browserFallbackOperations } = await import('./browser-fallback');
+    return browserFallbackOperations.fetchFromView(viewName, defaultValue, params);
+  }
+  
   try {
     let query = `SELECT * FROM ${viewName}`;
     const queryParams: any[] = [];
