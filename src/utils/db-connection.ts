@@ -1,5 +1,6 @@
 
 import { pgPool, DB_CONFIG } from './database/config';
+import { DatabaseConfig } from '@/types';
 
 /**
  * Checks if the database connection is available
