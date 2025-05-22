@@ -295,7 +295,7 @@ const BackupRecovery = () => {
     }
     
     const now = new Date();
-    let nextRun = new Date();
+    const nextRun = new Date();
     const [hours, minutes] = newSchedule.time?.split(':') || ['00', '00'];
     nextRun.setHours(parseInt(hours), parseInt(minutes), 0);
     

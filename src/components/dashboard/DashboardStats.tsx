@@ -1,10 +1,10 @@
-
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import StatCard from "@/components/dashboard/StatCard";
+import { DashboardStat } from "@/types/dashboard";
 
 interface DashboardStatsProps {
-  stats: any[];
+  stats: DashboardStat[];
   isStatsLoading: boolean;
 }
 
@@ -29,7 +29,7 @@ const DashboardStats = ({ stats, isStatsLoading }: DashboardStatsProps) => {
 
   return (
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-      {stats && stats.length > 0 ? stats.map((stat: any, index: number) => (
+      {stats && stats.length > 0 ? stats.map((stat, index) => (
         <StatCard key={index} {...stat} />
       )) : (
         <Card className="col-span-4">

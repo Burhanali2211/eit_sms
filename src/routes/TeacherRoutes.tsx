@@ -1,4 +1,3 @@
-
 import { Route } from "react-router-dom";
 import ProtectedRoute from "../components/dashboard/ProtectedRoute";
 import Classes from "../pages/dashboard/teacher/Classes";
@@ -15,7 +14,7 @@ const TeacherRoutes = () => {
       } />
       
       <Route path="/dashboard/grades" element={
-        <ProtectedRoute allowedRoles={['teacher', 'principal']}>
+        <ProtectedRoute allowedRoles={['teacher', 'principal', 'super-admin']}>
           <Grades />
         </ProtectedRoute>
       } />

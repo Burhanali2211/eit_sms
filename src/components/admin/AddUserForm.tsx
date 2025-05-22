@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -9,11 +8,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { UserRole } from "@/types/dashboard";
+import { User, UserRole } from "@/types/dashboard";
 import { toast } from "@/hooks/use-toast";
 
 interface AddUserFormProps {
-  onAddUser: (user: any) => void;
+  onAddUser: (user: Omit<User, "id" | "createdAt" | "updatedAt">) => void;
   onCancel: () => void;
 }
 

@@ -1,11 +1,10 @@
-
 export type UserRole = 'student' | 'teacher' | 'principal' | 'admin' | 'financial' | 
                        'admission' | 'school-admin' | 'labs' | 'club' | 'library' | 'super-admin';
 
 export interface MenuItem {
   title: string;
   href: string;
-  icon?: any;
+  icon?: React.ComponentType | string;
   role: UserRole[];
 }
 

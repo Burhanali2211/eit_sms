@@ -1,4 +1,3 @@
-
 // Database configuration with proper browser/server handling
 import { toast } from '@/hooks/use-toast';
 import { createPgPolyfills } from '../pg-polyfills';
@@ -23,33 +22,46 @@ export const DB_CONFIG = {
   appName: import.meta.env.VITE_APP_NAME || 'EduSync'
 };
 
+// This function allows us to isolate the import statement to avoid Vite analyzing it
+// It will be called only in Node.js environment
+const createNodePgPool = async () => {
+  if (isBrowser) return null;
+  
+  try {
+    // Using a direct dynamic import with a variable to prevent Vite from analyzing
+    // This is a workaround for the "Failed to resolve import" error
+    const modulePath = 'pg';
+    const pg = await import(/* @vite-ignore */ modulePath);
+    const { Pool } = pg;
+    const pool = new Pool(DB_CONFIG);
+    
+    pool.on('error', (err: Error) => {
+      console.error('Unexpected error on idle client', err);
+    });
+    
+    console.log(`PostgreSQL configuration loaded: ${DB_CONFIG.database} on ${DB_CONFIG.host}:${DB_CONFIG.port}`);
+    return pool;
+  } catch (err) {
+    console.error('Failed to initialize PostgreSQL pool:', err);
+    return null;
+  }
+};
+
 // Create a proper pool interface that works in both environments
 export class DatabasePool {
-  private pgPool: any;
+  private pgPool: any = null;
   private static instance: DatabasePool;
+  private initialized = false;
+  private initializing = false;
 
   private constructor() {
-    if (!isBrowser) {
-      try {
-        // Only import pg in Node.js environment
-        // Using dynamic import to prevent browser from trying to parse pg
-        import('pg').then(pg => {
-          const { Pool } = pg;
-          this.pgPool = new Pool(DB_CONFIG);
-          
-          this.pgPool.on('error', (err: Error) => {
-            console.error('Unexpected error on idle client', err);
-          });
-          
-          console.log(`PostgreSQL configuration loaded: ${DB_CONFIG.database} on ${DB_CONFIG.host}:${DB_CONFIG.port}`);
-        }).catch(err => {
-          console.error('Failed to import pg module:', err);
-        });
-      } catch (err) {
-        console.error('Failed to initialize PostgreSQL pool:', err);
-      }
-    } else {
+    if (isBrowser) {
       console.log('Browser environment detected, using mock database pool');
+    } else {
+      // Don't attempt to initialize pg immediately
+      // We'll do it lazily when first needed
+      this.initialized = false;
+      this.initializing = false;
     }
   }
 
@@ -60,11 +72,22 @@ export class DatabasePool {
     return DatabasePool.instance;
   }
 
+  private async ensureInitialized() {
+    if (isBrowser || this.initialized || this.initializing) return;
+    
+    this.initializing = true;
+    this.pgPool = await createNodePgPool();
+    this.initialized = true;
+    this.initializing = false;
+  }
+
   async query(text: string, params: any[] = []) {
     if (isBrowser) {
       console.warn('Cannot execute real database queries in browser');
       return { rows: [] };
     }
+    
+    await this.ensureInitialized();
     
     try {
       if (!this.pgPool) {
@@ -82,6 +105,8 @@ export class DatabasePool {
       console.warn('Cannot connect to database from browser');
       throw new Error('Cannot connect to database from browser');
     }
+    
+    await this.ensureInitialized();
     
     try {
       if (!this.pgPool) {

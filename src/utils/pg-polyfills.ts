@@ -64,10 +64,10 @@ export const createPgPolyfills = () => {
                 from: (data: any) => new Uint8Array(typeof data === 'string' ? new TextEncoder().encode(data) : data),
                 isBuffer: () => false,
                 concat: (arrays: any[]) => {
-                  let totalLength = arrays.reduce((acc, value) => acc + value.length, 0);
-                  let result = new Uint8Array(totalLength);
+                  const totalLength = arrays.reduce((acc, value) => acc + value.length, 0);
+                  const result = new Uint8Array(totalLength);
                   let offset = 0;
-                  for (let array of arrays) {
+                  for (const array of arrays) {
                     result.set(array, offset);
                     offset += array.length;
                   }

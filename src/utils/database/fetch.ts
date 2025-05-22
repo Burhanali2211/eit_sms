@@ -39,7 +39,7 @@ export async function fetchData<T>(
     console.log(`Fetching data from ${tableName} with options:`, options);
     
     // Build the SQL query
-    let selectFields = options.select || '*';
+    const selectFields = options.select || '*';
     let query = `SELECT ${selectFields} FROM ${tableName}`;
     const queryParams: any[] = [];
     

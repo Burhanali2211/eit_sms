@@ -1,5 +1,4 @@
-
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -48,12 +47,12 @@ const AchievementsCarousel = () => {
     },
   ];
 
-  const nextSlide = () => {
+  const nextSlide = useCallback(() => {
     if (isAnimating) return;
     setIsAnimating(true);
     setCurrentIndex((prevIndex) => (prevIndex === achievements.length - 1 ? 0 : prevIndex + 1));
     setTimeout(() => setIsAnimating(false), 500);
-  };
+  }, [isAnimating, achievements.length]);
 
   const prevSlide = () => {
     if (isAnimating) return;
@@ -91,7 +90,7 @@ const AchievementsCarousel = () => {
         clearTimeout(timeoutRef.current);
       }
     };
-  }, [currentIndex]);
+  }, [currentIndex, nextSlide]);
 
   return (
     <div className="container-section">
