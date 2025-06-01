@@ -1,3 +1,4 @@
+
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -28,7 +29,7 @@ const Dashboard = () => {
     if (dbStats && dbStats.length > 0) {
       // If dbStats is a nested array, flatten it
       if (Array.isArray(dbStats[0])) {
-        return (dbStats as DashboardStat[][]).flat();
+        return (dbStats as unknown as DashboardStat[][]).flat();
       }
       return dbStats as DashboardStat[];
     }
