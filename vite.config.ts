@@ -1,3 +1,4 @@
+
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
@@ -22,6 +23,7 @@ export default defineConfig(({ mode }) => ({
   // Completely exclude pg from the build
   optimizeDeps: {
     exclude: ['pg', 'pg-native'],
+    include: ['mapbox-gl'],
     esbuildOptions: {
       // Node.js global to browser globalThis
       define: {

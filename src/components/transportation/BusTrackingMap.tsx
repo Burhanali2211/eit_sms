@@ -1,7 +1,5 @@
 
 import React, { useEffect, useRef, useState } from 'react';
-import mapboxgl from 'mapbox-gl';
-import 'mapbox-gl/dist/mapbox-gl.css';
 import { BusRoute, BusLocation } from '@/types/transportation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -16,12 +14,30 @@ interface BusTrackingMapProps {
 
 const BusTrackingMap: React.FC<BusTrackingMapProps> = ({ routes, onLocationUpdate }) => {
   const mapContainer = useRef<HTMLDivElement>(null);
-  const map = useRef<mapboxgl.Map | null>(null);
+  const map = useRef<any>(null);
   const [mapboxToken, setMapboxToken] = useState('');
   const [selectedRoute, setSelectedRoute] = useState<string | null>(null);
+  const [mapboxgl, setMapboxgl] = useState<any>(null);
+
+  // Dynamically import mapbox-gl to avoid build issues
+  useEffect(() => {
+    const loadMapbox = async () => {
+      try {
+        const mapboxModule = await import('mapbox-gl');
+        await import('mapbox-gl/dist/mapbox-gl.css');
+        setMapboxgl(mapboxModule.default);
+      } catch (error) {
+        console.error('Failed to load Mapbox GL:', error);
+      }
+    };
+
+    if (mapboxToken && !mapboxgl) {
+      loadMapbox();
+    }
+  }, [mapboxToken, mapboxgl]);
 
   useEffect(() => {
-    if (!mapContainer.current || !mapboxToken) return;
+    if (!mapContainer.current || !mapboxToken || !mapboxgl) return;
 
     mapboxgl.accessToken = mapboxToken;
     
@@ -89,7 +105,7 @@ const BusTrackingMap: React.FC<BusTrackingMapProps> = ({ routes, onLocationUpdat
     return () => {
       map.current?.remove();
     };
-  }, [routes, mapboxToken]);
+  }, [routes, mapboxToken, mapboxgl]);
 
   const simulateLocationUpdate = (routeId: string) => {
     const route = routes.find(r => r.id === routeId);
