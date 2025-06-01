@@ -9,6 +9,7 @@ import Settings from "@/pages/dashboard/Settings";
 import Unauthorized from "@/pages/dashboard/Unauthorized";
 import SchoolOverview from "@/pages/dashboard/SchoolOverview";
 import Staff from "@/pages/dashboard/Staff";
+import Transportation from "@/pages/dashboard/Transportation";
 
 // Import Admin routes
 import UserManagement from "@/pages/dashboard/admin/UserManagement";
@@ -56,6 +57,13 @@ const DashboardRoutes = () => {
       <Route path="/dashboard/unauthorized" element={
         <ProtectedRoute>
           <Unauthorized />
+        </ProtectedRoute>
+      } />
+      
+      {/* Transportation route - accessible to admin, principal, and super-admin */}
+      <Route path="/dashboard/transportation" element={
+        <ProtectedRoute allowedRoles={['admin', 'principal', 'super-admin', 'school-admin']}>
+          <Transportation />
         </ProtectedRoute>
       } />
       

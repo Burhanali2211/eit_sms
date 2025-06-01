@@ -1,231 +1,216 @@
-
-import { useAuth } from "@/contexts/AuthContext";
-import { useTheme } from "@/contexts/ThemeContext";
-import { MenuItem } from "@/types/dashboard";
-import {
-  Home,
-  Book,
-  Users,
-  Calendar,
-  Clock,
-  User,
-  Bell,
-  Settings,
-  BookOpen,
-  GraduationCap,
-  Briefcase,
-  LayoutDashboard,
-  FileText,
-  Database,
-  Monitor,
-  Gauge,
-  FileArchive,
-  Bug,
-  Info,
-  History,
-  DatabaseBackup
-} from "lucide-react";
 import React from "react";
 import { NavLink } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@/components/ui/sidebar";
+import { 
+  Home, Users, BookOpen, Calendar, Settings, Bell, User, 
+  GraduationCap, Building, DollarSign, UserCheck, 
+  Beaker, Book, Activity, Database, Shield, Cpu,
+  FileText, BarChart3, Bus
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const DashboardNav = () => {
   const { user } = useAuth();
-  const { isDarkMode } = useTheme();
 
-  if (!user) return null;
-
-  // Define all navigation items with role-based access
-  const allNavItems: MenuItem[] = [
+  // Define menu items based on roles
+  const menuItems = [
     {
       title: "Dashboard",
       href: "/dashboard",
       icon: Home,
-      role: ["student", "teacher", "principal", "admin", "financial", "admission", "school-admin", "labs", "club", "library", "super-admin"],
+      roles: ["student", "teacher", "admin", "principal", "financial", "admission", "school-admin", "labs", "club", "library", "super-admin"]
     },
     {
       title: "Profile",
       href: "/dashboard/profile",
       icon: User,
-      role: ["student", "teacher", "principal", "admin", "financial", "admission", "school-admin", "labs", "club", "library", "super-admin"],
-    },
-    {
-      title: "Notifications",
-      href: "/dashboard/notifications",
-      icon: Bell,
-      role: ["student", "teacher", "principal", "admin", "financial", "admission", "school-admin", "labs", "club", "library", "super-admin"],
+      roles: ["student", "teacher", "admin", "principal", "financial", "admission", "school-admin", "labs", "club", "library", "super-admin"]
     },
     {
       title: "Calendar",
       href: "/dashboard/calendar",
       icon: Calendar,
-      role: ["student", "teacher", "principal", "admin", "financial", "admission", "school-admin", "labs", "club", "library", "super-admin"],
-    },
-    // Student specific
-    {
-      title: "Courses",
-      href: "/dashboard/courses",
-      icon: Book,
-      role: ["student"],
+      roles: ["student", "teacher", "admin", "principal", "financial", "admission", "school-admin", "labs", "club", "library", "super-admin"]
     },
     {
-      title: "Attendance",
-      href: "/dashboard/attendance",
-      icon: Clock,
-      role: ["student", "teacher", "school-admin"],
+      title: "Notifications",
+      href: "/dashboard/notifications",
+      icon: Bell,
+      roles: ["student", "teacher", "admin", "principal", "financial", "admission", "school-admin", "labs", "club", "library", "super-admin"]
     },
-    // Teacher specific
+    
+    // School Management
+    {
+      title: "School Overview",
+      href: "/dashboard/school-overview",
+      icon: Building,
+      roles: ["principal", "super-admin"]
+    },
+    {
+      title: "Staff Management",
+      href: "/dashboard/staff",
+      icon: Users,
+      roles: ["principal", "school-admin", "super-admin"]
+    },
+    {
+      title: "Transportation",
+      href: "/dashboard/transportation",
+      icon: Bus,
+      roles: ["admin", "principal", "super-admin", "school-admin"]
+    },
+    
+    // Academic
     {
       title: "Classes",
       href: "/dashboard/classes",
-      icon: Users,
-      role: ["teacher", "principal", "school-admin"],
+      icon: BookOpen,
+      roles: ["teacher", "principal", "school-admin"]
     },
     {
       title: "Grades",
       href: "/dashboard/grades",
-      icon: FileText,
-      role: ["teacher", "principal"],
-    },
-    // Principal specific
-    {
-      title: "School Overview",
-      href: "/dashboard/school-overview",
-      icon: LayoutDashboard,
-      role: ["principal", "super-admin"],
+      icon: GraduationCap,
+      roles: ["teacher", "principal", "super-admin"]
     },
     {
-      title: "Staff",
-      href: "/dashboard/staff",
-      icon: Users,
-      role: ["principal", "school-admin", "super-admin"],
+      title: "Courses",
+      href: "/dashboard/courses",
+      icon: Book,
+      roles: ["student", "teacher", "principal"]
     },
-    // Admin roles
+    {
+      title: "Attendance",
+      href: "/dashboard/attendance",
+      icon: UserCheck,
+      roles: ["student", "teacher", "principal"]
+    },
+    
+    // Administrative
     {
       title: "User Management",
       href: "/dashboard/users",
       icon: Users,
-      role: ["admin", "super-admin"],
+      roles: ["admin", "super-admin"]
     },
-    {
-      title: "System",
-      href: "/dashboard/system",
-      icon: Settings,
-      role: ["admin", "super-admin"],
-    },
-    // Super admin specific
-    {
-      title: "System Logs",
-      href: "/dashboard/logs",
-      icon: Bug,
-      role: ["admin", "super-admin"],
-    },
-    {
-      title: "Audit Trail",
-      href: "/dashboard/audit",
-      icon: History,
-      role: ["admin", "super-admin"],
-    },
-    {
-      title: "System Health",
-      href: "/dashboard/health",
-      icon: Gauge,
-      role: ["admin", "super-admin"],
-    },
-    {
-      title: "Backup & Recovery",
-      href: "/dashboard/backup",
-      icon: DatabaseBackup,
-      role: ["admin", "super-admin"],
-    },
-    {
-      title: "System Monitoring",
-      href: "/dashboard/monitoring",
-      icon: Monitor,
-      role: ["admin", "super-admin"],
-    },
-    // Financial admin
     {
       title: "Finance",
       href: "/dashboard/finance",
-      icon: Briefcase,
-      role: ["financial", "principal", "super-admin"],
+      icon: DollarSign,
+      roles: ["financial", "principal", "super-admin"]
     },
-    // Admission admin
     {
       title: "Admissions",
       href: "/dashboard/admissions",
-      icon: GraduationCap,
-      role: ["admission", "principal", "super-admin"],
+      icon: UserCheck,
+      roles: ["admission", "principal", "super-admin"]
     },
-    // School admin
-    {
-      title: "School Management",
-      href: "/dashboard/school-management",
-      icon: Briefcase,
-      role: ["school-admin", "principal", "super-admin"],
-    },
-    // Labs admin
-    {
-      title: "Lab Resources",
-      href: "/dashboard/labs",
-      icon: Monitor,
-      role: ["labs", "principal", "super-admin"],
-    },
-    // Club admin
-    {
-      title: "Clubs & Activities",
-      href: "/dashboard/clubs",
-      icon: Users,
-      role: ["club", "principal", "super-admin"],
-    },
-    // Library admin
+    
+    // Resources
     {
       title: "Library",
       href: "/dashboard/library",
-      icon: BookOpen,
-      role: ["library", "principal", "super-admin"],
+      icon: Book,
+      roles: ["library", "principal", "super-admin"]
     },
-    // Super admin
+    {
+      title: "Lab Resources",
+      href: "/dashboard/labs",
+      icon: Beaker,
+      roles: ["labs", "principal", "super-admin"]
+    },
+    {
+      title: "Club Activities",
+      href: "/dashboard/clubs",
+      icon: Activity,
+      roles: ["club", "principal", "super-admin"]
+    },
+    
+    // System (Super Admin only)
+    {
+      title: "System Health",
+      href: "/dashboard/system-health",
+      icon: Cpu,
+      roles: ["super-admin"]
+    },
     {
       title: "System Database",
-      href: "/dashboard/database",
+      href: "/dashboard/system-database",
       icon: Database,
-      role: ["super-admin"],
+      roles: ["super-admin"]
+    },
+    {
+      title: "Audit Trail",
+      href: "/dashboard/audit-trail",
+      icon: Shield,
+      roles: ["super-admin"]
+    },
+    {
+      title: "System Logs",
+      href: "/dashboard/system-logs",
+      icon: FileText,
+      roles: ["super-admin"]
+    },
+    {
+      title: "Backup & Recovery",
+      href: "/dashboard/backup-recovery",
+      icon: Database,
+      roles: ["super-admin"]
+    },
+    {
+      title: "System Monitoring",
+      href: "/dashboard/system-monitoring",
+      icon: BarChart3,
+      roles: ["super-admin"]
+    },
+    {
+      title: "Configuration",
+      href: "/dashboard/configuration",
+      icon: Settings,
+      roles: ["super-admin"]
+    },
+    
+    // Settings (always last)
+    {
+      title: "Settings",
+      href: "/dashboard/settings",
+      icon: Settings,
+      roles: ["student", "teacher", "admin", "principal", "financial", "admission", "school-admin", "labs", "club", "library", "super-admin"]
     }
   ];
 
-  // Filter items based on user role
-  const navItems = allNavItems.filter((item) =>
-    item.role.includes(user.role)
+  // Filter menu items based on user role
+  const visibleMenuItems = menuItems.filter(item => 
+    user?.role && item.roles.includes(user.role)
   );
 
   return (
-    <nav className="space-y-1 px-2 py-3">
-      {navItems.map((item) => (
-        <NavLink
-          key={item.href}
-          to={item.href}
-          className={({ isActive }) =>
-            cn(
-              "flex items-center px-3 py-2.5 text-sm font-medium rounded-md transition-colors duration-200",
-              isActive
-                ? isDarkMode
-                  ? "bg-school-primary/20 text-school-primary dark:text-school-secondary font-semibold"
-                  : "bg-school-primary/10 text-school-primary font-semibold"
-                : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-            )
-          }
-        >
-          {item.icon && (
-            <span className="mr-3 w-5 h-5 flex items-center justify-center">
-              {React.createElement(item.icon)}
-            </span>
-          )}
-          <span>{item.title}</span>
-        </NavLink>
-      ))}
-    </nav>
+    <SidebarMenu>
+      {visibleMenuItems.map((item) => {
+        const IconComponent = item.icon;
+        return (
+          <SidebarMenuItem key={item.href}>
+            <SidebarMenuButton asChild>
+              <NavLink
+                to={item.href}
+                className={({ isActive }) =>
+                  cn(
+                    "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                    "hover:bg-accent hover:text-accent-foreground",
+                    isActive
+                      ? "bg-accent text-accent-foreground"
+                      : "text-muted-foreground"
+                  )
+                }
+              >
+                <IconComponent className="h-4 w-4" />
+                {item.title}
+              </NavLink>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        );
+      })}
+    </SidebarMenu>
   );
 };
 
