@@ -1,0 +1,106 @@
+
+EDUSYNC DATABASE TABLES DOCUMENTATION
+===================================
+
+This document lists all the tables required for the EduSync school management system.
+
+TOTAL TABLES: 24
+
+CORE SYSTEM TABLES:
+1. users - Core user authentication and profiles for all system users
+2. schools - School information and settings
+3. departments - Academic departments within schools
+4. classes - Individual classes/courses
+5. students - Student-specific information and academic records
+6. teachers - Teacher-specific information and employment details
+7. subjects - Subject/course catalog
+8. enrollments - Student-class relationships
+
+ACADEMIC TABLES:
+9. assignments - Homework, quizzes, exams, and projects
+10. grades - Student grades for assignments
+11. attendance - Daily attendance records
+
+TRANSPORTATION TABLES:
+12. bus_routes - Bus route information and driver details
+13. bus_stops - Individual stops on bus routes
+14. student_transportation - Links students to their bus routes and stops
+15. bus_locations - Real-time GPS tracking data for buses
+
+LIBRARY MANAGEMENT TABLES:
+16. library_books - Book inventory and catalog
+17. library_checkouts - Book borrowing records
+
+LAB MANAGEMENT TABLES:
+18. lab_equipment - Laboratory equipment inventory
+19. lab_reservations - Equipment booking and reservations
+
+COMMUNICATION & EVENTS:
+20. notifications - System notifications for users
+21. events - Calendar events and school activities
+
+FINANCIAL MANAGEMENT:
+22. fee_structures - Fee definitions by grade and type
+23. student_fees - Individual student fee records and payments
+
+FEATURES EACH TABLE GROUP SUPPORTS:
+
+CORE SYSTEM:
+- User authentication and authorization
+- Role-based access control (admin, teacher, student, parent, etc.)
+- School hierarchy management
+- Department and class organization
+
+ACADEMIC MANAGEMENT:
+- Grade book functionality
+- Assignment creation and submission
+- Attendance tracking
+- Student enrollment management
+
+TRANSPORTATION:
+- Live bus tracking with GPS
+- Route management
+- Student pickup/dropoff assignments
+- Real-time location updates
+
+LIBRARY:
+- Book catalog and inventory
+- Check-out/check-in system
+- Overdue tracking
+
+LAB RESOURCES:
+- Equipment inventory management
+- Reservation system
+- Usage tracking
+
+COMMUNICATION:
+- Notification system
+- Event calendar
+- School announcements
+
+FINANCIAL:
+- Fee structure management
+- Payment tracking
+- Financial reporting
+
+INDEXES AND PERFORMANCE:
+- All tables include primary keys (UUID)
+- Foreign key relationships ensure data integrity
+- Performance indexes on frequently queried columns
+- Automatic timestamp tracking with triggers
+
+SETUP INSTRUCTIONS:
+1. Run complete_schema.sql to create all tables
+2. Run sample_data.sql to populate with demo data
+3. Configure your application database connection
+4. Update .env file with your PostgreSQL credentials
+
+REQUIRED POSTGRESQL EXTENSIONS:
+- uuid-ossp (for UUID generation)
+
+Each table includes:
+- id (UUID primary key)
+- created_at (timestamp)
+- updated_at (timestamp with auto-update trigger)
+- Proper foreign key constraints
+- Check constraints for data validation
