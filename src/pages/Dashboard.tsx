@@ -27,11 +27,13 @@ const Dashboard = () => {
   // Use database stats if available, otherwise fall back to mock data
   const stats: DashboardStat[] = (() => {
     if (dbStats && dbStats.length > 0) {
-      // If dbStats is a nested array, flatten it
-      if (Array.isArray(dbStats[0])) {
+      // Check if dbStats is actually a nested array and flatten it
+      if (Array.isArray(dbStats) && Array.isArray(dbStats[0])) {
+        // It's a nested array, flatten it
         return (dbStats as unknown as DashboardStat[][]).flat();
       }
-      return dbStats as DashboardStat[];
+      // It's already a flat array
+      return dbStats;
     }
     
     // Fall back to mock data
