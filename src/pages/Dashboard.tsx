@@ -24,11 +24,18 @@ const Dashboard = () => {
   );
 
   // Use database stats if available, otherwise fall back to mock data
-  const stats: DashboardStat[] = dbStats && dbStats.length > 0 
-    ? dbStats 
-    : user?.role 
-      ? getRoleDashboardStats(user.role) 
-      : [];
+  const stats: DashboardStat[] = (() => {
+    if (dbStats && dbStats.length > 0) {
+      // If dbStats is a nested array, flatten it
+      if (Array.isArray(dbStats[0])) {
+        return (dbStats as DashboardStat[][]).flat();
+      }
+      return dbStats as DashboardStat[];
+    }
+    
+    // Fall back to mock data
+    return user?.role ? getRoleDashboardStats(user.role) : [];
+  })();
 
   // Fetch events and notifications from database
   const { data: events = [] } = useDatabaseTable('calendar_events', {
