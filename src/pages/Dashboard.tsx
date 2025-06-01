@@ -1,4 +1,3 @@
-
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -25,7 +24,7 @@ const Dashboard = () => {
   );
 
   // Use database stats if available, otherwise fall back to mock data
-  const stats = dbStats && dbStats.length > 0 
+  const stats: DashboardStat[] = dbStats && dbStats.length > 0 
     ? dbStats 
     : user?.role 
       ? getRoleDashboardStats(user.role) 

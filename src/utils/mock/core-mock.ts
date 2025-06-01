@@ -1,4 +1,3 @@
-
 /**
  * Core mock data utilities
  */
@@ -8,58 +7,9 @@ import { shouldUseMockData } from '../database';
 import { fetchFromView } from '../database';
 
 // Get role-specific dashboard stats
-export const getRoleDashboardStats = async (role: UserRole): Promise<DashboardStat[]> => {
-  // Try to fetch from database if not using mock data
-  if (!shouldUseMockData()) {
-    try {
-      // Determine which view to use based on role
-      let viewName = '';
-      
-      switch(role) {
-        case 'student':
-          viewName = 'student_dashboard_view';
-          break;
-        case 'teacher':
-          viewName = 'teacher_dashboard_view';
-          break;
-        case 'financial':
-          viewName = 'financial_dashboard_view';
-          break;
-        case 'admission':
-          viewName = 'admission_dashboard_view';
-          break;
-        case 'library':
-          viewName = 'library_dashboard_view';
-          break;
-        case 'labs':
-          viewName = 'lab_resources_dashboard_view';
-          break;
-        case 'club':
-          viewName = 'club_activities_dashboard_view';
-          break;
-        case 'admin':
-        case 'super-admin':
-          viewName = 'system_health_dashboard_view';
-          break;
-        default:
-          // Fall back to mock data for other roles
-          return getMockStatsForRole(role);
-      }
-      
-      // Fetch data from the appropriate view
-      const viewData = await fetchFromView(viewName, {}, {});
-      
-      // Transform the view data into DashboardStat objects
-      if (viewData) {
-        return transformViewDataToStats(viewData, role);
-      }
-    } catch (error) {
-      console.error('Error fetching dashboard stats from database:', error);
-      // Fall back to mock data on error
-    }
-  }
-  
-  // Return mock data if database fetch failed or mock mode is enabled
+export const getRoleDashboardStats = (role: UserRole): DashboardStat[] => {
+  // For now, always return mock data since this is a synchronous function
+  // Database fetching should be handled separately in the component
   return getMockStatsForRole(role);
 };
 
