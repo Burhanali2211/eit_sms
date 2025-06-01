@@ -9,18 +9,27 @@ import DashboardEvents from "@/components/dashboard/DashboardEvents";
 import DashboardNotifications from "@/components/dashboard/DashboardNotifications";
 import RoleBasedContent from "@/components/dashboard/RoleBasedContent";
 import { useDatabaseView, useDatabaseTable } from "@/hooks/use-database-connection";
+import { DashboardStat } from "@/types/dashboard";
+import { getRoleDashboardStats } from "@/utils/mock/core-mock";
 
 const Dashboard = () => {
   const { user, isLoading, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
-  // Fetch dashboard stats based on user role
-  const { data: stats, isLoading: isStatsLoading } = useDatabaseView(
+  // Fetch dashboard stats based on user role with proper typing and fallback
+  const { data: dbStats, isLoading: isStatsLoading } = useDatabaseView<DashboardStat[]>(
     `${user?.role}_dashboard_view`,
+    [], // Default empty array
     { user_id: user?.id },
-    {},
     60000 // Refresh every minute
   );
+
+  // Use database stats if available, otherwise fall back to mock data
+  const stats = dbStats && dbStats.length > 0 
+    ? dbStats 
+    : user?.role 
+      ? getRoleDashboardStats(user.role) 
+      : [];
 
   // Fetch events and notifications from database
   const { data: events = [] } = useDatabaseTable('calendar_events', {
