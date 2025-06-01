@@ -2,7 +2,7 @@
 import { Route } from "react-router-dom";
 import ProtectedRoute from "../components/dashboard/ProtectedRoute";
 import Courses from "../pages/dashboard/student/Courses";
-import Attendance from "../pages/dashboard/student/Attendance";
+import Attendance from "../pages/dashboard/Attendance";
 
 const StudentRoutes = () => {
   return (

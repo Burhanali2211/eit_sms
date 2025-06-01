@@ -17,6 +17,7 @@ import Library from "@/pages/dashboard/admin/Library";
 
 // Import Teacher routes
 import Classes from "@/pages/dashboard/teacher/Classes";
+import Grades from "@/pages/dashboard/teacher/Grades";
 
 const DashboardRoutes = () => {
   return (
@@ -96,6 +97,12 @@ const DashboardRoutes = () => {
       <Route path="/dashboard/classes" element={
         <ProtectedRoute allowedRoles={['teacher', 'principal', 'school-admin']}>
           <Classes />
+        </ProtectedRoute>
+      } />
+      
+      <Route path="/dashboard/grades" element={
+        <ProtectedRoute allowedRoles={['teacher', 'principal', 'super-admin']}>
+          <Grades />
         </ProtectedRoute>
       } />
     </>
