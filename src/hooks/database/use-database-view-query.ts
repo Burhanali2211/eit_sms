@@ -11,7 +11,7 @@ export function useDatabaseViewQuery<T>(
   params: Record<string, any> = {},
   refreshInterval?: number
 ) {
-  const [data, setData] = useState<T[]>([]);
+  const [data, setData] = useState<T | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
   const [isConnected, setIsConnected] = useState<boolean | null>(null);
@@ -43,16 +43,17 @@ export function useDatabaseViewQuery<T>(
       const result = await pgPool.query(query, paramValues);
       
       if (result && result.rows) {
-        setData(result.rows as T[]);
+        // Return the raw rows data, let the consumer handle the structure
+        setData(result.rows as T);
       } else {
-        setData([] as T[]);
+        setData(null);
       }
       
       setError(null);
     } catch (err: any) {
       console.error(`Error fetching data from view ${viewName}:`, err);
       setError(err);
-      setData([] as T[]);
+      setData(null);
     } finally {
       setIsLoading(false);
     }
@@ -66,6 +67,10 @@ export function useDatabaseViewQuery<T>(
         const intervalId = setInterval(fetchData, refreshInterval);
         return () => clearInterval(intervalId);
       }
+    } else if (isConnected === false) {
+      // Database not connected, stop loading
+      setIsLoading(false);
+      setData(null);
     }
   }, [JSON.stringify(params), refreshInterval, isConnected]);
 

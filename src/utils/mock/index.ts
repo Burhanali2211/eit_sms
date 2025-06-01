@@ -1,3 +1,4 @@
+
 import { mockCalendarEvents } from './calendar-data';
 import { toast } from '@/hooks/use-toast';
 
@@ -96,20 +97,3 @@ export function handleMockResponse(action: string, success = true, item?: string
   
   return { success };
 }
-
-// Helper function to get role-specific dashboard stats
-export const getRoleDashboardStats = (role: string) => {
-  switch (role) {
-    case 'student':
-      return mockDashboardStats.student;
-    case 'teacher':
-      return mockDashboardStats.teacher;
-    case 'admin':
-    case 'super-admin':
-      return mockDashboardStats.admin;
-    case 'principal':
-      return mockDashboardStats.principal;
-    default:
-      return [];
-  }
-};

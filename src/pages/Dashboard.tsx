@@ -11,6 +11,7 @@ import RoleBasedContent from "@/components/dashboard/RoleBasedContent";
 import { useDatabaseView, useDatabaseTable } from "@/hooks/use-database-connection";
 import { DashboardStat } from "@/types/dashboard";
 import { getRoleDashboardStats } from "@/utils/mock/core-mock";
+import { flattenDashboardStats } from "@/utils/type-guards";
 
 const Dashboard = () => {
   const { user, isLoading, isAuthenticated } = useAuth();
@@ -26,18 +27,19 @@ const Dashboard = () => {
 
   // Use database stats if available, otherwise fall back to mock data
   const stats: DashboardStat[] = (() => {
-    if (dbStats && dbStats.length > 0) {
-      // Check if dbStats is actually a nested array and flatten it
-      if (Array.isArray(dbStats) && Array.isArray(dbStats[0])) {
-        // It's a nested array, flatten it
-        return (dbStats as DashboardStat[][]).flat();
-      }
-      // It's already a flat array
-      return dbStats as DashboardStat[];
+    console.log('Raw dbStats from database:', dbStats);
+    
+    // Try to use database stats first
+    const validDbStats = flattenDashboardStats(dbStats);
+    if (validDbStats.length > 0) {
+      console.log('Using database stats:', validDbStats);
+      return validDbStats;
     }
     
     // Fall back to mock data
-    return user?.role ? getRoleDashboardStats(user.role) : [];
+    const mockStats = user?.role ? getRoleDashboardStats(user.role) : [];
+    console.log('Using mock stats for role', user?.role, ':', mockStats);
+    return mockStats;
   })();
 
   // Fetch events and notifications from database
