@@ -30,10 +30,10 @@ const Dashboard = () => {
       // Check if dbStats is actually a nested array and flatten it
       if (Array.isArray(dbStats) && Array.isArray(dbStats[0])) {
         // It's a nested array, flatten it
-        return (dbStats as unknown as DashboardStat[][]).flat();
+        return (dbStats as DashboardStat[][]).flat();
       }
       // It's already a flat array
-      return dbStats;
+      return dbStats as DashboardStat[];
     }
     
     // Fall back to mock data
