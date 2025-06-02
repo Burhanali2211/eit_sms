@@ -5,9 +5,11 @@ import { useAuth } from "@/contexts/AuthContext";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import DashboardStats from "@/components/dashboard/DashboardStats";
-import DashboardEvents from "@/components/dashboard/DashboardEvents";
-import DashboardNotifications from "@/components/dashboard/DashboardNotifications";
 import RoleBasedContent from "@/components/dashboard/RoleBasedContent";
+import QuickActions from "@/components/dashboard/QuickActions";
+import RealTimeNotifications from "@/components/dashboard/RealTimeNotifications";
+import EnhancedCalendarWidget from "@/components/dashboard/EnhancedCalendarWidget";
+import DataAnalyticsWidget from "@/components/dashboard/DataAnalyticsWidget";
 import { useDatabaseView, useDatabaseTable } from "@/hooks/use-database-connection";
 import { DashboardStat } from "@/types/dashboard";
 import { getRoleDashboardStats } from "@/utils/mock/core-mock";
@@ -71,12 +73,25 @@ const Dashboard = () => {
     <DashboardLayout>
       <DashboardHeader title="Dashboard" />
 
-      <main className="flex-1 overflow-auto dashboard-content p-6">
+      <main className="flex-1 overflow-auto dashboard-content p-6 space-y-6">
+        {/* Main Stats */}
         <DashboardStats stats={stats} isStatsLoading={isStatsLoading} />
 
-        <div className="grid gap-6 grid-cols-1 md:grid-cols-2 mt-6">
-          <DashboardEvents events={events} />
-          <DashboardNotifications notifications={notifications} />
+        {/* Enhanced Dashboard Grid */}
+        <div className="grid gap-6 grid-cols-1 lg:grid-cols-3">
+          {/* Quick Actions */}
+          <QuickActions />
+          
+          {/* Real-time Notifications */}
+          <RealTimeNotifications />
+          
+          {/* Enhanced Calendar */}
+          <EnhancedCalendarWidget />
+        </div>
+
+        {/* Analytics Widget - Full Width */}
+        <div className="grid gap-6 grid-cols-1">
+          <DataAnalyticsWidget />
         </div>
 
         {/* Role-specific dashboard content */}
