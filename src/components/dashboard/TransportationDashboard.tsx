@@ -54,6 +54,10 @@ const TransportationDashboard: React.FC<TransportationDashboardProps> = ({ route
     }
   };
 
+  const handleRefresh = () => {
+    refetch();
+  };
+
   const activeRoutes = routes.filter(route => route.isActive);
   const totalStudents = routes.reduce((sum, route) => 
     sum + route.stops.reduce((stopSum, stop) => stopSum + stop.students.length, 0), 0
@@ -86,7 +90,7 @@ const TransportationDashboard: React.FC<TransportationDashboardProps> = ({ route
             <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
             <h3 className="text-lg font-semibold mb-2">Failed to Load Transportation Data</h3>
             <p className="text-gray-600 mb-4">{error}</p>
-            <Button onClick={refetch}>Try Again</Button>
+            <Button onClick={handleRefresh}>Try Again</Button>
           </div>
         </CardContent>
       </Card>

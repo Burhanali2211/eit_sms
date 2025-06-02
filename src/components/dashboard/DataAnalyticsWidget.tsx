@@ -126,6 +126,48 @@ const DataAnalyticsWidget = () => {
     </Card>
   );
 
+  // Helper function to get chart data for performance tab
+  const getPerformanceChartData = () => {
+    if (user?.role === 'student') {
+      return data.gradeData;
+    } else if (user?.role === 'teacher') {
+      return data.classData;
+    } else {
+      return data.enrollmentData;
+    }
+  };
+
+  // Helper function to get chart data key for performance tab
+  const getPerformanceDataKey = () => {
+    if (user?.role === 'student') {
+      return 'grade';
+    } else if (user?.role === 'teacher') {
+      return 'average';
+    } else {
+      return 'students';
+    }
+  };
+
+  // Helper function to get chart data key for x-axis
+  const getPerformanceXAxisKey = () => {
+    if (user?.role === 'student') {
+      return 'subject';
+    } else if (user?.role === 'teacher') {
+      return 'class';
+    } else {
+      return 'grade';
+    }
+  };
+
+  // Helper function to get trends chart data
+  const getTrendsChartData = () => {
+    if (data.attendanceData) {
+      return data.attendanceData;
+    } else {
+      return data.performanceData || [];
+    }
+  };
+
   return (
     <Card className="col-span-2">
       <CardHeader>
@@ -212,13 +254,13 @@ const DataAnalyticsWidget = () => {
           <TabsContent value="performance" className="space-y-4">
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={user?.role === 'student' ? data.gradeData : data.classData || data.enrollmentData}>
+                <BarChart data={getPerformanceChartData()}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey={user?.role === 'student' ? 'subject' : 'class' || 'grade'} />
+                  <XAxis dataKey={getPerformanceXAxisKey()} />
                   <YAxis />
                   <Tooltip />
                   <Bar 
-                    dataKey={user?.role === 'student' ? 'grade' : 'average' || 'students'} 
+                    dataKey={getPerformanceDataKey()} 
                     fill="#3b82f6" 
                   />
                 </BarChart>
@@ -229,7 +271,7 @@ const DataAnalyticsWidget = () => {
           <TabsContent value="trends" className="space-y-4">
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={data.attendanceData || data.performanceData}>
+                <LineChart data={getTrendsChartData()}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="month" />
                   <YAxis />
