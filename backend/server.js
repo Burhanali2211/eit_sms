@@ -17,6 +17,7 @@ const { testConnection } = require('./config/database');
 const userRoutes = require('./routes/users');
 const transportationRoutes = require('./routes/transportation');
 const academicRoutes = require('./routes/academic');
+const dashboardRoutes = require('./routes/dashboard');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -57,6 +58,7 @@ app.get('/health', (req, res) => {
 app.use('/api/users', userRoutes);
 app.use('/api/transportation', transportationRoutes);
 app.use('/api/academic', academicRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

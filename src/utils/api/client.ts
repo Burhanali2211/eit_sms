@@ -88,6 +88,24 @@ class ApiClient {
     return this.delete(`/users/${id}`);
   }
 
+  // Dashboard operations
+  async getDashboardStats(role: string, userId?: string) {
+    const endpoint = userId ? `/dashboard/stats/${role}/${userId}` : `/dashboard/stats/${role}`;
+    return this.get(endpoint);
+  }
+
+  async getNotifications(userId: string) {
+    return this.get(`/dashboard/notifications/${userId}`);
+  }
+
+  async getEvents(userId: string) {
+    return this.get(`/dashboard/events/${userId}`);
+  }
+
+  async markNotificationRead(notificationId: string) {
+    return this.put(`/dashboard/notifications/${notificationId}/read`, {});
+  }
+
   // Transportation operations
   async getBusRoutes() {
     return this.get('/transportation/routes');
