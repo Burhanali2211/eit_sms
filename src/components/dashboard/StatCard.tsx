@@ -1,10 +1,17 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { DashboardStat } from "@/types/dashboard";
 import { ArrowDown, ArrowUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const StatCard = ({ title, value, description, change, increasing }: DashboardStat) => {
+interface StatCardProps {
+  title: string;
+  value: string | number;
+  description: string;
+  change?: string | number;
+  increasing?: boolean;
+}
+
+const StatCard = ({ title, value, description, change, increasing }: StatCardProps) => {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between pb-2">

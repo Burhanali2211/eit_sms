@@ -4,11 +4,39 @@ import { apiClient } from '@/utils/api/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
 
-interface DashboardStat {
+interface BackendDashboardStat {
   metric: string;
   value: number;
   label: string;
   description: string;
+}
+
+interface BackendNotification {
+  id: string;
+  title: string;
+  message: string;
+  type: 'info' | 'warning' | 'error' | 'success';
+  is_read: boolean;
+  created_at: string;
+}
+
+interface BackendEvent {
+  id: string;
+  title: string;
+  description: string;
+  start_date: string;
+  end_date: string;
+  location: string;
+  event_type: string;
+}
+
+// Frontend types
+interface DashboardStat {
+  title: string;
+  value: string | number;
+  description: string;
+  change?: string | number;
+  increasing?: boolean;
 }
 
 interface Notification {
@@ -50,21 +78,28 @@ export function useDashboardData() {
       if (statsResponse.error) {
         throw new Error(statsResponse.error);
       }
-      setStats(statsResponse.data || []);
+      
+      // Transform backend stats to frontend format
+      const transformedStats: DashboardStat[] = (statsResponse.data as BackendDashboardStat[] || []).map(stat => ({
+        title: stat.label,
+        value: stat.value,
+        description: stat.description
+      }));
+      setStats(transformedStats);
 
       // Fetch notifications
       const notificationsResponse = await apiClient.getNotifications(user.id);
       if (notificationsResponse.error) {
         throw new Error(notificationsResponse.error);
       }
-      setNotifications(notificationsResponse.data || []);
+      setNotifications(notificationsResponse.data as Notification[] || []);
 
       // Fetch events
       const eventsResponse = await apiClient.getEvents(user.id);
       if (eventsResponse.error) {
         throw new Error(eventsResponse.error);
       }
-      setEvents(eventsResponse.data || []);
+      setEvents(eventsResponse.data as Event[] || []);
 
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to fetch dashboard data';
@@ -79,7 +114,7 @@ export function useDashboardData() {
 
       // Set fallback data
       setStats([
-        { metric: 'total', value: 0, label: 'Loading...', description: 'Data will load shortly' }
+        { title: 'Loading...', value: 0, description: 'Data will load shortly' }
       ]);
       setNotifications([]);
       setEvents([]);
