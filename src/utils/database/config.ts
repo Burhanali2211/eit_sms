@@ -1,3 +1,4 @@
+
 // Database configuration with proper browser/server handling
 import { toast } from '@/hooks/use-toast';
 import { createPgPolyfills } from '../pg-polyfills';
@@ -14,22 +15,37 @@ export const DB_CONFIG = {
   port: parseInt(import.meta.env.VITE_PG_PORT || '5432'),
   database: import.meta.env.VITE_PG_DATABASE || 'edusync',
   user: import.meta.env.VITE_PG_USER || 'postgres',
-  password: import.meta.env.VITE_PG_PASSWORD || 'Admin',
+  password: import.meta.env.VITE_PG_PASSWORD || 'password',
   // Disable SSL in development environment
   ssl: import.meta.env.PROD ? { rejectUnauthorized: false } : false,
-  // Add the missing properties
+  // Connection settings
+  max: 20,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 2000,
+  // App settings
   environment: import.meta.env.VITE_APP_ENV || 'development',
   appName: import.meta.env.VITE_APP_NAME || 'EduSync'
 };
 
+// Backend configuration (for Node.js environment)
+export const BACKEND_DB_CONFIG = {
+  host: process.env.DB_HOST || 'localhost',
+  port: parseInt(process.env.DB_PORT || '5432'),
+  database: process.env.DB_NAME || 'edusync',
+  user: process.env.DB_USER || 'postgres',
+  password: process.env.DB_PASSWORD || 'password',
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+  max: 20,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 2000,
+};
+
 // This function allows us to isolate the import statement to avoid Vite analyzing it
-// It will be called only in Node.js environment
 const createNodePgPool = async () => {
   if (isBrowser) return null;
   
   try {
     // Using a direct dynamic import with a variable to prevent Vite from analyzing
-    // This is a workaround for the "Failed to resolve import" error
     const modulePath = 'pg';
     const pg = await import(/* @vite-ignore */ modulePath);
     const { Pool } = pg;
@@ -58,8 +74,6 @@ export class DatabasePool {
     if (isBrowser) {
       console.log('Browser environment detected, using mock database pool');
     } else {
-      // Don't attempt to initialize pg immediately
-      // We'll do it lazily when first needed
       this.initialized = false;
       this.initializing = false;
     }
@@ -138,7 +152,6 @@ export async function shouldUseMockData(): Promise<boolean> {
 
   try {
     const client = await pgPool.connect();
-    // client.release() would be called here in Node environment
     return false; // Connection successful, no need for mock data
   } catch (error) {
     console.error('Database connection failed, using mock data instead', error);
