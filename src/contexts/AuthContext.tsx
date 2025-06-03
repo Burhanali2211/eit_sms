@@ -1,183 +1,133 @@
-import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
-import { User, UserRole } from '@/types/dashboard';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { toast } from '@/components/ui/use-toast';
+
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { apiClient } from '@/utils/api/client';
+import { toast } from '@/hooks/use-toast';
+
+interface User {
+  id: string;
+  email: string;
+  name: string;
+  role: string;
+  status: string;
+  phone?: string;
+  address?: string;
+  last_login?: string;
+  created_at: string;
+}
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string, role: UserRole) => Promise<void>;
-  logout: () => void;
   isLoading: boolean;
   isAuthenticated: boolean;
+  login: (email: string, password: string) => Promise<boolean>;
+  logout: () => void;
+  register: (userData: any) => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
+interface AuthProviderProps {
+  children: ReactNode;
+}
 
-// Mock user data
-const mockUsers: Record<string, Omit<User, 'id'> & { password: string }> = {
-  'student@edusync.com': {
-    name: 'Alex Student',
-    email: 'student@edusync.com',
-    role: 'student',
-    password: 'password123',
-    createdAt: new Date().toISOString(),
-    avatar: 'https://github.com/shadcn.png',
-  },
-  'teacher@edusync.com': {
-    name: 'Taylor Teacher',
-    email: 'teacher@edusync.com',
-    role: 'teacher',
-    password: 'password123',
-    createdAt: new Date().toISOString(),
-    avatar: 'https://github.com/shadcn.png',
-  },
-  'principal@edusync.com': {
-    name: 'Pat Principal',
-    email: 'principal@edusync.com',
-    role: 'principal',
-    password: 'password123',
-    createdAt: new Date().toISOString(),
-    avatar: 'https://github.com/shadcn.png',
-  },
-  'admin@edusync.com': {
-    name: 'Admin User',
-    email: 'admin@edusync.com',
-    role: 'admin',
-    password: 'password123',
-    createdAt: new Date().toISOString(),
-    avatar: 'https://github.com/shadcn.png',
-  },
-  'financial@edusync.com': {
-    name: 'Finance Manager',
-    email: 'financial@edusync.com',
-    role: 'financial',
-    password: 'password123',
-    createdAt: new Date().toISOString(),
-    avatar: 'https://github.com/shadcn.png',
-  },
-  'admission@edusync.com': {
-    name: 'Admission Officer',
-    email: 'admission@edusync.com',
-    role: 'admission',
-    password: 'password123',
-    createdAt: new Date().toISOString(),
-    avatar: 'https://github.com/shadcn.png',
-  },
-  'schooladmin@edusync.com': {
-    name: 'School Admin',
-    email: 'schooladmin@edusync.com',
-    role: 'school-admin',
-    password: 'password123',
-    createdAt: new Date().toISOString(),
-    avatar: 'https://github.com/shadcn.png',
-  },
-  'labs@edusync.com': {
-    name: 'Labs Manager',
-    email: 'labs@edusync.com',
-    role: 'labs',
-    password: 'password123',
-    createdAt: new Date().toISOString(),
-    avatar: 'https://github.com/shadcn.png',
-  },
-  'club@edusync.com': {
-    name: 'Club Coordinator',
-    email: 'club@edusync.com',
-    role: 'club',
-    password: 'password123',
-    createdAt: new Date().toISOString(),
-    avatar: 'https://github.com/shadcn.png',
-  },
-  'library@edusync.com': {
-    name: 'Librarian',
-    email: 'library@edusync.com',
-    role: 'library',
-    password: 'password123',
-    createdAt: new Date().toISOString(),
-    avatar: 'https://github.com/shadcn.png',
-  },
-  'superadmin@edusync.com': {
-    name: 'Super Admin',
-    email: 'superadmin@edusync.com',
-    role: 'super-admin',
-    password: 'password123',
-    createdAt: new Date().toISOString(),
-    avatar: 'https://github.com/shadcn.png',
-  },
-};
-
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const navigate = useNavigate();
-  const location = useLocation();
 
   useEffect(() => {
-    // Check for existing session in localStorage
-    const storedUser = localStorage.getItem('eduSync_user');
-    if (storedUser) {
-      try {
-        setUser(JSON.parse(storedUser));
-      } catch (error) {
-        // If JSON parsing fails, clear the corrupted data
-        localStorage.removeItem('eduSync_user');
-        console.error("Failed to parse stored user data");
-      }
-    }
-    setIsLoading(false);
+    initializeAuth();
   }, []);
 
-  const login = async (email: string, password: string, role: UserRole) => {
-    setIsLoading(true);
-    
+  const initializeAuth = async () => {
     try {
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const mockUser = mockUsers[email.toLowerCase()];
-      
-      if (!mockUser || mockUser.password !== password) {
-        throw new Error('Invalid credentials');
+      const token = localStorage.getItem('authToken');
+      if (token) {
+        apiClient.setToken(token);
+        const response = await apiClient.verifyToken(token);
+        
+        if (response.error) {
+          // Token is invalid, clear it
+          localStorage.removeItem('authToken');
+          apiClient.clearToken();
+        } else {
+          setUser(response.data as User);
+        }
       }
-      
-      if (role !== 'student' && mockUser.role !== role) {
-        throw new Error(`Invalid role. You don't have ${role} privileges.`);
-      }
-
-      const userData: User = {
-        id: email.toLowerCase(),
-        name: mockUser.name,
-        email: mockUser.email,
-        role: mockUser.role,
-        avatar: mockUser.avatar,
-        createdAt: mockUser.createdAt,
-      };
-
-      setUser(userData);
-      localStorage.setItem('eduSync_user', JSON.stringify(userData));
-      
-      toast({
-        title: 'Login successful',
-        description: `Welcome back, ${userData.name}!`,
-      });
-      
-      // Redirect user to where they were trying to go or dashboard
-      const from = location.state?.from?.pathname || "/dashboard";
-      navigate(from, { replace: true });
     } catch (error) {
+      console.error('Auth initialization error:', error);
+      localStorage.removeItem('authToken');
+      apiClient.clearToken();
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const login = async (email: string, password: string): Promise<boolean> => {
+    try {
+      setIsLoading(true);
+      const response = await apiClient.login(email, password);
+      
+      if (response.error) {
+        toast({
+          title: 'Login Failed',
+          description: response.error,
+          variant: 'destructive',
+        });
+        return false;
+      }
+
+      const { user: userData, token } = response.data as any;
+      
+      setUser(userData);
+      apiClient.setToken(token);
+      
       toast({
-        variant: 'destructive',
-        title: 'Login failed',
-        description: error instanceof Error ? error.message : 'Unknown error occurred',
+        title: 'Welcome back!',
+        description: `Logged in as ${userData.name}`,
       });
-      throw error; // Re-throw to be caught by the login component
+      
+      return true;
+    } catch (error) {
+      console.error('Login error:', error);
+      toast({
+        title: 'Login Error',
+        description: 'An unexpected error occurred',
+        variant: 'destructive',
+      });
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const register = async (userData: any): Promise<boolean> => {
+    try {
+      setIsLoading(true);
+      const response = await apiClient.register(userData);
+      
+      if (response.error) {
+        toast({
+          title: 'Registration Failed',
+          description: response.error,
+          variant: 'destructive',
+        });
+        return false;
+      }
+
+      toast({
+        title: 'Registration Successful',
+        description: 'You can now log in with your credentials',
+      });
+      
+      return true;
+    } catch (error) {
+      console.error('Registration error:', error);
+      toast({
+        title: 'Registration Error',
+        description: 'An unexpected error occurred',
+        variant: 'destructive',
+      });
+      return false;
     } finally {
       setIsLoading(false);
     }
@@ -185,16 +135,35 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('eduSync_user');
-    navigate('/login');
+    localStorage.removeItem('authToken');
+    apiClient.clearToken();
+    
     toast({
-      title: 'Logged out successfully',
+      title: 'Logged out',
+      description: 'You have been successfully logged out',
     });
   };
 
+  const value: AuthContextType = {
+    user,
+    isLoading,
+    isAuthenticated: !!user,
+    login,
+    logout,
+    register,
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, logout, isLoading, isAuthenticated: !!user }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
+};
+
+export const useAuth = (): AuthContextType => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
 };

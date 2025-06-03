@@ -14,9 +14,21 @@ interface ApiResponse<T> {
 
 class ApiClient {
   private baseURL: string;
+  private token: string | null = null;
 
   constructor(baseURL: string = API_BASE_URL) {
     this.baseURL = baseURL;
+    this.token = localStorage.getItem('authToken');
+  }
+
+  setToken(token: string) {
+    this.token = token;
+    localStorage.setItem('authToken', token);
+  }
+
+  clearToken() {
+    this.token = null;
+    localStorage.removeItem('authToken');
   }
 
   private async request<T>(
@@ -25,12 +37,18 @@ class ApiClient {
   ): Promise<ApiResponse<T>> {
     try {
       const url = `${this.baseURL}${endpoint}`;
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+        ...options.headers as Record<string, string>,
+      };
+
+      if (this.token) {
+        headers['Authorization'] = `Bearer ${this.token}`;
+      }
+
       const response = await fetch(url, {
-        headers: {
-          'Content-Type': 'application/json',
-          ...options.headers,
-        },
         ...options,
+        headers,
       });
 
       if (!response.ok) {
@@ -71,6 +89,19 @@ class ApiClient {
     return this.request<T>(endpoint, { method: 'DELETE' });
   }
 
+  // Authentication operations
+  async login(email: string, password: string) {
+    return this.post('/auth/login', { email, password });
+  }
+
+  async register(userData: any) {
+    return this.post('/auth/register', userData);
+  }
+
+  async verifyToken(token: string) {
+    return this.post('/auth/verify', { token });
+  }
+
   // User operations
   async getUsers() {
     return this.get('/users');
@@ -104,6 +135,28 @@ class ApiClient {
 
   async markNotificationRead(notificationId: string) {
     return this.put(`/dashboard/notifications/${notificationId}/read`, {});
+  }
+
+  // Calendar operations
+  async getCalendarEvents(startDate?: string, endDate?: string) {
+    const params = new URLSearchParams();
+    if (startDate) params.append('start_date', startDate);
+    if (endDate) params.append('end_date', endDate);
+    
+    const query = params.toString() ? `?${params.toString()}` : '';
+    return this.get(`/calendar/events${query}`);
+  }
+
+  async createEvent(eventData: any) {
+    return this.post('/calendar/events', eventData);
+  }
+
+  async updateEvent(id: string, eventData: any) {
+    return this.put(`/calendar/events/${id}`, eventData);
+  }
+
+  async deleteEvent(id: string) {
+    return this.delete(`/calendar/events/${id}`);
   }
 
   // Transportation operations

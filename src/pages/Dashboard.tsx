@@ -7,8 +7,8 @@ import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import DashboardStats from "@/components/dashboard/DashboardStats";
 import RoleBasedContent from "@/components/dashboard/RoleBasedContent";
 import QuickActions from "@/components/dashboard/QuickActions";
-import RealTimeNotifications from "@/components/dashboard/RealTimeNotifications";
-import EnhancedCalendarWidget from "@/components/dashboard/EnhancedCalendarWidget";
+import FunctionalNotifications from "@/components/dashboard/FunctionalNotifications";
+import FunctionalCalendarWidget from "@/components/dashboard/FunctionalCalendarWidget";
 import DataAnalyticsWidget from "@/components/dashboard/DataAnalyticsWidget";
 import { useDashboardData } from "@/hooks/use-dashboard-data";
 import LoadingSpinner from "@/components/ui/loading-spinner";
@@ -48,10 +48,10 @@ const Dashboard = () => {
             <QuickActions />
             
             {/* Real-time Notifications */}
-            <RealTimeNotifications />
+            <FunctionalNotifications />
             
             {/* Enhanced Calendar */}
-            <EnhancedCalendarWidget />
+            <FunctionalCalendarWidget />
           </div>
 
           {/* Analytics Widget - Full Width */}
