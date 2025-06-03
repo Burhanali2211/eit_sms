@@ -13,6 +13,7 @@ import DataAnalyticsWidget from "@/components/dashboard/DataAnalyticsWidget";
 import { useDashboardData } from "@/hooks/use-dashboard-data";
 import LoadingSpinner from "@/components/ui/loading-spinner";
 import ErrorBoundary from "@/components/ui/error-boundary";
+import { UserRole } from "@/types/dashboard";
 
 const Dashboard = () => {
   const { user, isLoading: authLoading, isAuthenticated } = useAuth();
@@ -60,7 +61,7 @@ const Dashboard = () => {
           </div>
 
           {/* Role-specific dashboard content */}
-          <RoleBasedContent role={user.role} />
+          <RoleBasedContent role={user.role as UserRole} />
         </main>
       </DashboardLayout>
     </ErrorBoundary>

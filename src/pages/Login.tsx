@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -52,7 +51,7 @@ const Login = () => {
     }
     
     try {
-      await login(email, password, role);
+      await login(email, password);
       // No need for toast here as the login function handles it
     } catch (error) {
       // Error is handled in the login function

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -53,7 +52,7 @@ const FunctionalCalendarWidget = () => {
       if (response.error) {
         throw new Error(response.error);
       }
-      setEvents(response.data || []);
+      setEvents((response.data as CalendarEvent[]) || []);
     } catch (error) {
       console.error('Error fetching events:', error);
       toast({

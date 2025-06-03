@@ -11,6 +11,7 @@ interface User {
   status: string;
   phone?: string;
   address?: string;
+  avatar?: string;
   last_login?: string;
   created_at: string;
 }
