@@ -1,100 +1,89 @@
 
-import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
-import { ChevronRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { ArrowRight, Play } from "lucide-react";
 
 const HeroSection = () => {
-  const [currentSlide, setCurrentSlide] = useState(0);
-  
-  const slides = [
-    {
-      image: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&q=80",
-      title: "Shaping Tomorrow's Leaders",
-      subtitle: "Providing quality education for a brighter future",
-    },
-    {
-      image: "https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&q=80",
-      title: "Excellence in Education",
-      subtitle: "Cultivating innovation, creativity and leadership",
-    },
-    {
-      image: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&q=80",
-      title: "Unlocking Potential",
-      subtitle: "Discover the path to academic success with us",
-    }
-  ];
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev === slides.length - 1 ? 0 : prev + 1));
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [slides.length]);
-
-  const goToSlide = (index: number) => {
-    setCurrentSlide(index);
-  };
+  const navigate = useNavigate();
 
   return (
-    <div className="relative h-[85vh] overflow-hidden">
-      {/* Background Slides */}
-      {slides.map((slide, index) => (
-        <div
-          key={index}
-          className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-            currentSlide === index ? "opacity-100" : "opacity-0"
-          }`}
-          style={{
-            backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(${slide.image})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-        />
-      ))}
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+      {/* Background Image */}
+      <div 
+        className="absolute inset-0 z-0"
+        style={{
+          backgroundImage: 'url("https://images.unsplash.com/photo-1487958449943-2429e8be8625?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80")',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat'
+        }}
+      >
+        <div className="absolute inset-0 bg-blue-900/60"></div>
+      </div>
 
       {/* Content */}
-      <div className="absolute inset-0 flex flex-col items-center justify-center text-white px-4">
-        <div className="text-center max-w-3xl mx-auto">
-          <h1 className="text-4xl md:text-6xl font-bold mb-4 animate-fade-in">
-            {slides[currentSlide].title}
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
+        <div className="space-y-8">
+          <h1 className="text-4xl md:text-6xl font-bold leading-tight">
+            Welcome to
+            <span className="block text-yellow-400">EduSync School</span>
           </h1>
-          <p className="text-xl md:text-2xl mb-8 animate-fade-in">
-            {slides[currentSlide].subtitle}
+          
+          <p className="text-xl md:text-2xl max-w-3xl mx-auto leading-relaxed opacity-90">
+            Empowering minds, shaping futures. Join us in our mission to provide world-class education 
+            and nurture the leaders of tomorrow.
           </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4 animate-fade-in">
-            <Link to="/admissions">
-              <Button size="lg" className="bg-school-accent hover:bg-school-accent/90 text-white">
-                Apply Now <ChevronRight className="ml-2 h-4 w-4" />
-              </Button>
-            </Link>
-            <Link to="/academics">
-              <Button variant="outline" size="lg" className="border-white text-white hover:bg-white/10">
-                Learn More
-              </Button>
-            </Link>
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <Button 
+              size="lg"
+              onClick={() => navigate("/admission-process")}
+              className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold px-8 py-3 rounded-full"
+            >
+              Apply for Admission
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
+            
+            <Button 
+              size="lg"
+              variant="outline"
+              onClick={() => navigate("/about")}
+              className="border-white text-white hover:bg-white hover:text-blue-900 px-8 py-3 rounded-full"
+            >
+              <Play className="mr-2 h-5 w-5" />
+              Learn More
+            </Button>
+          </div>
+
+          {/* Stats */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-16">
+            <div className="text-center">
+              <div className="text-3xl md:text-4xl font-bold text-yellow-400">1500+</div>
+              <div className="text-sm md:text-base opacity-90">Students</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl md:text-4xl font-bold text-yellow-400">80+</div>
+              <div className="text-sm md:text-base opacity-90">Teachers</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl md:text-4xl font-bold text-yellow-400">25+</div>
+              <div className="text-sm md:text-base opacity-90">Years</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl md:text-4xl font-bold text-yellow-400">95%</div>
+              <div className="text-sm md:text-base opacity-90">Success Rate</div>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Slide Indicators */}
-      <div className="absolute bottom-10 left-0 right-0">
-        <div className="flex justify-center gap-3">
-          {slides.map((_, index) => (
-            <button
-              key={index}
-              className={`w-3 h-3 rounded-full transition-all ${
-                currentSlide === index
-                  ? "bg-white w-8"
-                  : "bg-white/50 hover:bg-white/80"
-              }`}
-              onClick={() => goToSlide(index)}
-              aria-label={`Go to slide ${index + 1}`}
-            />
-          ))}
+      {/* Scroll Indicator */}
+      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+        <div className="w-1 h-16 bg-white/30 rounded-full">
+          <div className="w-1 h-8 bg-white rounded-full animate-pulse"></div>
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 

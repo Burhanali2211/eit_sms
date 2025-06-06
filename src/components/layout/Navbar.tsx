@@ -1,195 +1,214 @@
 
-import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, ChevronDown } from "lucide-react";
-import { useTheme } from "@/contexts/ThemeContext";
+import { Menu, X, GraduationCap, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "@/components/ui/navigation-menu";
 
 const Navbar = () => {
-  const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const { isDarkMode } = useTheme();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 20) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
+      setIsScrolled(window.scrollY > 50);
     };
 
     window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const navLinks = [
-    { name: "Home", path: "/" },
-    { name: "About", path: "/about" },
+  const menuItems = [
     {
-      name: "Academics",
-      path: "#",
-      dropdown: true,
-      subLinks: [
-        { name: "Curriculum", path: "/academics/curriculum" },
-        { name: "Faculty", path: "/academics/faculty" },
-        { name: "Calendar", path: "/academics/calendar" },
+      title: "About",
+      items: [
+        { title: "About School", href: "/about" },
+        { title: "Principal's Message", href: "/principal-message" },
+        { title: "Vision & Mission", href: "/vision-mission" },
+        { title: "School History", href: "/history" },
+        { title: "Management Committee", href: "/management" },
       ]
     },
-    { name: "Admissions", path: "/admissions" },
-    { name: "Contact", path: "/contact" },
+    {
+      title: "Academics",
+      items: [
+        { title: "Curriculum", href: "/curriculum" },
+        { title: "Academic Calendar", href: "/academic-calendar" },
+        { title: "Class Schedule", href: "/class-schedule" },
+        { title: "Examination", href: "/examination" },
+        { title: "Results", href: "/results" },
+      ]
+    },
+    {
+      title: "Admissions",
+      items: [
+        { title: "Admission Process", href: "/admission-process" },
+        { title: "Fee Structure", href: "/fee-structure" },
+        { title: "Required Documents", href: "/documents" },
+        { title: "Online Application", href: "/online-application" },
+      ]
+    },
+    {
+      title: "Facilities",
+      items: [
+        { title: "Library", href: "/library" },
+        { title: "Laboratories", href: "/laboratories" },
+        { title: "Sports", href: "/sports" },
+        { title: "Transportation", href: "/transportation" },
+        { title: "Hostel", href: "/hostel" },
+      ]
+    },
   ];
 
   return (
-    <nav className={cn(
-      "fixed top-0 w-full z-50 transition-all duration-300",
-      isScrolled
-        ? "bg-background dark:bg-background shadow-md py-2"
-        : "bg-transparent py-4"
-    )}>
-      <div className="container mx-auto px-4">
-        <div className="flex justify-between items-center">
-          <Link to="/" className="flex items-center">
-            <span className="text-2xl font-bold text-school-primary">
-              EduSync
-              <span className="text-school-secondary">Academy</span>
-            </span>
+    <nav
+      className={cn(
+        "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
+        isScrolled
+          ? "bg-white/95 backdrop-blur-md shadow-lg border-b"
+          : "bg-white/80 backdrop-blur-sm"
+      )}
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16">
+          {/* Logo */}
+          <Link to="/" className="flex items-center space-x-2">
+            <GraduationCap className="h-8 w-8 text-blue-600" />
+            <span className="font-bold text-xl text-gray-900">EduSync</span>
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
-            {navLinks.map((link, index) => (
-              link.dropdown ? (
-                <div key={index} className="relative group">
-                  <button className={cn(
-                    "flex items-center font-medium",
-                    "text-foreground hover:text-school-primary"
-                  )}>
-                    {link.name}
-                    <ChevronDown className="ml-1 h-4 w-4" />
-                  </button>
-                  <div className={cn(
-                    "absolute left-0 mt-2 w-48 rounded-md shadow-lg hidden group-hover:block",
-                    "bg-background dark:bg-background border border-border"
-                  )}>
-                    <div className="py-1">
-                      {link.subLinks?.map((subLink, subIndex) => (
-                        <Link
-                          key={subIndex}
-                          to={subLink.path}
-                          className={cn(
-                            "block px-4 py-2 text-sm",
-                            "text-foreground hover:bg-muted"
-                          )}
-                        >
-                          {subLink.name}
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <Link
-                  key={index}
-                  to={link.path}
-                  className={cn(
-                    "font-medium",
-                    "text-foreground hover:text-school-primary"
-                  )}
-                >
-                  {link.name}
-                </Link>
-              )
-            ))}
-          </div>
+          <div className="hidden lg:flex items-center space-x-8">
+            <Link to="/" className="text-gray-700 hover:text-blue-600 transition-colors">
+              Home
+            </Link>
+            
+            <NavigationMenu>
+              <NavigationMenuList>
+                {menuItems.map((menu) => (
+                  <NavigationMenuItem key={menu.title}>
+                    <NavigationMenuTrigger className="text-gray-700 hover:text-blue-600">
+                      {menu.title}
+                    </NavigationMenuTrigger>
+                    <NavigationMenuContent>
+                      <ul className="grid w-48 gap-3 p-4">
+                        {menu.items.map((item) => (
+                          <li key={item.title}>
+                            <NavigationMenuLink asChild>
+                              <Link
+                                to={item.href}
+                                className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                              >
+                                <div className="text-sm font-medium leading-none">
+                                  {item.title}
+                                </div>
+                              </Link>
+                            </NavigationMenuLink>
+                          </li>
+                        ))}
+                      </ul>
+                    </NavigationMenuContent>
+                  </NavigationMenuItem>
+                ))}
+              </NavigationMenuList>
+            </NavigationMenu>
 
-          <div className="hidden md:block">
-            <Link to="/login">
-              <Button className="bg-school-primary hover:bg-school-primary/90 text-white">
-                Log In
-              </Button>
+            <Link to="/gallery" className="text-gray-700 hover:text-blue-600 transition-colors">
+              Gallery
+            </Link>
+            <Link to="/news" className="text-gray-700 hover:text-blue-600 transition-colors">
+              News & Events
+            </Link>
+            <Link to="/contact" className="text-gray-700 hover:text-blue-600 transition-colors">
+              Contact
             </Link>
           </div>
 
-          {/* Mobile Navigation Button */}
-          <div className="md:hidden">
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className={cn(
-                "focus:outline-none",
-                "text-foreground"
-              )}
+          {/* Login Button */}
+          <div className="hidden lg:flex items-center space-x-4">
+            <Button
+              onClick={() => navigate("/login")}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
             >
-              {isOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
+              Portal Login
+            </Button>
           </div>
+
+          {/* Mobile menu button */}
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="lg:hidden p-2 rounded-md text-gray-700 hover:text-blue-600"
+          >
+            {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </button>
         </div>
 
-        {/* Mobile Navigation Menu */}
-        {isOpen && (
-          <div className={cn(
-            "md:hidden mt-4 rounded-lg shadow-lg animate-fade-in",
-            "bg-background dark:bg-background border border-border"
-          )}>
-            <div className="flex flex-col py-4">
-              {navLinks.map((link, index) => (
-                <div key={index}>
-                  {link.dropdown ? (
-                    <>
-                      <button
-                        className={cn(
-                          "flex items-center justify-between w-full px-4 py-2",
-                          "text-foreground hover:bg-muted"
-                        )}
-                        onClick={(e) => {
-                          e.currentTarget.nextElementSibling?.classList.toggle('hidden');
-                        }}
-                      >
-                        {link.name}
-                        <ChevronDown className="h-4 w-4" />
-                      </button>
-                      <div className={cn(
-                        "hidden pl-4 ml-4",
-                        "border-l-2 border-school-primary/20"
-                      )}>
-                        {link.subLinks?.map((subLink, subIndex) => (
-                          <Link
-                            key={subIndex}
-                            to={subLink.path}
-                            className={cn(
-                              "block px-4 py-2 text-sm",
-                              "text-foreground hover:bg-muted"
-                            )}
-                            onClick={() => setIsOpen(false)}
-                          >
-                            {subLink.name}
-                          </Link>
-                        ))}
-                      </div>
-                    </>
-                  ) : (
+        {/* Mobile Navigation */}
+        {isMobileMenuOpen && (
+          <div className="lg:hidden">
+            <div className="px-2 pt-2 pb-3 space-y-1 bg-white border-t">
+              <Link
+                to="/"
+                className="block px-3 py-2 text-gray-700 hover:text-blue-600"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Home
+              </Link>
+              {menuItems.map((menu) => (
+                <div key={menu.title} className="space-y-1">
+                  <div className="px-3 py-2 font-medium text-gray-900">{menu.title}</div>
+                  {menu.items.map((item) => (
                     <Link
-                      to={link.path}
-                      className={cn(
-                        "block px-4 py-2",
-                        "text-foreground hover:bg-muted"
-                      )}
-                      onClick={() => setIsOpen(false)}
+                      key={item.title}
+                      to={item.href}
+                      className="block px-6 py-2 text-sm text-gray-700 hover:text-blue-600"
+                      onClick={() => setIsMobileMenuOpen(false)}
                     >
-                      {link.name}
+                      {item.title}
                     </Link>
-                  )}
+                  ))}
                 </div>
               ))}
-              <div className="mt-4 px-4">
-                <Link to="/login" onClick={() => setIsOpen(false)}>
-                  <Button className="w-full bg-school-primary hover:bg-school-primary/90 text-white">
-                    Log In
-                  </Button>
-                </Link>
+              <Link
+                to="/gallery"
+                className="block px-3 py-2 text-gray-700 hover:text-blue-600"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Gallery
+              </Link>
+              <Link
+                to="/news"
+                className="block px-3 py-2 text-gray-700 hover:text-blue-600"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                News & Events
+              </Link>
+              <Link
+                to="/contact"
+                className="block px-3 py-2 text-gray-700 hover:text-blue-600"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Contact
+              </Link>
+              <div className="px-3 py-2">
+                <Button
+                  onClick={() => {
+                    navigate("/login");
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  Portal Login
+                </Button>
               </div>
             </div>
           </div>

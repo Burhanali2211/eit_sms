@@ -2,10 +2,13 @@
 import { useEffect } from "react";
 import Navbar from "@/components/layout/Navbar";
 import HeroSection from "@/components/home/HeroSection";
-import CalendarNotifications from "@/components/home/CalendarNotifications";
-import AchievementsCarousel from "@/components/home/AchievementsCarousel";
+import AboutSection from "@/components/home/AboutSection";
+import AcademicsSection from "@/components/home/AcademicsSection";
+import AdmissionsSection from "@/components/home/AdmissionsSection";
 import FacilitiesSection from "@/components/home/FacilitiesSection";
-import PrincipalNote from "@/components/home/PrincipalNote";
+import NewsEvents from "@/components/home/NewsEvents";
+import PhotoGallery from "@/components/home/PhotoGallery";
+import ContactSection from "@/components/home/ContactSection";
 import Footer from "@/components/home/Footer";
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -13,7 +16,6 @@ import { useTheme } from "@/contexts/ThemeContext";
 const Index = () => {
   const { isDarkMode } = useTheme();
   
-  // Add scroll reveal effect
   useEffect(() => {
     const observerOptions = {
       root: null,
@@ -50,23 +52,18 @@ const Index = () => {
       "transition-colors duration-300"
     )}>
       <Navbar />
+      <HeroSection />
       
-      {/* Hero with floating effect */}
-      <div className="relative overflow-hidden">
-        <div className="absolute inset-0 z-0">
-          <div className="absolute top-20 left-10 w-72 h-72 bg-school-primary/20 rounded-full filter blur-3xl animate-float"></div>
-          <div className="absolute bottom-10 right-10 w-96 h-96 bg-school-secondary/20 rounded-full filter blur-3xl animate-float" style={{ animationDelay: '2s' }}></div>
-        </div>
-        <HeroSection />
-      </div>
-      
-      {/* Main content with reveal animations */}
       <div className="reveal-section">
-        <CalendarNotifications />
+        <AboutSection />
       </div>
       
       <div className="reveal-section">
-        <AchievementsCarousel />
+        <AcademicsSection />
+      </div>
+      
+      <div className="reveal-section">
+        <AdmissionsSection />
       </div>
       
       <div className="reveal-section">
@@ -74,7 +71,15 @@ const Index = () => {
       </div>
       
       <div className="reveal-section">
-        <PrincipalNote />
+        <NewsEvents />
+      </div>
+      
+      <div className="reveal-section">
+        <PhotoGallery />
+      </div>
+      
+      <div className="reveal-section">
+        <ContactSection />
       </div>
       
       <Footer />
