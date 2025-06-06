@@ -1,15 +1,15 @@
 
 import { useEffect } from "react";
 import Navbar from "@/components/layout/Navbar";
-import EnhancedHeroSection from "@/components/home/EnhancedHeroSection";
+import ModernHeroSection from "@/components/home/ModernHeroSection";
 import AboutSection from "@/components/home/AboutSection";
-import InteractiveStatsSection from "@/components/home/InteractiveStatsSection";
+import CleanStatsSection from "@/components/home/CleanStatsSection";
 import AcademicsSection from "@/components/home/AcademicsSection";
 import AdmissionsSection from "@/components/home/AdmissionsSection";
 import FacilitiesSection from "@/components/home/FacilitiesSection";
 import NewsEvents from "@/components/home/NewsEvents";
 import PhotoGallery from "@/components/home/PhotoGallery";
-import AdvancedTestimonialsCarousel from "@/components/home/AdvancedTestimonialsCarousel";
+import ModernTestimonialsCarousel from "@/components/home/ModernTestimonialsCarousel";
 import ContactSection from "@/components/home/ContactSection";
 import Footer from "@/components/home/Footer";
 import AchievementsCarousel from "@/components/home/AchievementsCarousel";
@@ -48,21 +48,16 @@ const Index = () => {
   }, []);
 
   return (
-    <div className={cn(
-      "min-h-screen flex flex-col",
-      "bg-gradient-to-b from-white via-gray-50 to-white",
-      "dark:from-gray-900 dark:via-gray-950 dark:to-gray-900",
-      "transition-colors duration-300"
-    )}>
+    <div className="min-h-screen flex flex-col bg-white dark:bg-gray-900 transition-colors duration-300">
       <Navbar />
-      <EnhancedHeroSection />
+      <ModernHeroSection />
       
       <div className="reveal-section">
         <AboutSection />
       </div>
       
       <div className="reveal-section">
-        <InteractiveStatsSection />
+        <CleanStatsSection />
       </div>
       
       <div className="reveal-section">
@@ -82,7 +77,7 @@ const Index = () => {
       </div>
       
       <div className="reveal-section">
-        <AdvancedTestimonialsCarousel />
+        <ModernTestimonialsCarousel />
       </div>
       
       <div className="reveal-section">
