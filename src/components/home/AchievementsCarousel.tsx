@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef, useCallback } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -93,109 +94,123 @@ const AchievementsCarousel = () => {
   }, [currentIndex, nextSlide]);
 
   return (
-    <div className="container-section">
-      <h2 className="section-heading">Our Achievements</h2>
-      
-      <div className="relative flex flex-col items-center py-10">
-        <div className="w-full flex justify-center items-center relative h-[400px] md:h-[500px]">
-          {achievements.map((achievement, index) => {
-            const position = getIndexPosition(index);
-            
-            let className = "absolute transition-all duration-500 rounded-lg overflow-hidden shadow-lg";
-            let width = "w-full md:w-2/3";
-            let zIndex = "z-0";
-            let opacity = "opacity-0";
-            let scale = "scale-90";
-            let transform = "";
-            
-            if (position === 0) {
-              // Current slide (center)
-              className += " md:left-1/2 md:-translate-x-1/2";
-              width = "w-full md:w-2/3";
-              zIndex = "z-30";
-              opacity = "opacity-100";
-              scale = "scale-100";
-            } else if (position === 1) {
-              // Next slide (right)
-              className += " right-0 md:right-4";
-              width = "hidden md:block md:w-1/3";
-              zIndex = "z-20";
-              opacity = "opacity-60";
-              transform = "translate-x-1/4";
-            } else if (position === achievements.length - 1) {
-              // Previous slide (left)
-              className += " left-0 md:left-4";
-              width = "hidden md:block md:w-1/3";
-              zIndex = "z-20";
-              opacity = "opacity-60";
-              transform = "-translate-x-1/4";
-            } else {
-              // Hidden slides
-              width = "hidden";
-            }
-            
-            return (
-              <div
-                key={achievement.id}
-                className={`${className} ${width} ${zIndex} ${opacity} ${scale} ${transform} h-full`}
-              >
-                <div className="h-full w-full bg-white rounded-lg overflow-hidden">
-                  <div className="relative h-3/5 overflow-hidden">
-                    <img
-                      src={achievement.image}
-                      alt={achievement.title}
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-                    <h3 className="absolute bottom-4 left-4 right-4 text-white text-xl md:text-2xl font-bold">{achievement.title}</h3>
-                  </div>
-                  <div className="p-4 h-2/5 overflow-auto">
-                    <p className="text-gray-700">{achievement.description}</p>
+    <section className="py-20 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-slate-900 dark:to-slate-800">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+            Our Achievements
+          </h2>
+          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+            Celebrating excellence and recognizing the outstanding accomplishments of our school community
+          </p>
+        </div>
+        
+        <div className="relative flex flex-col items-center py-10">
+          <div className="w-full flex justify-center items-center relative h-[400px] md:h-[500px]">
+            {achievements.map((achievement, index) => {
+              const position = getIndexPosition(index);
+              
+              let className = "absolute transition-all duration-700 ease-in-out rounded-lg overflow-hidden shadow-lg";
+              let width = "w-full md:w-2/3";
+              let zIndex = "z-0";
+              let opacity = "opacity-0";
+              let scale = "scale-90";
+              let transform = "";
+              
+              if (position === 0) {
+                // Current slide (center)
+                className += " md:left-1/2 md:-translate-x-1/2";
+                width = "w-full md:w-2/3";
+                zIndex = "z-30";
+                opacity = "opacity-100";
+                scale = "scale-100";
+              } else if (position === 1) {
+                // Next slide (right)
+                className += " right-0 md:right-4";
+                width = "hidden md:block md:w-1/3";
+                zIndex = "z-20";
+                opacity = "opacity-60";
+                transform = "translate-x-1/4";
+              } else if (position === achievements.length - 1) {
+                // Previous slide (left)
+                className += " left-0 md:left-4";
+                width = "hidden md:block md:w-1/3";
+                zIndex = "z-20";
+                opacity = "opacity-60";
+                transform = "-translate-x-1/4";
+              } else {
+                // Hidden slides
+                width = "hidden";
+              }
+              
+              return (
+                <div
+                  key={achievement.id}
+                  className={`${className} ${width} ${zIndex} ${opacity} ${scale} ${transform} h-full cursor-pointer hover:scale-105 transition-transform`}
+                  onClick={() => goToSlide(index)}
+                >
+                  <div className="h-full w-full bg-white dark:bg-slate-800 rounded-lg overflow-hidden shadow-xl">
+                    <div className="relative h-3/5 overflow-hidden">
+                      <img
+                        src={achievement.image}
+                        alt={achievement.title}
+                        className="w-full h-full object-cover transition-transform duration-700 hover:scale-110"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+                      <h3 className="absolute bottom-4 left-4 right-4 text-white text-xl md:text-2xl font-bold">
+                        {achievement.title}
+                      </h3>
+                    </div>
+                    <div className="p-6 h-2/5 overflow-auto">
+                      <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                        {achievement.description}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
-
-        <div className="flex justify-center mt-8 space-x-2">
-          <Button
-            onClick={prevSlide}
-            variant="outline"
-            size="icon"
-            className="rounded-full"
-            aria-label="Previous slide"
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          
-          <div className="flex items-center space-x-2">
-            {achievements.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => goToSlide(index)}
-                className={`w-2 h-2 rounded-full transition-all ${
-                  currentIndex === index
-                    ? "bg-school-primary w-6"
-                    : "bg-gray-300 hover:bg-gray-400"
-                }`}
-                aria-label={`Go to slide ${index + 1}`}
-              />
-            ))}
+              );
+            })}
           </div>
-          
-          <Button
-            onClick={nextSlide}
-            variant="outline"
-            size="icon"
-            className="rounded-full"
-            aria-label="Next slide"
-          >
-            <ChevronRight className="h-4 w-4" />
-          </Button>
+
+          <div className="flex justify-center mt-8 space-x-4">
+            <Button
+              onClick={prevSlide}
+              variant="outline"
+              size="icon"
+              className="rounded-full shadow-lg hover:shadow-xl transition-all"
+              aria-label="Previous slide"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            
+            <div className="flex items-center space-x-2">
+              {achievements.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => goToSlide(index)}
+                  className={`h-2 rounded-full transition-all ${
+                    currentIndex === index
+                      ? "bg-blue-600 w-8"
+                      : "bg-gray-300 w-2 hover:bg-gray-400"
+                  }`}
+                  aria-label={`Go to slide ${index + 1}`}
+                />
+              ))}
+            </div>
+            
+            <Button
+              onClick={nextSlide}
+              variant="outline"
+              size="icon"
+              className="rounded-full shadow-lg hover:shadow-xl transition-all"
+              aria-label="Next slide"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 

@@ -10,6 +10,7 @@ import NewsEvents from "@/components/home/NewsEvents";
 import PhotoGallery from "@/components/home/PhotoGallery";
 import ContactSection from "@/components/home/ContactSection";
 import Footer from "@/components/home/Footer";
+import AchievementsCarousel from "@/components/home/AchievementsCarousel";
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/contexts/ThemeContext";
 
@@ -56,6 +57,10 @@ const Index = () => {
       
       <div className="reveal-section">
         <AboutSection />
+      </div>
+      
+      <div className="reveal-section">
+        <AchievementsCarousel />
       </div>
       
       <div className="reveal-section">
