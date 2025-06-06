@@ -1,13 +1,15 @@
 
 import { useEffect } from "react";
 import Navbar from "@/components/layout/Navbar";
-import HeroSection from "@/components/home/HeroSection";
+import EnhancedHeroSection from "@/components/home/EnhancedHeroSection";
 import AboutSection from "@/components/home/AboutSection";
+import InteractiveStatsSection from "@/components/home/InteractiveStatsSection";
 import AcademicsSection from "@/components/home/AcademicsSection";
 import AdmissionsSection from "@/components/home/AdmissionsSection";
 import FacilitiesSection from "@/components/home/FacilitiesSection";
 import NewsEvents from "@/components/home/NewsEvents";
 import PhotoGallery from "@/components/home/PhotoGallery";
+import AdvancedTestimonialsCarousel from "@/components/home/AdvancedTestimonialsCarousel";
 import ContactSection from "@/components/home/ContactSection";
 import Footer from "@/components/home/Footer";
 import AchievementsCarousel from "@/components/home/AchievementsCarousel";
@@ -20,7 +22,7 @@ const Index = () => {
   useEffect(() => {
     const observerOptions = {
       root: null,
-      rootMargin: '0px',
+      rootMargin: '-100px',
       threshold: 0.1
     };
     
@@ -36,7 +38,7 @@ const Index = () => {
     
     const sections = document.querySelectorAll('.reveal-section');
     sections.forEach(section => {
-      section.classList.add('opacity-0', 'translate-y-10', 'transition-all', 'duration-700');
+      section.classList.add('opacity-0', 'translate-y-10', 'transition-all', 'duration-1000');
       observer.observe(section);
     });
     
@@ -48,15 +50,19 @@ const Index = () => {
   return (
     <div className={cn(
       "min-h-screen flex flex-col",
-      "bg-gradient-to-b from-white to-gray-50",
-      "dark:from-gray-900 dark:to-gray-950",
+      "bg-gradient-to-b from-white via-gray-50 to-white",
+      "dark:from-gray-900 dark:via-gray-950 dark:to-gray-900",
       "transition-colors duration-300"
     )}>
       <Navbar />
-      <HeroSection />
+      <EnhancedHeroSection />
       
       <div className="reveal-section">
         <AboutSection />
+      </div>
+      
+      <div className="reveal-section">
+        <InteractiveStatsSection />
       </div>
       
       <div className="reveal-section">
@@ -73,6 +79,10 @@ const Index = () => {
       
       <div className="reveal-section">
         <FacilitiesSection />
+      </div>
+      
+      <div className="reveal-section">
+        <AdvancedTestimonialsCarousel />
       </div>
       
       <div className="reveal-section">
