@@ -1,87 +1,25 @@
 
-import { useState, useEffect } from "react";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useDatabaseTable } from "@/hooks/use-database-connection";
 import { toast } from "@/hooks/use-toast";
 import ClassCard from "@/components/teacher/ClassCard";
 import ClassTabs from "@/components/teacher/ClassTabs";
-import { Student } from "@/types/dashboard";
+import { useClassManagement } from "@/hooks/useClassManagement";
 
 const Classes = () => {
-  // Fetch classes from database
-  const { 
-    data: classesData, 
-    isLoading: classesLoading, 
-    error: classesError 
-  } = useDatabaseTable<any>("classes", {
-    refreshInterval: 30000 // refresh every 30 seconds
-  });
-
-  // Use first class as default, or empty if none available
-  const defaultClass = classesData?.[0] || { 
-    id: 0, 
-    name: "", 
-    subject: "", 
-    students: 0, 
-    schedule: "", 
-    room: "" 
-  };
-  
-  const [selectedClass, setSelectedClass] = useState(defaultClass);
-  
-  // Update selected class when data loads
-  useEffect(() => {
-    if (classesData && classesData.length > 0) {
-      setSelectedClass(classesData[0]);
-    }
-  }, [classesData]);
-
-  // Fetch students for the selected class
-  const { 
-    data: studentsData, 
-    isLoading: studentsLoading, 
-    error: studentsError,
-    update: updateStudent
-  } = useDatabaseTable<Student>("students", {
-    filter: { 
-      grade: selectedClass?.grade || "",
-      section: selectedClass?.section || ""
-    }
-  });
-
-  const students = studentsData || [];
-  
-  const handleAttendance = async (studentId: string, present: boolean) => {
-    try {
-      // Calculate new attendance percentage
-      const student = students.find(s => s.id === studentId);
-      if (!student) return;
-      
-      // Update attendance in the database
-      const newAttendance = present ? 
-        Math.min(100, student.attendance + 1) : 
-        Math.max(0, student.attendance - 1);
-        
-      await updateStudent(studentId, { 
-        attendance: newAttendance,
-      });
-      
-      toast({
-        title: `Attendance Updated`,
-        description: `Student marked as ${present ? 'present' : 'absent'}`,
-      });
-    } catch (error) {
-      console.error("Error updating attendance:", error);
-      toast({
-        title: "Error",
-        description: "Failed to update attendance",
-        variant: "destructive"
-      });
-    }
-  };
+  const {
+    classesData,
+    classesLoading,
+    classesError,
+    selectedClass,
+    setSelectedClass,
+    students,
+    studentsLoading,
+    studentsError,
+    handleAttendance
+  } = useClassManagement();
   
   if (classesLoading) {
     return (
